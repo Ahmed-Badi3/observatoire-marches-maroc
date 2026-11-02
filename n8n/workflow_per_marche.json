@@ -1,0 +1,396 @@
+{
+  "name": "PER marché - test extraction",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "538f7ec3-e796-431f-a74a-8a1f9b07cbef",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "1755016a-af99-4a3f-8303-66b6eeb99177",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "paragraphes",
+              "cssSelector": "p",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "997d8d15-cad1-49d5-9288-de369ad43942",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Cet article a été publié le {{ $('Liste des articles').item.json.date_article }}.\n\nTu es analyste financier. À partir de l'article ci-dessous, extrais les ratios de valorisation du marché boursier marocain : le PER et le rendement du dividende, pour chaque année citée.\n\nRègles :\n- Une entrée par année et par périmètre.\n- perimetre : recopie le périmètre tel que l'article le nomme, en utilisant uniquement ces libellés : « Scope 40 » (les 40 valeurs suivies par BKGR), « marché total » (PER ou rendement de l'ensemble de la cote), « hors valeurs minières », ou « moyenne historique » suivi de la période exacte écrite dans l'article.\n- Ignore les PER « théoriques » ou « cibles », et les chiffres de sociétés individuelles : uniquement les ratios observés ou prévus pour le marché.\n- per : un nombre décimal (« 18 fois » → 18). Mets null s'il n'est pas donné.\n- rendement_dividende_pct : un nombre en % (« 2,9 % » → 2.9). Mets null s'il n'est pas donné.\n- estimation : false si l'année est antérieure à l'année de publication de l'article (chiffre réalisé), true sinon (prévision).\n- Pour une moyenne historique : annee = null et perimetre = « moyenne historique » suivi de la période exacte écrite dans l'article (par exemple « moyenne historique 10 ans », « moyenne historique 5 ans », « moyenne récente »). N'invente jamais de période.\n- source : le nom de la société de bourse ou du bureau d'études qui publie les chiffres.\n- N'invente aucun chiffre : uniquement ceux écrits dans l'article.\n\nRéponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, dans ce format (exemple fictif) :\n{\"valorisations\": [\n  {\"annee\": 2030, \"perimetre\": \"ensemble du marché\", \"per\": 15.5, \"rendement_dividende_pct\": 3.2, \"estimation\": true, \"source\": \"Société X\"},\n  {\"annee\": 2029, \"perimetre\": \"hors valeurs minières\", \"per\": 12.0, \"rendement_dividende_pct\": null, \"estimation\": true, \"source\": \"Société X\"}\n]}\nNe renvoie jamais le schéma JSON lui-même, seulement les données.\n\nArticle :\n{{ $json.paragraphes.join('\\n') }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        896,
+        0
+      ],
+      "id": "cd12c290-dc47-41eb-9824-64bf21a76d3d",
+      "name": "Basic LLM Chain",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        784,
+        208
+      ],
+      "id": "3b2a40d3-a104-4f97-9b5a-63e9914be284",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "AiUIaEtrbou1TA0i",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Les articles de départ, dans le même ordre que les réponses de l'IA\nconst articles = $('Liste des articles').all();\n\nconst normaliserSource = s =>\n  /bkgr|bmce/i.test(s ?? '') ? 'BMCE Capital Global Research' : (s ?? 'Inconnue');\n\n// Liste fermée des périmètres acceptés pour une année donnée\nconst PERIMETRES = ['Scope 40', 'marché total', 'hors valeurs minières'];\n\n// Normalise le libellé d'une moyenne, ou renvoie null s'il est inconnu\nfunction normaliserMoyenne(libelle) {\n  if (/r[ée]cente/i.test(libelle)) return 'moyenne récente (période non précisée)';\n  const m = libelle.match(/(\\d+)\\s*ans/i);\n  return m ? `moyenne historique ${m[1]} ans` : null;\n}\n\nconst sorties = [];\n\n$input.all().forEach((item, i) => {\n  const article = articles[i].json;\n  const nettoye = item.json.text.replace(/```json|```/g, '').trim();\n\n  let donnees;\n  try {\n    donnees = JSON.parse(nettoye);\n  } catch (e) {\n    throw new Error(`Réponse JSON illisible pour ${article.url}`);\n  }\n  if (!donnees.valorisations || donnees.valorisations.length === 0) {\n    throw new Error(`Aucune valorisation trouvée pour ${article.url}`);\n  }\n\n  for (const v of donnees.valorisations) {\n    // Règle 1 : une ligne sans aucun chiffre ne sert à rien\n    if (v.per === null && v.rendement_dividende_pct === null) continue;\n\n    let perimetre = v.perimetre;\n    let estimation = v.estimation;\n\n    if (v.annee === null) {\n      // Règle 2 : une moyenne a un libellé standard et n'est jamais une prévision\n      perimetre = normaliserMoyenne(perimetre);\n      estimation = false;\n      if (!perimetre) {\n        throw new Error(`Libellé de moyenne inconnu « ${v.perimetre} » pour ${article.url}`);\n      }\n    } else if (!PERIMETRES.includes(perimetre)) {\n      // Règle 3 : un périmètre hors de la liste fermée arrête le workflow\n      throw new Error(`Périmètre inconnu « ${perimetre} » pour ${article.url}`);\n    }\n\n    sorties.push({\n      json: {\n        annee: v.annee,\n        perimetre: perimetre,\n        per: v.per,\n        rendement_dividende_pct: v.rendement_dividende_pct,\n        estimation: estimation,\n        source: normaliserSource(v.source),\n        url_article: article.url,\n        date_article: article.date_article\n      }\n    });\n  }\n});\n\nreturn sorties;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        0
+      ],
+      "id": "160c867f-984a-443a-a751-5219f28cef2c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "staging",
+          "mode": "list",
+          "cachedResultName": "staging"
+        },
+        "table": {
+          "__rl": true,
+          "value": "valorisation_marche",
+          "mode": "list",
+          "cachedResultName": "valorisation_marche"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "estimation": false,
+            "id": 0,
+            "annee": 0,
+            "per": 0,
+            "rendement_dividende_pct": 0
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "annee",
+              "displayName": "annee",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "perimetre",
+              "displayName": "perimetre",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "per",
+              "displayName": "per",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rendement_dividende_pct",
+              "displayName": "rendement_dividende_pct",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estimation",
+              "displayName": "estimation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "url_article",
+              "displayName": "url_article",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date_extraction",
+              "displayName": "date_extraction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "skipOnConflict": true
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        1488,
+        0
+      ],
+      "id": "80d48870-6eb3-49c2-8df7-50fc271c2e65",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "78d1sbbqMrD93wUH",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { url: 'https://boursenews.ma/article/marches/entreprises-cotees-bkgr-publie-ses-previsions-2024-2025', date_article: '2024-05-15' } },\n  { json: { url: 'https://boursenews.ma/article/marches/societes-cotees-bkgr-anticipation-capacite-beneficiaire-2024', date_article: '2024-10-22' } },\n  { json: { url: 'https://boursenews.ma/article/marches/CFG-bank-devoile-previsions-2025', date_article: '2025-01-29' } },\n  { json: { url: 'https://boursenews.ma/article/marches/bourse-cfg-bank-devoile-ses-previsions-2026-et-huit-actions-conseillees', date_article: '2026-02-09' } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "1638fd46-c02d-4d1c-8437-4e0ef2c4f26b",
+      "name": "Liste des articles"
+    },
+    {
+      "parameters": {
+        "chatId": "6861543591",
+        "text": "=   ✅ Workflow PER terminé\n   📰 Articles traités : {{ $('Liste des articles').all().length }}\n   📊 Lignes extraites par l'IA : {{ $('Code in JavaScript').all().length }}\n   🕒 {{ $now.format('dd/MM/yyyy HH:mm') }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1712,
+        0
+      ],
+      "id": "bba03794-b4d6-4cfa-a339-b3415bf568da",
+      "name": "Send a text message",
+      "webhookId": "450881db-f19e-419c-aef2-be063f34a448",
+      "executeOnce": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "TM4kUbCgDE8zUDML",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Liste des articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Liste des articles": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Africa/Casablanca",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "6c6039f1-e6ab-46da-b069-52bf27e533d8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5107dc7535ae574626ffb745665a2ce03f13a1e977623abd006b8124634fff5e"
+  },
+  "nodeGroups": [],
+  "id": "sOrUdo5jccZjeT4s",
+  "tags": []
+}

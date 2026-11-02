@@ -1,0 +1,147 @@
+{
+  "name": "Agent analyste",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fa649b48-2646-4679-ac29-8cc6224961e8",
+      "name": "When chat message received",
+      "webhookId": "254559e4-e67c-44e6-b641-f119c30b6d95"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Tu es un analyste financier qui répond aux questions sur le marché financier marocain à partir de la base PostgreSQL du projet « Observatoire des marchés financiers marocains ».\n\nTables disponibles :\n- staging.valorisation_marche (annee, perimetre, per, rendement_dividende_pct, estimation, source, url_article, date_article) : PER et rendement du dividende extraits d'études de sociétés de bourse. estimation = true pour une prévision. perimetre vaut « Scope 40 », « marché total », « hors valeurs minières » ou « moyenne historique … ».\n- dw.v_indices_synthese (indice, debut, fin, rendement_total_pct, volatilite_annualisee_pct, pire_drawdown_pct, drawdown_actuel_pct) : synthèse du MASI et du MASI 20.\n- dw.v_indices_annuel (indice, annee, nb_seances, cloture_fin, rendement_pct, volatilite_annualisee_pct, pire_drawdown_pct).\n- dw.fact_opcvm_hebdo (date, categorie, nb_opcvm, actif_net, souscriptions, rachats, flux_net, indice_perf, perf_hebdo_pct) : statistiques hebdomadaires des OPCVM (montants en MAD).\n\nRègles :\n- Utilise l'outil SQL pour chaque question chiffrée. N'invente jamais un chiffre.\n- Écris uniquement des requêtes SELECT, avec LIMIT 50 au maximum.\n- Pour un PER ou un rendement, cite toujours la source, le périmètre et la date de l'étude.\n- Réponds en français, de façon concise. Montants en millions ou milliards de MAD."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "1f01c9e3-517b-4bad-95f2-59b5a7a78c1a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "44a0a409-72d9-4cda-9aef-a2db8462839d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "AiUIaEtrbou1TA0i",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        240,
+        208
+      ],
+      "id": "7a57ee19-709a-4fb9-a943-4ab7905a292e",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "  {{ $fromAI('requete_sql', 'Une requête SQL SELECT valide pour PostgreSQL', 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.7,
+      "position": [
+        384,
+        208
+      ],
+      "id": "c05159d6-fd70-4d0e-8449-3a33e2390b6e",
+      "name": "Execute a SQL query in Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "TqjjYIHg0ytW7Sed",
+          "name": "agent_lecture"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query in Postgres": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0fd34e09-8c10-4944-a7c9-6ea8ccdbf1ab",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5107dc7535ae574626ffb745665a2ce03f13a1e977623abd006b8124634fff5e"
+  },
+  "nodeGroups": [],
+  "id": "4hnYVZVPvLxbK9N5",
+  "tags": []
+}

@@ -1,0 +1,16 @@
+# Identifiants : ne JAMAIS publier
+scripts/config.py
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Données brutes téléchargées (213 fichiers AMMC, régénérables avec les scripts)
+data/raw/
+
+# Fichiers temporaires
+*.tmp
+~$*
+.DS_Store
+Thumbs.db
