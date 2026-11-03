@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: inflation_mensuelle
+    description: "Inflation mensuelle et sur un an (glissement annuel), calculée à partir de l'IPC du HCP"
+    columns:
+      - name: date_ref
+        description: "Premier jour du mois"
+        tests:
+          - unique
+          - not_null
+      - name: indice_general
+        description: "Indice des prix à la consommation, base 100 = 2017"
+        tests:
+          - not_null
+
+  - name: croissance_pib
+    description: "Croissance du PIB en volume, sur un an et d'un trimestre à l'autre"
+    columns:
+      - name: date_ref
+        tests:
+          - unique
+          - not_null
+      - name: pib_volume
+        tests:
+          - not_null
+
+  - name: chomage_trimestriel
+    description: "Taux de chômage national, urbain, rural et des 15-24 ans"
+    columns:
+      - name: date_ref
+        tests:
+          - unique
+          - not_null
+      - name: chomage_national_pct
+        tests:
+          - not_null
+
+  - name: decisions_bam
+    description: "Décisions de taux de Bank Al-Maghrib, avec variation en points de base"
+    columns:
+      - name: date_effet
+        tests:
+          - unique
+          - not_null
+      - name: type_decision
+        tests:
+          - accepted_values:
+              values: ['initial', 'hausse', 'baisse', 'maintien']
+
+  - name: taux_directeur_quotidien
+    description: "Taux directeur en vigueur pour chaque jour calendaire depuis 2017"
+    columns:
+      - name: date_jour
+        tests:
+          - unique
+          - not_null
+      - name: taux_directeur_pct
+        tests:
+          - not_null

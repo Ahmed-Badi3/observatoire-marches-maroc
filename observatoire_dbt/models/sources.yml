@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: staging
+    description: "Données brutes chargées par les scripts Python"
+    tables:
+      - name: macro_indicateurs
+        description: "Indicateurs HCP et BAM au format long (une ligne = une date x un indicateur)"
