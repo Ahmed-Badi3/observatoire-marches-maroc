@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: masi_et_taux_quotidien
+    description: "Clôture du MASI et taux directeur en vigueur pour chaque séance"
+    columns:
+      - name: date_seance
+        tests:
+          - unique
+          - not_null
+      - name: taux_directeur_pct
+        tests:
+          - not_null
