@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: masi_vs_macro_trimestriel
+    description: "Performance trimestrielle et annuelle du MASI face à la croissance du PIB et au chômage"
+    columns:
+      - name: date_ref
+        tests:
+          - unique
+          - not_null

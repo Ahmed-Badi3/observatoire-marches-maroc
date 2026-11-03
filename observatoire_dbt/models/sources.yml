@@ -6,3 +6,5 @@ sources:
     tables:
       - name: macro_indicateurs
         description: "Indicateurs HCP et BAM au format long (une ligne = une date x un indicateur)"
+      - name: bvc_indices
+        description: "Clôtures quotidiennes du MASI et du MASI 20 (Bourse de Casablanca, phase 1)"

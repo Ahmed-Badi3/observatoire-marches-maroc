@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: masi_autour_decisions_bam
+    description: "Étude d'événement : MASI 5 et 20 séances après chaque annonce de Bank Al-Maghrib"
+    columns:
+      - name: date_annonce
+        tests:
+          - unique
+          - not_null
+
+  - name: masi_rendement_reel
+    description: "MASI nominal et réel (déflaté par l'IPC du HCP), base 100, fin de mois"
+    columns:
+      - name: mois
+        tests:
+          - unique
+          - not_null
