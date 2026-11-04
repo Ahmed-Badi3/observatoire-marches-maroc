@@ -32,3 +32,26 @@ models:
       - name: indice
         tests:
           - not_null
+
+  - name: fonds_taux_annuel
+    description: "Q1 : rendement annuel de chaque fonds de taux et variation du taux 10 ans sur l'année"
+    columns:
+      - name: categorie
+        tests:
+          - not_null
+      - name: annee
+        tests:
+          - not_null
+      - name: rendement_pct
+        tests:
+          - not_null
+
+  - name: sensibilite_fonds_taux
+    description: "Q2 : sensibilité implicite (−pente de régression) des fonds de taux à la variation du taux 10 ans"
+    columns:
+      - name: periode
+        tests:
+          - not_null
+      - name: categorie
+        tests:
+          - not_null
