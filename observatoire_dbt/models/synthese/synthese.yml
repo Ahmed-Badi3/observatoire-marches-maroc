@@ -1,0 +1,35 @@
+version: 2
+
+sources:
+  - name: staging_synthese
+    schema: staging
+    tables:
+      - name: ammc_indices
+        description: Indices hebdomadaires des OPCVM par catégorie (AMMC), colonnes date, categorie, indice
+
+models:
+  - name: synthese_rendements_hebdo
+    description: >
+      Rendement hebdomadaire de chaque placement (MASI, fonds Actions, Diversifiés, OMLT, OCT, Monétaire)
+      et des 3 portefeuilles types, sur la période commune (dates AMMC couvertes par le MASI).
+    columns:
+      - name: actif
+        tests:
+          - not_null
+      - name: rendement_hebdo
+        tests:
+          - not_null
+
+  - name: synthese_classes_actifs
+    description: Une ligne par placement ou portefeuille — rendement, volatilité, pire baisse, ratio rendement/risque.
+    columns:
+      - name: actif
+        tests:
+          - unique
+          - not_null
+
+  - name: synthese_correlations
+    description: Corrélation des rendements hebdomadaires entre chaque paire de placements.
+
+  - name: synthese_annuel
+    description: Rendement de chaque placement et portefeuille par année civile (2026 = jusqu'à la dernière semaine disponible).

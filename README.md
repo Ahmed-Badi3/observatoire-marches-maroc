@@ -4,7 +4,11 @@
 
 Projet d'analyse de données de bout en bout : collecte automatisée (scraping), base PostgreSQL en schéma en étoile, transformations versionnées et testées avec dbt, analyses SQL / Python, dashboard Power BI, et automatisation avec n8n et une IA (extraction de données de presse, agent analyste).
 
-> Phases 1 et 2 terminées : OPCVM (module 4), marché actions (module 2), contexte économique (module 1), taux et obligations (module 3). Données de septembre 2022 à novembre 2026.
+> Les 6 modules sont terminés : OPCVM (4), marché actions (2), contexte économique (1), taux et obligations (3), introductions en bourse (5) et synthèse quantitative (6). Données de septembre 2022 à novembre 2026.
+
+## En une phrase
+
+Sur 2023–2026, les actions ont rapporté le plus (+42 % pour le MASI) mais tous les placements ont un rendement par unité de risque presque identique : il fallait choisir son niveau de risque, diversifier avec des fonds de taux, et surtout ne pas acheter après la hausse, ce que les épargnants marocains font pourtant, en OPCVM comme en IPO.
 
 ---
 
@@ -68,6 +72,49 @@ Régression du rendement hebdomadaire sur la variation du taux 10 ans (201 semai
 **11. Les épargnants obligataires suivent moins la tendance que ceux des fonds actions.**
 Corrélation des flux avec la performance passée : **0,15** pour les fonds MLT (contre 0,43 pour les fonds actions). Après +54 Md MAD de souscriptions en 2024–2025, les fonds MLT perdent **−17,5 Md MAD** en 2026, au profit des fonds monétaires (+34 Md) et CT (+24 Md).
 
+### Introductions en bourse (phase 3, module 5)
+
+**12. Les IPO récentes battent le MASI, pour ceux qui les ont souscrites.**
+Sur les 6 IPO de décembre 2023 à juillet 2026, 5 font mieux que le MASI depuis leur introduction, de **+13 à +36 points**.
+
+| IPO | 1re cotation | Sursouscription | 5 séances | 1 mois | Depuis l'IPO (03/11/2026) | Écart avec le MASI |
+|---|---|---|---|---|---|---|
+| CFG Bank | 18/12/2023 | 34,7x | +28,2 % | +38,4 % | +66,4 % | +31,2 pts |
+| CMGP | 16/12/2024 | 37x | +38,7 % | +75,5 % | +25,0 % | +13,5 pts |
+| Vicenne | 15/07/2025 | 64x | +61,0 % | +92,8 % | +21,6 % | +35,0 pts |
+| Cash Plus | 08/12/2025 | 64x | +61,0 % | +57,0 % | +6,0 % | +17,3 pts |
+| SGTM | 16/12/2025 | 34,1x | +61,0 % | +111,0 % | +24,8 % | +36,4 pts |
+| T2S | 27/07/2026 | 43,75x | +7,1 % | +6,7 % | −9,4 % | −1,8 pt |
+
+**13. Le premier jour est plafonné, la vraie hausse vient après.**
+Cinq titres gagnent exactement environ +10 % à la première séance (seuil de variation de la Bourse), puis jusqu'à +61 % en 5 séances.
+
+**14. Racheter une IPO en bourse après le premier mois fait perdre.**
+Acheté au cours du 20e jour et gardé jusqu'au 03/11/2026 : SGTM **−40,9 %**, Vicenne −36,9 %, Cash Plus −32,5 %, CMGP −28,8 %, T2S −15,1 % ; seule CFG Bank gagne (+20,2 %). Et le souscripteur, servi à 1,5–3 %, gagne moins de 1,10 DH pour 100 DH demandés.
+
+### Synthèse quantitative (phase 4, module 6)
+
+**15. Plus de rendement, c'est autant plus de risque.**
+Novembre 2023 → octobre 2026 (153 semaines), avec 3 portefeuilles types construits à partir des fonds (prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70 en monétaire / OMLT / actions) :
+
+| Placement | Rendement cumulé | Rendement annualisé | Volatilité | Pire baisse | Ratio de Sharpe |
+|---|---|---|---|---|---|
+| MASI | +42,3 % | +12,7 % | 15,2 % | −16,2 % | 0,66 |
+| Fonds Actions | +39,6 % | +12,0 % | 16,2 % | −19,0 % | 0,57 |
+| Portefeuille dynamique | +31,7 % | +9,8 % | 11,8 % | −13,8 % | 0,59 |
+| Portefeuille équilibré | +23,5 % | +7,4 % | 7,5 % | −8,4 % | 0,62 |
+| Fonds obligataires MLT | +14,3 % | +4,7 % | 3,3 % | −2,5 % | 0,57 |
+| Portefeuille prudent | +13,9 % | +4,5 % | 3,0 % | −2,2 % | 0,58 |
+| Monétaire | +8,4 % | +2,8 % | 1,2 % | −1,2 % | — |
+
+Tous les ratios de Sharpe sont entre 0,57 et 0,66 : aucun placement n'est « meilleur ». Le portefeuille équilibré garde 58 % du rendement du MASI avec la moitié de son risque.
+
+**16. 2026 inverse le classement.** Après +22,6 % (2024) et +24,5 % (2025) pour les fonds actions, 2026 ne laisse gagner que les fonds CT (+2,1 %) et monétaires (+2,0 %) ; le portefeuille prudent limite la perte à −0,5 %, le dynamique perd −6,2 %.
+
+**17. La diversification fonctionne.** Corrélation hebdomadaire du MASI : 0,92 avec les fonds actions, mais seulement **0,38** avec les fonds obligataires MLT et **0,21** avec les fonds CT.
+
+**18. Les fonds actions ne battent pas l'indice.** +39,6 % contre +42,3 % pour le MASI, avec plus de volatilité, alors que le MASI ne compte pas les dividendes : l'écart correspond aux frais et aux choix de gestion.
+
 ---
 
 ## Architecture
@@ -75,9 +122,10 @@ Corrélation des flux avec la performance passée : **0,15** pour les fonds MLT 
 ```mermaid
 flowchart LR
     A[AMMC<br/>213 fichiers Excel hebdo] --> P[Python<br/>scraping, nettoyage,<br/>contrôles qualité]
-    B[Bourse de Casablanca<br/>MASI, MASI 20] --> P
+    B[Bourse de Casablanca<br/>MASI, MASI 20,<br/>cours des IPO] --> P
     H[HCP<br/>inflation, PIB, chômage] --> P
     R[Bank Al-Maghrib<br/>taux directeur,<br/>courbe des taux BDT] --> P
+    I[Presse financière<br/>fiches des IPO] --> T
     C[Articles de presse<br/>études BKGR, CFG] --> N[n8n + LLM Gemini<br/>extraction PER / dividendes]
     P --> S[(PostgreSQL<br/>schéma staging)]
     N --> S
@@ -96,7 +144,7 @@ flowchart LR
 | Collecte et nettoyage | Python 3.13 : requests, BeautifulSoup, pandas, python-calamine |
 | Stockage | PostgreSQL 18 : schéma `staging` (données publiées), `dw` (vues en étoile), `analytics` (modèles dbt) |
 | Chargement | SQLAlchemy + psycopg, upsert (`ON CONFLICT`) |
-| Transformation | dbt (dbt-core 1.11 + dbt-postgres) : 16 modèles, tests automatiques, documentation |
+| Transformation | dbt (dbt-core 1.11 + dbt-postgres) : 21 modèles et 1 seed, tests automatiques, documentation |
 | Analyse | SQL (fonctions de fenêtre, interpolation, régression `regr_slope`, corrélations), pandas |
 | Visualisation | Power BI Desktop (import, relations un-à-plusieurs, mesures DAX, thème JSON) |
 | Automatisation et IA | n8n (auto-hébergé), Google Gemini, Telegram |
@@ -116,6 +164,7 @@ flowchart LR
 │   ├── 06_extraire_macro.py        # HCP (inflation, PIB, chômage) + taux directeur BAM
 │   ├── 07_collecter_courbe_bam.py  # scraping de la courbe des taux BAM (relançable)
 │   ├── 08_charger_courbe_bam.py    # chargement de la courbe des taux (upsert)
+│   ├── 09_charger_cours_ipo.py     # cours des IPO et du MASI (détection automatique des colonnes)
 │   └── config.example.py           # modèle de configuration (copier en config.py)
 ├── sql/
 │   ├── 01_staging_ammc.sql         # tables staging AMMC
@@ -125,10 +174,14 @@ flowchart LR
 │   ├── 05_staging_macro.sql        # indicateurs macroéconomiques
 │   └── 06_staging_taux.sql         # courbe des taux de référence BAM
 ├── observatoire_dbt/               # projet dbt (schéma analytics)
+│   ├── seeds/
+│   │   └── ipo_operations.csv      # fiche de chaque IPO (prix, sursouscription…, une source par ligne)
 │   └── models/
 │       ├── sources.yml             # tables staging utilisées
 │       ├── macro/                  # module 1 : inflation, PIB, chômage, décisions BAM, MASI réel
-│       └── obligations/            # module 3 : courbe interpolée, sensibilité, flux
+│       ├── obligations/            # module 3 : courbe interpolée, sensibilité, flux
+│       ├── ipo/                    # module 5 : performance des IPO face au MASI
+│       └── synthese/               # module 6 : classes d'actifs, portefeuilles types, corrélations
 ├── n8n/
 │   ├── workflow_per_marche.json    # extraction PER / dividendes (HTTP → HTML → LLM → contrôles → PostgreSQL → Telegram)
 │   └── workflow_agent_analyste.json # agent IA avec outil SQL en lecture seule
@@ -138,6 +191,7 @@ flowchart LR
 ├── data/
 │   ├── raw/macro/                  # fichiers HCP + taux_directeur_bam.csv
 │   ├── raw/taux/                   # courbe_bam_brut.csv
+│   ├── raw/ipo/                    # cours quotidiens des IPO et du MASI (Bourse de Casablanca)
 │   └── processed/                  # CSV nettoyés
 └── docs/images/                    # captures
 ```
@@ -190,9 +244,10 @@ Leçons tirées :
 4. Exécuter `sql/01_staging_ammc.sql`, puis les scripts `01` à `05` dans l'ordre
 5. Exécuter `sql/02_dw_phase1.sql`, `sql/03_dw_marche_actions.sql` et `sql/04_staging_valorisation.sql`
 6. Exécuter `sql/05_staging_macro.sql` et `sql/06_staging_taux.sql`, puis les scripts `06` à `08`
-7. Depuis `observatoire_dbt/` : `dbt build` (construit et teste le schéma `analytics`)
-8. Ouvrir le dashboard Power BI et actualiser la connexion
-9. (Optionnel) importer les workflows `n8n/*.json` dans n8n et créer ses propres identifiants (Gemini, Telegram, PostgreSQL)
+7. Télécharger les cours des IPO et du MASI (Bourse de Casablanca → Market Data → Cours) dans `data/raw/ipo/`, puis lancer `09_charger_cours_ipo.py`
+8. Depuis `observatoire_dbt/` : `dbt build` (seed des IPO, construction et tests du schéma `analytics`)
+9. Ouvrir le dashboard Power BI et actualiser la connexion
+10. (Optionnel) importer les workflows `n8n/*.json` dans n8n et créer ses propres identifiants (Gemini, Telegram, PostgreSQL)
 
 L'historique du MASI s'exporte manuellement depuis le site de la Bourse de Casablanca (3 ans maximum). La collecte complète de la courbe des taux BAM prend environ 1 h 30 (une page par jour, pause d'une seconde entre deux requêtes).
 
@@ -207,6 +262,8 @@ L'historique du MASI s'exporte manuellement depuis le site de la Bourse de Casab
 - Décisions de Bank Al-Maghrib : peu de cas (3 hausses et 3 baisses depuis 2022), conclusions fragiles.
 - Courbe des taux : rupture de méthode BAM en mars 2023 ; données hebdomadaires seulement entre mars 2023 et 2025 ; 5 semaines sans courbe (vendredis fériés).
 - Le taux à 13 semaines dépend aussi des besoins de financement du Trésor, pas seulement des anticipations sur Bank Al-Maghrib.
+- IPO : 6 cas seulement, pas de classement avant 2023 (historique gratuit de 3 ans) ; fiches saisies depuis la presse.
+- Synthèse : 3 ans dont deux années de forte hausse ; indices de catégorie AMMC (moyenne de fonds différents) ; ni frais d'entrée ni impôts.
 
 ---
 
@@ -216,8 +273,9 @@ L'historique du MASI s'exporte manuellement depuis le site de la Bourse de Casab
 |---|---|---|
 | 1 | OPCVM, marché actions | ✅ Terminée |
 | 2 | Contexte économique (HCP, Bank Al-Maghrib), taux et obligations | ✅ Terminée |
-| 3 | Introductions en bourse (SGTM, Laprophan…) face au MASI | À venir |
-| 4 | Synthèse quantitative : portefeuilles types, risque, régressions ; collecte automatisée (GitHub Actions) ; dashboard public (Streamlit) | À venir |
+| 3 | Introductions en bourse (CFG Bank, CMGP, Vicenne, Cash Plus, SGTM, T2S) face au MASI | ✅ Terminée |
+| 4 | Synthèse quantitative : classes d'actifs, portefeuilles types, risque, corrélations | ✅ Terminée |
+| Suite | Laprophan (cotation fin novembre 2026) ; collecte automatisée (GitHub Actions) ; dashboard public (Streamlit) | À venir |
 
 ---
 
