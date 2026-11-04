@@ -1,0 +1,28 @@
+version: 2
+
+seeds:
+  - name: ipo_operations
+    description: >
+      Une ligne par introduction en bourse (saisie à la main, une source par ligne).
+      date_premiere_cotation vide = IPO pas encore cotée (exclue des calculs).
+      prix_ipo = prix de référence (SGTM : 420 DH ; les particuliers ont payé 380 DH).
+    config:
+      column_types:
+        ticker: text
+        societe: text
+        date_premiere_cotation: date
+        prix_ipo: numeric
+        montant_mdh: numeric
+        type_operation: text
+        sursouscription: numeric
+        nb_souscripteurs: integer
+        taux_satisfaction_pct: numeric
+        source: text
+    columns:
+      - name: ticker
+        tests:
+          - unique
+          - not_null
+      - name: prix_ipo
+        tests:
+          - not_null

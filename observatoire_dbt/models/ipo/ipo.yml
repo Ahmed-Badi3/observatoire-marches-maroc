@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: staging_ipo
+    schema: staging
+    tables:
+      - name: bvc_cours_titres
+        description: Clôtures quotidiennes des titres introduits en bourse et du MASI (ticker 'MASI'), chargées par scripts/09_charger_cours_ipo.py
+
+models:
+  - name: ipo_performance
+    description: >
+      Une ligne par IPO cotée : rendement depuis le prix d'introduction (J1, J5, 1 mois, 6 mois, 1 an, depuis l'IPO),
+      rendement anormal face au MASI et gain réel pour 100 DH demandés.
+    columns:
+      - name: ticker
+        tests:
+          - unique
+          - not_null
+      - name: prix_ipo
+        tests:
+          - not_null
