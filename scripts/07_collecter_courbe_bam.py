@@ -17,7 +17,8 @@ import requests
 from bs4 import BeautifulSoup
 
 # ---------------- Paramètres ----------------
-ESSAI = False            # True : 5 dates seulement, affichage à l'écran, rien n'est écrit
+ESSAI = False
+COMBLER_TROUS = False
 DATE_DEBUT = "2022-09-01"  # un mois avant le premier fichier AMMC (30/09/2022)
 PAUSE_S = 1.0              # pause entre deux requêtes (politesse envers le site)
 SAUVEGARDE_TOUS_LES = 100  # sauvegarde intermédiaire tous les N jours
@@ -33,9 +34,11 @@ COLONNES = ["date_courbe", "date_echeance", "transaction_mmad", "taux_pct", "dat
 
 
 def nombre_fr(texte):
-    """'2,170%' -> 2.17 ; '1 234,56' -> 1234.56 ; '' -> None"""
+    """'2,170%' -> 2.17 ; '1 234,56' -> 1234.56 ; '' ou '-' -> None"""
     t = texte.replace("%", "").replace("\xa0", "").replace(" ", "").replace(",", ".")
-    return float(t) if t else None
+    if t in ("", "-"):
+        return None
+    return float(t)
 
 
 def lire_courbe(jour, session):
@@ -89,18 +92,23 @@ def sauvegarder(existant, nouvelles_lignes):
 
 
 def main():
-    # 1. Point de départ : reprise après la dernière date déjà collectée
-    if FICHIER_CSV.exists() and not ESSAI:
+       # 1. Jours à interroger
+    if COMBLER_TROUS:
+        # Réinterroge uniquement les vendredis absents du CSV
+        existant = pd.read_csv(FICHIER_CSV)
+        deja = set(pd.to_datetime(existant["date_courbe"]))
+        tous = pd.bdate_range(DATE_DEBUT, max(deja))
+        jours = pd.DatetimeIndex([j for j in tous if j.weekday() == 4 and j not in deja])
+        print(f"Comblement des trous : {len(jours)} vendredis manquants")
+    elif FICHIER_CSV.exists() and not ESSAI:
         existant = pd.read_csv(FICHIER_CSV)
         derniere = pd.to_datetime(existant["date_courbe"]).max()
-        debut = derniere + pd.Timedelta(days=1)
+        jours = pd.bdate_range(derniere + pd.Timedelta(days=1), date.today())
         print(f"Reprise : {len(existant)} lignes déjà collectées, dernière courbe le {derniere:%d/%m/%Y}")
     else:
         existant = pd.DataFrame(columns=COLONNES)
-        debut = pd.Timestamp(DATE_DEBUT)
+        jours = pd.bdate_range(DATE_DEBUT, date.today())
 
-    # 2. Jours ouvrés à interroger (lundi à vendredi)
-    jours = pd.bdate_range(debut, date.today())
     if ESSAI:
         jours = jours[:5]
     if len(jours) == 0:
