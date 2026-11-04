@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: courbe_taux_quotidienne
+    description: "Courbe des taux BAM interpolée à maturités fixes, une ligne par jour et par maturité"
+    columns:
+      - name: date_courbe
+        tests:
+          - not_null
+      - name: maturite
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['13 sem', '1 an', '2 ans', '5 ans', '10 ans']
+      - name: taux_pct
+        tests:
+          - not_null
+
+  - name: obligations_vs_taux_hebdo
+    description: "Rendement hebdomadaire des fonds Monétaire, Obligations CT et MLT face au niveau et à la variation des taux BAM"
+    columns:
+      - name: date_semaine
+        tests:
+          - not_null
+      - name: categorie
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Monétaire', 'Obligations CT', 'Obligations MLT']
+      - name: indice
+        tests:
+          - not_null
