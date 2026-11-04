@@ -55,3 +55,33 @@ models:
       - name: categorie
         tests:
           - not_null
+
+  - name: taux_autour_decisions_bam
+    description: "Q3 : taux 13 semaines vs taux directeur à la veille de chaque décision BAM (anticipation du marché)"
+    columns:
+      - name: date_effet
+        tests:
+          - not_null
+      - name: decision
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Hausse', 'Baisse', 'Maintien']
+
+  - name: flux_fonds_taux_timing
+    description: "Q4 : corrélation des flux nets hebdomadaires avec la performance et les taux passés (4 sem.) et futurs (4 sem.)"
+    columns:
+      - name: categorie
+        tests:
+          - not_null
+
+  - name: flux_fonds_taux_annuel
+    description: "Q4 : flux nets annuels des fonds de taux face au rendement et à la variation du taux 10 ans"
+    columns:
+      - name: categorie
+        tests:
+          - not_null
+      - name: annee
+        tests:
+          - not_null

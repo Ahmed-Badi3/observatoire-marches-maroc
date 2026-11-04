@@ -12,3 +12,5 @@ sources:
         description: "Courbe des taux de référence des BDT (BAM, marché secondaire), une ligne par date de courbe x échéance"
       - name: ammc_indices
         description: "Indices hebdomadaires des OPCVM par catégorie (AMMC, phase 1)"
+      - name: ammc_flux
+        description: "Souscriptions et rachats hebdomadaires des OPCVM par catégorie (AMMC, phase 1)"
