@@ -6,22 +6,11 @@ import { useEffect, useState } from "react";
 import { ExternalLink, Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/format";
 import { MENTION_LEGALE, PAGES, URL_GITHUB, pageCourante } from "@/lib/pages";
 
 // La « coque » du site : barre latérale, barre du haut, contenu, pied de page.
 // Image : le cadre d'un tableau. Les pages ne changent que la peinture à l'intérieur.
-// Date AAAA-MM-JJ -> « 23 octobre 2026 ». Lue en UTC pour éviter tout décalage de fuseau.
-// (Les fonctions de format français complètes arrivent à la tâche D5.)
-function dateEnFrancais(iso: string): string {
-  const [a, m, j] = iso.split("-").map(Number);
-  return new Date(Date.UTC(a, m - 1, j)).toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
-
 export function AppShell({
   children,
   dateAmmc,
@@ -102,7 +91,7 @@ export function AppShell({
 
         <div className="space-y-2 border-t border-separateur p-6 text-xs text-texte-secondaire">
           <p>
-            Données AMMC jusqu&apos;au {dateAmmc ? dateEnFrancais(dateAmmc) : "—"}
+            Données AMMC jusqu&apos;au {formatDate(dateAmmc)}
           </p>
           <a
             href={URL_GITHUB}
