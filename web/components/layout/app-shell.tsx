@@ -122,6 +122,10 @@ export function AppShell({
               {page?.href !== "/" && <> / {page?.titre ?? "Hors menu"}</>}
             </p>
             <h1 className="truncate text-2xl font-semibold text-texte">{page?.titre ?? "Page hors menu"}</h1>
+            {/* Sur téléphone la barre latérale est repliée : la date de mise à jour reste visible ici. */}
+            <p className="text-xs text-texte-secondaire lg:hidden">
+              Données AMMC jusqu&apos;au {formatDate(dateAmmc)}
+            </p>
           </div>
         </header>
 

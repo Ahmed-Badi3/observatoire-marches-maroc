@@ -161,7 +161,7 @@ export function TableauTriable({
                   <td
                     key={col.cle}
                     className={cn(
-                      "px-4 py-2.5",
+                      "whitespace-nowrap px-4 py-2.5",
                       numerique ? "text-right" : "text-left",
                       col.colore && COULEUR_TEXTE_TON[tonDe(v)],
                       col.colore && "font-medium",

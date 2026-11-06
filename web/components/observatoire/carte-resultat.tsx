@@ -2,11 +2,13 @@
 // Dans les pages de module, elle occupe 1/3 de la largeur, à gauche du graphique.
 export function CarteResultat({
   numero,
+  etiquette,
   phrase,
   chiffre,
   legende,
 }: {
-  numero: number;
+  numero?: number; // 1 à 18 ; sans numéro, on passe une `etiquette` (ex. « Courbe des taux »)
+  etiquette?: string;
   phrase: string;
   chiffre: string;
   legende?: string;
@@ -14,7 +16,7 @@ export function CarteResultat({
   return (
     <div className="flex flex-col gap-3 rounded-carte bg-carte p-6 shadow-carte">
       <span className="inline-flex w-fit rounded-lg bg-page px-3 py-1 text-xs font-semibold text-accent-fonce">
-        Résultat {numero}
+        {etiquette ?? `Résultat ${numero}`}
       </span>
       <p className="text-base font-semibold text-texte">{phrase}</p>
       <p className="text-[32px] font-semibold leading-tight text-accent-fonce">{chiffre}</p>

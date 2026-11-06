@@ -91,7 +91,7 @@ Chaque tâche indique comment je vérifie qu'elle est terminée.
 ## Phase E — Les pages
 - [x] **E1** Composants communs : carte KPI, carte vedette, carte de résultat, onglets,
   tableau triable, squelette de chargement. *Vérif : page de démonstration.*
-- [ ] **E2** Accueil : bandeau, 2 cartes vedettes, 4 cartes KPI.
+- [x] **E2** Accueil : bandeau, 2 cartes vedettes, 4 cartes KPI.
 - [ ] **E3** Accueil : nuage rendement / risque + tableau triable des placements + rangée des 6 modules.
 - [ ] **E4** OPCVM et marché actions : résultats 1 et 2 (flux vs MASI, timing, volatilité, drawdown).
 - [ ] **E5** OPCVM et marché actions : résultats 3 et 4 (MASI vs MASI 20, PER).

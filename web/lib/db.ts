@@ -20,8 +20,11 @@ function creerConnexion() {
       "DATABASE_URL est absente : créez web/.env.local (voir docs/DATA.md).",
     );
   }
+  // SSL obligatoire pour Supabase ; désactivé pour une base sur ce PC (copie figée, tâche B7),
+  // qui n'a en général pas de certificat.
+  const surCePc = /@(localhost|127\.0\.0\.1)(:|\/)/.test(url);
   return postgres(url, {
-    ssl: "require",
+    ssl: surCePc ? false : "require",
     prepare: false,
     max: 1, // une fonction serverless = une connexion
     idle_timeout: 20,

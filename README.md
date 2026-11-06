@@ -6,6 +6,19 @@ Projet d'analyse de données de bout en bout : collecte automatisée (scraping),
 
 > Les 6 modules sont terminés : OPCVM (4), marché actions (2), contexte économique (1), taux et obligations (3), introductions en bourse (5) et synthèse quantitative (6). Données de septembre 2022 à novembre 2026.
 
+## Le site
+
+**Site interactif : <!-- À COMPLÉTER (tâche F2) : adresse Vercel du site --> adresse à ajouter.**
+Il présente ces résultats en 7 pages (accueil, OPCVM et marché actions, contexte économique, taux et obligations, introductions en bourse, synthèse, méthode) avec des graphiques interactifs : filtre de période, choix de catégorie ou de portefeuille, bascule nominal / réel, tableaux triables. Il se met à jour chaque semaine sans intervention pour les données de l'AMMC. Le site ne calcule rien : tous les chiffres viennent de la base Supabase (vues `dw` et modèles dbt `analytics`), en lecture seule.
+
+![Accueil du site](docs/images/site_accueil.png)
+
+| OPCVM et marché actions | Taux et obligations | Synthèse |
+|---|---|---|
+| ![Flux des OPCVM](docs/images/site_opcvm.png) | ![Courbe des taux](docs/images/site_taux.png) | ![Corrélations](docs/images/site_synthese.png) |
+
+Le site s'affiche aussi sur téléphone : ![Accueil sur téléphone](docs/images/site_accueil_telephone.png)
+
 ## En une phrase
 
 Sur 2023–2026, les actions ont rapporté le plus (+42 % pour le MASI) mais tous les placements ont un rendement par unité de risque presque identique : il fallait choisir son niveau de risque, diversifier avec des fonds de taux, et surtout ne pas acheter après la hausse, ce que les épargnants marocains font pourtant, en OPCVM comme en IPO.
@@ -185,6 +198,8 @@ flowchart LR
 ├── n8n/
 │   ├── workflow_per_marche.json    # extraction PER / dividendes (HTTP → HTML → LLM → contrôles → PostgreSQL → Telegram)
 │   └── workflow_agent_analyste.json # agent IA avec outil SQL en lecture seule
+├── web/                            # site public : Next.js, Tailwind CSS, Recharts (lit dw et analytics, lecture seule)
+├── .github/workflows/              # mise à jour hebdomadaire de l'AMMC + maintien de Supabase
 ├── dashboard/
 │   ├── observatoire_marches_maroc.pbix
 │   └── theme_observatoire.json     # thème Power BI
@@ -275,7 +290,8 @@ L'historique du MASI s'exporte manuellement depuis le site de la Bourse de Casab
 | 2 | Contexte économique (HCP, Bank Al-Maghrib), taux et obligations | ✅ Terminée |
 | 3 | Introductions en bourse (CFG Bank, CMGP, Vicenne, Cash Plus, SGTM, T2S) face au MASI | ✅ Terminée |
 | 4 | Synthèse quantitative : classes d'actifs, portefeuilles types, risque, corrélations | ✅ Terminée |
-| Suite | Laprophan (cotation fin novembre 2026) ; collecte automatisée (GitHub Actions) ; dashboard public (Streamlit) | À venir |
+| 5 | Site public interactif (Next.js, Supabase, Vercel) et mise à jour hebdomadaire de l'AMMC (GitHub Actions) | ✅ Terminée |
+| Suite | Laprophan (cotation fin novembre 2026) ; courbe des taux automatisée si Bank Al-Maghrib l'autorise ; version anglaise ; agent analyste en ligne | À venir |
 
 ---
 

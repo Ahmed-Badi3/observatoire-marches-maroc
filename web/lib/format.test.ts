@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   formatDate,
   formatDateCourte,
+  formatMoisAnnee,
   formatMilliards,
   formatMontant,
   formatMultiple,
@@ -89,5 +90,12 @@ describe("dates", () => {
   });
   it("date invalide", () => {
     expect(formatDate("pas une date")).toBe("—");
+  });
+});
+
+describe("mois et année (axes des graphiques)", () => {
+  it("écrit le mois en toutes lettres", () => {
+    expect(formatMoisAnnee("2026-03-03")).toBe("mars 2026");
+    expect(formatMoisAnnee(null)).toBe("—");
   });
 });

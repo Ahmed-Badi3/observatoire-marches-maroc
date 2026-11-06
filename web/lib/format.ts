@@ -106,6 +106,13 @@ export function formatDate(v: Valeur): string {
   });
 }
 
+// « mars 2026 » : pour les axes des graphiques.
+export function formatMoisAnnee(v: Valeur): string {
+  const date = enDate(v);
+  if (!date) return MANQUANT;
+  return date.toLocaleDateString("fr-FR", { month: "long", year: "numeric", timeZone: "UTC" });
+}
+
 // « 23/10/2026 »
 export function formatDateCourte(v: Valeur): string {
   const date = enDate(v);

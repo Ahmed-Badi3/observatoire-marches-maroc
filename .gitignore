@@ -13,6 +13,8 @@ data/raw/
 .env.local
 node_modules/
 .next/
+# Captures Playwright des tâches E (web/e2/, web/e3/, ...)
+web/e[0-9]*/
 
 # Journaux (dbt, etc.) : régénérés à chaque exécution
 logs/
