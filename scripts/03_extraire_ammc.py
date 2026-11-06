@@ -1,4 +1,9 @@
-"""Extrait les 4 tableaux de chaque fichier AMMC et les empile dans 4 fichiers CSV."""
+"""Extrait les 4 tableaux de chaque fichier AMMC et les empile dans 4 fichiers CSV.
+
+Lancé seul, il relit tous les fichiers de data/raw/ammc/ (comme avant).
+`extraire` et `semaines_incoherentes` sont aussi utilisées par 11_ajouter_semaines_ammc.py,
+qui ajoute seulement les nouvelles semaines sans tout relire.
+"""
 import io
 import re
 from pathlib import Path
@@ -63,14 +68,9 @@ def lire_flux(df):
     return b
 
 
-# 1) Liste des fichiers à lire, regroupés par date
-inv = pd.read_csv(INVENTAIRE, parse_dates=["date"])
-inv = inv[inv["statut"] == "ok"]
-
-
-def extraire(fichier, date):
+def extraire(fichier, date, dossier=DOSSIER):
     """Lit les 4 tableaux d'un fichier. Renvoie 4 DataFrames (ou lève une erreur)."""
-    contenu = (DOSSIER / fichier).read_bytes()      # force OneDrive à télécharger le fichier
+    contenu = (dossier / fichier).read_bytes()      # force OneDrive à télécharger le fichier
     df = pd.read_excel(io.BytesIO(contenu), header=None, engine="calamine")
 
     # Bloc 1 : actif net par catégorie
@@ -94,26 +94,15 @@ def extraire(fichier, date):
     return [b.assign(date=date) for b in (b1, b2, b3, b4)]
 
 
-actif_net, indices, actif_valeurs, flux, erreurs = [], [], [], [], []
-
-for date, groupe in inv.groupby("date"):
-    # S'il y a plusieurs versions pour une même semaine : on essaie la plus récente
-    # d'abord, et si elle est illisible on passe à la suivante.
-    candidats = sorted(groupe["fichier"], reverse=True)
-    for fichier in candidats:
-        try:
-            b1, b2, b3, b4 = extraire(fichier, date)
-        except Exception as e:
-            erreurs.append((fichier, f"{type(e).__name__}: {e}"))
-            continue
-        actif_net.append(b1)
-        indices.append(b2)
-        actif_valeurs.append(b3)
-        flux.append(b4)
-        break                                   # une version lue = semaine terminée
+def semaines_incoherentes(t_flux):
+    """Semaines où la somme des catégories n'égale pas la ligne Total (écart > 1 dirham)."""
+    detail = t_flux[t_flux["categorie"] != "Total"].groupby("date")["souscriptions"].sum()
+    total = t_flux[t_flux["categorie"] == "Total"].set_index("date")["souscriptions"]
+    ecart = (detail - total).abs()
+    return ecart[ecart > 1]
 
 
-# 2) Empiler et enregistrer
+# Empiler et enregistrer
 def enregistrer(morceaux, nom):
     table = pd.concat(morceaux, ignore_index=True)
     table = table[["date"] + [c for c in table.columns if c != "date"]]
@@ -122,19 +111,44 @@ def enregistrer(morceaux, nom):
     return table
 
 
-print(f"Semaines extraites : {len(actif_net)} / {inv['date'].nunique()}\n")
-t_actif = enregistrer(actif_net, "ammc_actif_net.csv")
-enregistrer(indices, "ammc_indices.csv")
-enregistrer(actif_valeurs, "ammc_actif_valeurs.csv")
-t_flux = enregistrer(flux, "ammc_flux.csv")
+def main():
+    # 1) Liste des fichiers à lire, regroupés par date
+    inv = pd.read_csv(INVENTAIRE, parse_dates=["date"])
+    inv = inv[inv["statut"] == "ok"]
 
-if erreurs:
-    print("\nFichiers ignorés (illisibles) :")
-    for f, e in erreurs:
-        print(" ", f, "->", e)
+    actif_net, indices, actif_valeurs, flux, erreurs = [], [], [], [], []
 
-# 3) Contrôle qualité : la somme des catégories doit égaler la ligne Total
-detail = t_flux[t_flux["categorie"] != "Total"].groupby("date")["souscriptions"].sum()
-total = t_flux[t_flux["categorie"] == "Total"].set_index("date")["souscriptions"]
-ecart = (detail - total).abs()
-print(f"\nContrôle flux : {(ecart > 1).sum()} semaine(s) où la somme ≠ Total")
+    for date, groupe in inv.groupby("date"):
+        # S'il y a plusieurs versions pour une même semaine : on essaie la plus récente
+        # d'abord, et si elle est illisible on passe à la suivante.
+        candidats = sorted(groupe["fichier"], reverse=True)
+        for fichier in candidats:
+            try:
+                b1, b2, b3, b4 = extraire(fichier, date)
+            except Exception as e:
+                erreurs.append((fichier, f"{type(e).__name__}: {e}"))
+                continue
+            actif_net.append(b1)
+            indices.append(b2)
+            actif_valeurs.append(b3)
+            flux.append(b4)
+            break                                   # une version lue = semaine terminée
+
+    # 2) Enregistrer
+    print(f"Semaines extraites : {len(actif_net)} / {inv['date'].nunique()}\n")
+    enregistrer(actif_net, "ammc_actif_net.csv")
+    enregistrer(indices, "ammc_indices.csv")
+    enregistrer(actif_valeurs, "ammc_actif_valeurs.csv")
+    t_flux = enregistrer(flux, "ammc_flux.csv")
+
+    if erreurs:
+        print("\nFichiers ignorés (illisibles) :")
+        for f, e in erreurs:
+            print(" ", f, "->", e)
+
+    # 3) Contrôle qualité : la somme des catégories doit égaler la ligne Total
+    print(f"\nContrôle flux : {len(semaines_incoherentes(t_flux))} semaine(s) où la somme ≠ Total")
+
+
+if __name__ == "__main__":
+    main()

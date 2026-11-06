@@ -124,6 +124,10 @@ select
     round((c_dernier / prix_ipo - masi_dernier / masi_veille) * 100, 2) as anormal_depuis_ipo_pts,
 
     -- gain réel d'un souscripteur pour 100 DH demandés (il n'est servi qu'au taux de satisfaction)
-    round((c_dernier / prix_ipo - 1) * taux_satisfaction_pct, 3)        as gain_pour_100_dh_demandes
+    round((c_dernier / prix_ipo - 1) * taux_satisfaction_pct, 3)        as gain_pour_100_dh_demandes,
+
+    -- achat en bourse au cours de la 20e séance (≈ 1 mois), gardé jusqu'au dernier cours (%)
+    c_m1                                                                as cours_j20,
+    round((c_dernier / c_m1 - 1) * 100, 2)                              as rdt_achat_j20_pct
 from base
 order by date_premiere_cotation

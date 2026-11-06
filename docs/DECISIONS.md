@@ -13,3 +13,4 @@ Chaque choix important, sa date et sa raison. J'ajoute une ligne à chaque nouve
 | 06/11/2026 | Mise à jour hebdomadaire (samedi) + maintien le mercredi | Les fichiers AMMC sont hebdomadaires ; un projet Supabase gratuit se met en pause après 7 jours sans activité |
 | 06/11/2026 | MASI, IPO, HCP et PER restent manuels | Pas de source automatisable fiable ou gratuite pour l'instant |
 | 06/11/2026 | Couleurs reprises du thème Power BI | Identité visuelle commune entre le dashboard Power BI et le site |
+| 06/11/2026 | Taille de la base locale mesurée (tâche A4) : 13 Mo (`pg_database_size`), contre 500 Mo de limite du plan gratuit Supabase | Le plus gros tableau est `staging.macro_indicateurs` (1,7 Mo) : la base tient largement dans l offre gratuite, sans compression ni tri des données |

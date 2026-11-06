@@ -50,10 +50,14 @@ FROM staging.bvc_indices
 WHERE indice = 'MASI';
 
 -- ---------- Fait MASI hebdo, aligné sur les dates AMMC ----------
--- Pour chaque date de publication AMMC : dernière clôture MASI connue à cette date
+-- Pour chaque date de publication AMMC : dernière clôture MASI connue à cette date.
+-- Les semaines AMMC APRÈS la dernière séance MASI en base sont exclues (tâche A9) : sinon la même
+-- clôture figée serait répétée sur chaque nouvelle semaine et fausserait rendements et corrélations.
 CREATE OR REPLACE VIEW dw.fact_masi_hebdo AS
 WITH semaines AS (
-    SELECT DISTINCT date FROM staging.ammc_actif_net
+    SELECT DISTINCT date
+    FROM staging.ammc_actif_net
+    WHERE date <= (SELECT MAX(date) FROM staging.bvc_indices WHERE indice = 'MASI')
 ),
 aligne AS (
     SELECT s.date, m.date AS date_seance, m.cloture

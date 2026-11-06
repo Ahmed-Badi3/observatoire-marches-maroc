@@ -1,0 +1,20 @@
+# Profil dbt pour GitHub Actions (tâche C4) : AUCUN secret ici.
+# Image : un formulaire avec des cases vides. Le workflow remplit les cases (variables d'environnement
+# SUPABASE_DB_*, tirées du secret DATABASE_URL) au moment du lancement.
+#
+# Utilisation : dbt build --target supabase --profiles-dir ci   (depuis le dossier observatoire_dbt)
+# Ce fichier est dans le sous-dossier ci/ pour ne pas être pris par ton dbt local, qui lit ~/.dbt/profiles.yml.
+
+observatoire_dbt:
+  target: supabase
+  outputs:
+    supabase:
+      type: postgres
+      host: "{{ env_var('SUPABASE_DB_HOST') }}"
+      port: "{{ env_var('SUPABASE_DB_PORT', '5432') | as_number }}"
+      user: "{{ env_var('SUPABASE_DB_USER') }}"
+      pass: "{{ env_var('SUPABASE_DB_PASSWORD') }}"
+      dbname: "{{ env_var('SUPABASE_DB_NAME', 'postgres') }}"
+      schema: analytics
+      threads: 1
+      sslmode: require

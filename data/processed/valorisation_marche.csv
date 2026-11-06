@@ -1,0 +1,22 @@
+﻿annee,perimetre,per,rendement_dividende_pct,estimation,source,url_article,date_article,date_extraction
+2024,Scope 40,,3.30,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/entreprises-cotees-bkgr-publie-ses-previsions-2024-2025,2024-05-15,2026-11-02
+2024,marché total,18.50,,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/societes-cotees-bkgr-anticipation-capacite-beneficiaire-2024,2024-10-22,2026-11-02
+2024,Scope 40,20.90,,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/societes-cotees-bkgr-anticipation-capacite-beneficiaire-2024,2024-10-22,2026-11-02
+2025,marché total,17.10,,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/societes-cotees-bkgr-anticipation-capacite-beneficiaire-2024,2024-10-22,2026-11-02
+,moyenne historique 10 ans,18.00,,False,CFG Bank,https://boursenews.ma/article/marches/CFG-bank-devoile-previsions-2025,2025-01-29,2026-11-02
+2025,marché total,18.40,,True,CFG Bank,https://boursenews.ma/article/marches/CFG-bank-devoile-previsions-2025,2025-01-29,2026-11-02
+2024,Scope 40,,2.90,False,BMCE Capital Global Research,https://boursenews.ma/article/marches/BKGR-lourd-solide-bourse-casablanca,2025-05-15,2026-11-02
+2025,Scope 40,20.80,3.00,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/BKGR-lourd-solide-bourse-casablanca,2025-05-15,2026-11-02
+2026,Scope 40,19.40,3.10,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/BKGR-lourd-solide-bourse-casablanca,2025-05-15,2026-11-02
+2026,marché total,20.60,,True,CFG Bank,https://boursenews.ma/article/marches/bourse-cfg-bank-devoile-ses-previsions-2026-et-huit-actions-conseillees,2026-02-09,2026-11-02
+,moyenne récente (période non précisée),20.00,,False,BMCE Capital Global Research,https://boursenews.ma/article/marches/BKGR-Forecast-Mai-2026,2026-05-19,2026-11-02
+2025,Scope 40,20.70,2.70,False,BMCE Capital Global Research,https://boursenews.ma/article/marches/BKGR-Forecast-Mai-2026,2026-05-19,2026-11-02
+2026,Scope 40,19.70,2.80,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/BKGR-Forecast-Mai-2026,2026-05-19,2026-11-02
+2027,Scope 40,18.40,,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/BKGR-Forecast-Mai-2026,2026-05-19,2026-11-02
+,moyenne historique 10 ans,20.30,,False,BMCE Capital Global Research,https://boursenews.ma/article/marches/bourse-casablanca-2027-valorisation-rendement-bkgr,2026-10-23,2026-11-01
+2023,Scope 40,,3.20,False,BMCE Capital Global Research,https://boursenews.ma/article/marches/bourse-casablanca-2027-valorisation-rendement-bkgr,2026-10-23,2026-11-01
+2025,Scope 40,20.60,2.60,False,BMCE Capital Global Research,https://boursenews.ma/article/marches/bourse-casablanca-2027-valorisation-rendement-bkgr,2026-10-23,2026-11-01
+2026,hors valeurs minières,16.50,,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/bourse-casablanca-2027-valorisation-rendement-bkgr,2026-10-23,2026-11-01
+2026,Scope 40,18.00,2.90,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/bourse-casablanca-2027-valorisation-rendement-bkgr,2026-10-23,2026-11-01
+2027,hors valeurs minières,14.80,,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/bourse-casablanca-2027-valorisation-rendement-bkgr,2026-10-23,2026-11-01
+2027,Scope 40,16.80,3.10,True,BMCE Capital Global Research,https://boursenews.ma/article/marches/bourse-casablanca-2027-valorisation-rendement-bkgr,2026-10-23,2026-11-01

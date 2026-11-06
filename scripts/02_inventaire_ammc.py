@@ -1,4 +1,8 @@
-"""Inventaire des fichiers AMMC : date de chaque fichier, doublons, trous, format."""
+"""Inventaire des fichiers AMMC : date de chaque fichier, doublons, trous, format.
+
+Lancé seul, il refait l'inventaire complet de data/raw/ammc/ (comme avant).
+`analyser_fichier` est aussi utilisée par 11_ajouter_semaines_ammc.py pour lire un seul fichier.
+"""
 import re
 from pathlib import Path
 
@@ -7,7 +11,6 @@ import pandas as pd
 RACINE = Path(__file__).resolve().parent.parent
 DOSSIER = RACINE / "data" / "raw" / "ammc"
 SORTIE = RACINE / "data" / "processed" / "inventaire_ammc.csv"
-SORTIE.parent.mkdir(parents=True, exist_ok=True)
 
 
 def fabriquer_date(jour, mois, annee):
@@ -45,16 +48,15 @@ def date_depuis_nom(nom):
     return fabriquer_date(*m.groups()) if m else None
 
 
-lignes = []
-for fichier in sorted(DOSSIER.glob("*.xls*")):
+def analyser_fichier(fichier):
+    """Fiche d'identité d'un fichier Excel : sa date, d'où elle vient, ses blocs, son statut."""
     info = {"fichier": fichier.name, "date": None, "source_date": None,
             "flux": False, "indices": False, "statut": "ok"}
     try:
         feuilles = pd.read_excel(fichier, sheet_name=None, header=None)
     except Exception as e:
         info["statut"] = f"illisible : {type(e).__name__}"
-        lignes.append(info)
-        continue
+        return info
 
     texte = " ".join(str(v) for df in feuilles.values()
                      for v in df.values.ravel() if pd.notna(v))
@@ -70,36 +72,45 @@ for fichier in sorted(DOSSIER.glob("*.xls*")):
 
     info["flux"] = "souscriptions" in texte.lower()
     info["indices"] = "indices de performance" in texte.lower()
-    lignes.append(info)
+    return info
 
-inv = pd.DataFrame(lignes)
-inv["date"] = pd.to_datetime(inv["date"])
-inv.to_csv(SORTIE, index=False, encoding="utf-8-sig")
 
-# ---------- Résumé ----------
-ok = inv[inv["statut"] == "ok"]
-print(f"Fichiers lus : {len(inv)}")
-print(inv["statut"].value_counts().to_string())
-print("\nOrigine de la date :")
-print(ok["source_date"].value_counts().to_string())
+def main():
+    SORTIE.parent.mkdir(parents=True, exist_ok=True)
+    lignes = [analyser_fichier(f) for f in sorted(DOSSIER.glob("*.xls*"))]
 
-problemes = inv[inv["statut"] != "ok"]
-if len(problemes):
-    print("\nFichiers à problème :")
-    print(problemes[["fichier", "statut"]].to_string(index=False))
+    inv = pd.DataFrame(lignes)
+    inv["date"] = pd.to_datetime(inv["date"])
+    inv.to_csv(SORTIE, index=False, encoding="utf-8-sig")
 
-print(f"\nPériode : {ok['date'].min():%d/%m/%Y} -> {ok['date'].max():%d/%m/%Y}")
-print(f"Semaines distinctes : {ok['date'].nunique()}")
+    # ---------- Résumé ----------
+    ok = inv[inv["statut"] == "ok"]
+    print(f"Fichiers lus : {len(inv)}")
+    print(inv["statut"].value_counts().to_string())
+    print("\nOrigine de la date :")
+    print(ok["source_date"].value_counts().to_string())
 
-doublons = ok[ok.duplicated("date", keep=False)].sort_values("date")
-print(f"\nDates en double : {doublons['date'].nunique()}")
+    problemes = inv[inv["statut"] != "ok"]
+    if len(problemes):
+        print("\nFichiers à problème :")
+        print(problemes[["fichier", "statut"]].to_string(index=False))
 
-dates = ok["date"].drop_duplicates().sort_values()
-ecarts = dates.diff().dt.days
-print(f"Trous de plus de 8 jours : {(ecarts > 8).sum()}")
-for d, e in zip(dates[ecarts > 8], ecarts[ecarts > 8]):
-    print(f"  {d:%d/%m/%Y} : {int(e)} jours depuis le précédent")
+    print(f"\nPériode : {ok['date'].min():%d/%m/%Y} -> {ok['date'].max():%d/%m/%Y}")
+    print(f"Semaines distinctes : {ok['date'].nunique()}")
 
-print(f"\nSans bloc souscriptions/rachats : {(~ok['flux']).sum()}")
-print(f"Sans bloc indices : {(~ok['indices']).sum()}")
-print(f"\nDétail enregistré dans {SORTIE}")
+    doublons = ok[ok.duplicated("date", keep=False)].sort_values("date")
+    print(f"\nDates en double : {doublons['date'].nunique()}")
+
+    dates = ok["date"].drop_duplicates().sort_values()
+    ecarts = dates.diff().dt.days
+    print(f"Trous de plus de 8 jours : {(ecarts > 8).sum()}")
+    for d, e in zip(dates[ecarts > 8], ecarts[ecarts > 8]):
+        print(f"  {d:%d/%m/%Y} : {int(e)} jours depuis le précédent")
+
+    print(f"\nSans bloc souscriptions/rachats : {(~ok['flux']).sum()}")
+    print(f"Sans bloc indices : {(~ok['indices']).sum()}")
+    print(f"\nDétail enregistré dans {SORTIE}")
+
+
+if __name__ == "__main__":
+    main()

@@ -3,16 +3,41 @@
 ## Sources et mise à jour
 | Source | Données | Script(s) | Fréquence | Automatique ? |
 |---|---|---|---|---|
-| AMMC | Statistiques hebdomadaires OPCVM (actif net, indices, flux) | 01 → 02 → 03 → 04 | Hebdomadaire | Oui, GitHub Actions (phase C) |
+| AMMC | Statistiques hebdomadaires OPCVM (actif net, indices, flux) | 01 → 02 → 03 → 04 | Hebdomadaire | Oui, GitHub Actions (phase C). Mise à jour : 01 (nouveautés) → 11 (ajoute les semaines aux CSV) → 04 |
 | Bank Al-Maghrib | Courbe des taux de référence (BDT) | 07 → 08 | Quotidienne (jours ouvrés) | Oui, seulement les nouveaux jours (phase C) |
 | Bourse de Casablanca | MASI, MASI 20 (historique 3 ans maximum) vers `staging.bvc_indices` | 05 | Export manuel | Non |
 | Bourse de Casablanca | Cours quotidiens des IPO **et du MASI** vers `staging.bvc_cours_titres` | 09 + seed `ipo_operations.csv` | Manuel | Non |
 | HCP | Inflation (mensuelle), PIB et chômage (trimestriels) | 06 | Mensuelle / trimestrielle | Non |
 | Bank Al-Maghrib | Taux directeur (`taux_directeur_bam.csv`) | 06 | À chaque décision | Non |
-| Presse (BKGR, CFG) | PER, dividendes | n8n + Gemini (local), puis export CSV et chargeur (tâche A7) | Ponctuelle | Non |
+| Presse (BKGR, CFG) | PER, dividendes | n8n + Gemini (local), export dans `data/processed/valorisation_marche.csv`, puis script 10 | Ponctuelle | Non |
 
-Conditions d'utilisation : à vérifier pour chaque site avant d'automatiser
-(tâche C1). Les données sont publiques ; le site cite toujours ses sources.
+Conditions d'utilisation : relevées à la tâche C1, voir « Conditions de réutilisation » ci-dessous.
+Les données sont publiques ; le site cite toujours ses sources.
+
+## Conditions de réutilisation (tâche C1, relevé du 06/11/2026)
+Pas un avis juridique : un constat des textes publiés, et les mesures de prudence retenues.
+
+| Source | Ce que disent les textes | Collecte automatique |
+|---|---|---|
+| AMMC ([mentions légales](https://www.ammc.ma/fr/node/98)) | Reproduction des documents « seulement aux fins d'information », avec les mentions de droit d'auteur. « Adaptation, traduction, transformation, modification » et « transfert vers un autre site ou support » : « strictement interdits ». | Non mentionnée. `robots.txt` standard Drupal : ne bloque que l'administration, la recherche et les comptes. |
+| Bank Al-Maghrib ([mentions légales](https://www.bkam.ma/Trouvez-l-information-concernant/Mentions-legales), [confidentialité](https://www.bkam.ma/musee/Articles/Politique-de-confidentialite)) | Droit d'auteur à la Banque, « reproduction, en totalité ou en partie, interdite ». Réutilisation des données et statistiques soumise à la « Charte de BAM sur la diffusion des données et statistiques » (texte non trouvé). La politique de confidentialité parle d'un « consentement préalable exprès écrit ». | Non mentionnée. `robots.txt` : seul `/switch/` est bloqué. |
+
+**Constat** : ni interdiction ni autorisation explicite de la collecte automatique. Le risque porte sur
+la reproduction et la transformation du contenu. Le site n'affiche pas les documents sources : il affiche
+des indicateurs calculés, avec la source citée.
+
+**Mesures retenues (les plus prudentes)**
+1. **Demander une autorisation écrite** à l'AMMC et à Bank Al-Maghrib (courriers envoyés le 06/11/2026 ;
+   AMMC : envoyé à contacts@ammc.ma, réponse : en attente ; BAM : envoyé à accueil@bkam.ma, adresse générale
+   car aucune adresse « statistiques » n'est publiée, réponse : en attente).
+2. **Rester discret** : au plus une collecte par semaine et par site, pauses entre les requêtes
+   (1 s entre deux requêtes pour l'AMMC et pour BAM, 5 s entre deux tentatives en cas d'échec chez BAM), uniquement les nouvelles données, jamais de collecte en parallèle.
+   Un `User-Agent` honnête qui nomme le projet et donne le lien GitHub, au lieu de `Mozilla/5.0`
+   (scripts 01 et 07, fait aux tâches C2 et C3).
+3. **Ne rien republier en brut** : aucun fichier AMMC ou BAM d'origine sur le site. Seuls des indicateurs
+   calculés, avec « Source : AMMC » ou « Source : Bank Al-Maghrib » et un lien vers la page d'origine.
+4. **Plan B** : en cas de refus ou de demande d'arrêt, la collecte s'arrête et la procédure manuelle
+   (tâche C6) prend le relais. En l'absence de réponse, le site reste en collecte discrète (mesures 2 et 3).
 
 **Le MASI vit dans deux tables.** Imagine deux carnets qui notent le même cours :
 `bvc_indices` sert aux vues `dw` et aux modèles `macro`, `bvc_cours_titres` à la synthèse
@@ -24,64 +49,121 @@ Dernières dates au 06/11/2026 : AMMC 16/10, `bvc_indices` 30/10, `bvc_cours_tit
   depuis `data/processed/` → il faut des CSV complets.
 - `05_charger_masi.py` : supprime puis recharge les indices présents dans le fichier.
 - `06`, `08`, `09` : upsert (`ON CONFLICT ... DO UPDATE`) → relançables sans doublons.
-- `07_collecter_courbe_bam.py` : reprend après la dernière date du fichier
-  `data/raw/taux/courbe_bam_brut.csv`, qui n'est PAS sur GitHub → à adapter pour
-  reprendre depuis la dernière date en base (tâche C3).
-- `sql/01_staging_ammc.sql` est vide : les tables AMMC n'existent que dans la base locale
-  (à reconstruire, tâche A5). `bvc_indices` et `bvc_cours_titres` sont créées par les
-  scripts 05 et 09, pas par `sql/`.
-- `staging.valorisation_marche` n'est chargée par aucun script : n8n l'écrit en local (tâche A7).
+- `07_collecter_courbe_bam.py` : reprend après la dernière date **en base** (`staging.bam_courbe_taux`,
+  tâche C3). Repli sur le fichier local `data/raw/taux/courbe_bam_brut.csv` (PAS sur GitHub) si la base est
+  injoignable ; sans base ni fichier, il s'arrête au lieu de tout recollecter (`--tout` pour le forcer).
+  Code de sortie 1 si 3 jours ouvrés ou plus ne renvoient aucune courbe.
+- `sql/01_staging_ammc.sql` crée les 4 tables AMMC (tâche A5) : elles doivent exister avant le script 04.
+  `bvc_indices` et `bvc_cours_titres` sont créées par les scripts 05 et 09, pas par `sql/`.
+- Connexion : tous les scripts passent par `scripts/connexion.py` (`DATABASE_URL` si elle existe,
+  sinon `scripts/config.py`) ; `07` sera adapté à la tâche C3.
+- `staging.valorisation_marche` : n8n l'écrit en local. `10_charger_valorisation.py` la recharge
+  depuis `data/processed/valorisation_marche.csv` (upsert, relançable). Après un passage de n8n,
+  `10_charger_valorisation.py --exporter` met le CSV à jour (21 lignes au 06/11/2026).
 
 ## Tables lues par le site
 Le site lit uniquement les schémas `dw` (vues SQL) et `analytics` (modèles dbt).
-Les colonnes exactes sont à compléter par Claude Code à la tâche A2, à partir de
-`sql/` et des fichiers `.yml` de `observatoire_dbt/models/`.
+Colonnes relevées à la tâche A2 dans `sql/02`, `sql/03`, `sql/04` et dans les modèles dbt
+(`observatoire_dbt/models/`). Les `.yml` dbt ne décrivent presque aucune colonne : la source de vérité
+est le `SELECT` final de chaque modèle. Les incertitudes sont regroupées en fin de section.
+
+Rappel des unités : une colonne `_pct` est déjà en pourcentage, `_pb` en points de base,
+`_pts` / `_pt` en points de pourcentage. Piège : certaines colonnes en pourcentage n'ont pas de suffixe
+(`perf_hebdo_pct` a le suffixe, mais `masi_perf_4s_passees`, `masi_perf_4s_futures`, `flux_net_pct` sont
+aussi en %), et `rendement_hebdo` (synthèse) ainsi que `rendement_jour` (dw) sont des **fractions**.
 
 ### Accueil et Synthèse quantitative
-| Table | Utilisation |
+Période commune : vendredis AMMC couverts par l'historique du MASI. Valeurs de `actif` :
+`MASI`, `Fonds Actions`, `Fonds Diversifiés`, `OMLT`, `OCT`, `Monétaire`, `Portefeuille prudent`,
+`Portefeuille équilibré`, `Portefeuille dynamique`.
+
+| Table | Colonnes |
 |---|---|
-| `analytics.synthese_classes_actifs` | Rendement cumulé et annualisé, volatilité, pire baisse, Sharpe par placement |
-| `analytics.synthese_annuel` | Rendement par année et par placement (2026 inverse le classement) |
-| `analytics.synthese_correlations` | Corrélations hebdomadaires entre toutes les paires de placements, hors portefeuilles (chaque paire une seule fois, sans diagonale) |
-| `analytics.synthese_rendements_hebdo` | Courbes de performance cumulée par placement |
+| `analytics.synthese_classes_actifs` (1 ligne par placement ou portefeuille) | `actif`, `nb_semaines`, `debut`, `fin`, `rdt_cumule_pct`, `rdt_annualise_pct`, `volatilite_pct`, `pire_baisse_pct`, `pire_semaine_pct`, `semaines_negatives_pct`, `ratio_rendement_risque` (Sharpe), `part_rdt_masi_pct`, `part_risque_masi_pct` (rendement annualisé et volatilité en % de ceux du MASI, tâche A8) |
+| `analytics.synthese_annuel` | `actif`, `annee`, `nb_semaines` (1re et dernière année partielles), `rendement_pct` |
+| `analytics.synthese_correlations` (chaque paire une fois, `actif_1 < actif_2` par ordre alphabétique, hors portefeuilles) | `actif_1`, `actif_2`, `nb_semaines`, `correlation` (de −1 à 1, pas un %) |
+| `analytics.synthese_rendements_hebdo` | `date`, `actif`, `rendement_hebdo` (**fraction**, 0,01 = 1 %) |
 
 ### OPCVM et marché actions
-| Table | Utilisation |
+| Table | Colonnes |
 |---|---|
-| `dw.fact_opcvm_hebdo` | Actif net, flux et indices hebdomadaires par catégorie |
-| `dw.dim_categorie`, `dw.dim_date` | Libellés et calendrier |
-| `dw.v_kpi_timing` | Corrélation flux / performance passée et future |
-| `dw.v_actions_vs_masi` | Flux vers les fonds actions vs MASI |
-| `dw.fact_masi_quotidien`, `dw.fact_masi_hebdo` | Historique du MASI |
-| `dw.v_masi_drawdown`, `dw.v_masi_annuel` | Drawdown et volatilité annuels (pour le rendement annuel du résultat 1, voir « Quelle source pour quel chiffre ») |
-| `dw.v_indices_quotidien`, `dw.v_indices_annuel`, `dw.v_indices_synthese` | MASI vs MASI 20 |
-| `dw.v_valorisation` (à créer, tâche B6) | PER et dividendes issus de `staging.valorisation_marche`, avec la date de publication ajoutée à la tâche A7 |
+| `dw.fact_opcvm_hebdo` (semaine × catégorie, sans la catégorie `Total`) | `date`, `categorie`, `nb_opcvm`, `actif_net`, `souscriptions`, `rachats`, `flux_net` (souscriptions − rachats), `indice_perf`, `perf_hebdo_pct` |
+| `analytics.flux_opcvm_annuel` (tâche A8, par catégorie et par année civile, 1re et dernière année partielles) | `categorie`, `annee`, `nb_semaines`, `flux_net` (MAD), `flux_net_md` (milliards MAD) |
+| `dw.dim_categorie` | `categorie`, `ordre_risque` (1 à 6), `profil` (Prudent, Équilibré, Dynamique, Autre) |
+| `dw.dim_date` (un jour par ligne, du 01/01/2022 au 31/12/2027) | `date`, `annee`, `trimestre`, `mois`, `annee_mois` (texte `AAAA-MM`), `semaine_iso`, `jour_semaine` (1 = lundi) |
+| `dw.v_kpi_timing` (1 seule ligne) | `corr_passe`, `corr_futur` (corrélations flux / MASI, résultat +0,43 et −0,08), `masi_moyen_achat`, `masi_moyen_vente` (niveaux du MASI, pondérés par les flux mensuels) |
+| `dw.v_actions_vs_masi` (fonds Actions, une ligne par semaine) | `date`, `flux_net`, `flux_net_pct` (en % de l'actif net de la semaine précédente), `masi`, `masi_perf_4s_passees` (%), `masi_perf_4s_futures` (%) |
+| `dw.fact_masi_quotidien` | `date`, `cloture`, `plus_haut`, `plus_bas`, `var_quotidienne_pct` |
+| `dw.fact_masi_hebdo` (dates AMMC, dernière clôture MASI connue) | `date`, `date_seance`, `masi`, `masi_perf_hebdo_pct` |
+| `dw.v_masi_drawdown` | `date`, `cloture`, `rendement_jour` (**fraction**), `plus_haut_atteint`, `drawdown_pct` |
+| `dw.v_masi_annuel` | `annee`, `nb_seances`, `cloture_fin`, `rendement_pct`, `volatilite_annualisee_pct`, `pire_drawdown_pct` |
+| `dw.v_indices_quotidien` (par indice) | `indice`, `date`, `cloture`, `rendement_jour` (**fraction**), `base_100`, `drawdown_pct` |
+| `dw.v_indices_annuel` | `indice`, `annee`, `nb_seances`, `cloture_fin`, `rendement_pct`, `volatilite_annualisee_pct`, `pire_drawdown_pct` |
+| `dw.v_indices_synthese` (1 ligne par indice) | `indice`, `debut`, `fin`, `rendement_total_pct`, `volatilite_annualisee_pct`, `pire_drawdown_pct`, `drawdown_actuel_pct` |
+| `dw.v_valorisation` (**à créer**, tâche B6) | Colonnes prévues, d'après `staging.valorisation_marche` : `annee`, `perimetre`, `per`, `rendement_dividende_pct`, `estimation` (booléen), `source`, `url_article`, `date_extraction`, `date_article` (date de publication de l'étude : 19,4x est daté du 15/05/2025, 18,0x du 23/10/2026) |
+
+Valeurs de `indice` : `MASI`, `MASI 20` (la table `staging.bvc_indices` peut en contenir d'autres, à vérifier).
 
 ### Contexte économique
-| Table | Utilisation |
+| Table | Colonnes |
 |---|---|
-| `analytics.masi_vs_macro_trimestriel` | MASI vs croissance du PIB |
-| `analytics.masi_rendement_reel` | MASI nominal vs réel |
-| `analytics.inflation_mensuelle`, `analytics.croissance_pib`, `analytics.chomage_trimestriel` | Indicateurs HCP |
-| `analytics.decisions_bam`, `analytics.taux_directeur_quotidien` | Décisions et taux directeur |
-| `analytics.masi_autour_decisions_bam` | MASI 20 séances après chaque décision |
-| `analytics.masi_et_taux_quotidien` | MASI et taux directeur sur un même graphique |
+| `analytics.masi_vs_macro_trimestriel` | `date_ref` (1er jour du trimestre), `annee`, `trimestre`, `masi_fin_trimestre`, `perf_masi_trimestre_pct`, `perf_masi_annuelle_pct`, `croissance_pib_pct`, `chomage_national_pct` |
+| `analytics.masi_rendement_reel` (fin de mois) | `mois`, `derniere_seance`, `masi`, `ipc`, `masi_nominal_base100`, `masi_reel_base100` |
+| `analytics.inflation_mensuelle` | `date_ref` (1er jour du mois), `indice_general` (IPC base 2017 = 100), `inflation_annuelle_pct`, `inflation_mensuelle_pct`, `inflation_alimentaire_pct`, `inflation_non_alimentaire_pct` (glissement annuel) |
+| `analytics.croissance_pib` | `date_ref`, `annee`, `trimestre`, `pib_volume`, `croissance_annuelle_pct`, `croissance_trimestrielle_pct` |
+| `analytics.chomage_trimestriel` | `date_ref`, `annee`, `trimestre`, `chomage_national_pct`, `chomage_urbain_pct`, `chomage_rural_pct`, `chomage_jeunes_pct` (15-24 ans) |
+| `analytics.decisions_bam` | `date_effet`, `taux_directeur_pct`, `variation_pb`, `type_decision` (`initial`, `hausse`, `baisse`, `maintien`, en minuscules) |
+| `analytics.taux_directeur_quotidien` (un jour calendaire par ligne, jusqu'au jour du `dbt build`) | `date_jour`, `taux_directeur_pct`, `date_derniere_decision` |
+| `analytics.masi_moyennes_decisions_bam` (tâche A8, 1 ligne par type de décision : `baisse`, `maintien`) | `type_decision`, `nb_decisions`, `rendement_anormal_5_moyen_pct`, `rendement_anormal_20_moyen_pct` |
+| `analytics.masi_autour_decisions_bam` | `date_annonce` (date d'effet − 2 jours), `type_decision`, `variation_pb`, `taux_directeur_pct`, `seance_reference`, `masi_avant`, `perf_5_seances_pct`, `perf_20_seances_pct`, `reference_5_seances_pct`, `reference_20_seances_pct`, `rendement_anormal_5_pct`, `rendement_anormal_20_pct` |
+| `analytics.masi_et_taux_quotidien` | `date_seance`, `masi`, `taux_directeur_pct` |
 
 ### Taux et obligations
-| Table | Utilisation |
+Valeurs de `categorie` : `Monétaire`, `Obligations CT`, `Obligations MLT`.
+Valeurs de `maturite` : `13 sem`, `1 an`, `2 ans`, `5 ans`, `10 ans`.
+
+| Table | Colonnes |
 |---|---|
-| `analytics.courbe_taux_quotidienne` | Courbe interpolée (13 semaines, 1, 2, 5, 10 ans) |
-| `analytics.fonds_taux_annuel` | Rendement annuel des fonds monétaires, CT, MLT |
-| `analytics.obligations_vs_taux_hebdo` | Rendement hebdomadaire des fonds vs variation du taux 10 ans |
-| `analytics.sensibilite_fonds_taux` | Sensibilité implicite (régression) |
-| `analytics.taux_autour_decisions_bam` | Écart taux 13 semaines / taux directeur avant les décisions |
-| `analytics.flux_fonds_taux_annuel`, `analytics.flux_fonds_taux_timing` | Flux des fonds de taux |
+| `analytics.courbe_taux_quotidienne` | `date_courbe`, `maturite`, `cible_ans`, `taux_pct`, `maturite_bas_ans`, `maturite_haut_ans` (les deux dernières : points réels encadrant la maturité cible, pour l'interpolation) |
+| `analytics.fonds_taux_annuel` | `categorie`, `annee`, `date_debut`, `date_fin`, `rendement_pct`, `taux_10a_debut`, `taux_10a_fin`, `var_taux_10a_pb` |
+| `analytics.obligations_vs_taux_hebdo` | `date_semaine`, `categorie`, `indice`, `rendement_hebdo_pct`, `date_courbe`, `taux_13s`, `taux_2a`, `taux_5a`, `taux_10a`, `var_taux_10a_pb`, `var_taux_5a_pb`, `pente_10a_13s_pt` |
+| `analytics.sensibilite_fonds_taux` (2 périodes × 3 catégories) | `periode` (`Toute la période` ou `Depuis le 24/03/2023 (nouvelle méthode BAM)`), `categorie`, `nb_semaines`, `sensibilite_implicite`, `correlation`, `r2` |
+| `analytics.taux_autour_decisions_bam` | `date_effet`, `decision` (`Hausse`, `Baisse`, `Maintien`, avec majuscule), `taux_avant`, `taux_apres`, `date_courbe_veille`, `taux_13s_veille`, `ecart_13s_vs_directeur_pb`, `var_13s_30j_pb`, `pente_10a_13s_pt` |
+| `analytics.flux_fonds_taux_annuel` | `categorie`, `annee`, `rendement_pct`, `var_taux_10a_pb`, `flux_net` |
+| `analytics.flux_fonds_taux_timing` (1 ligne par catégorie) | `categorie`, `nb_semaines`, `corr_flux_rend_passe`, `corr_flux_rend_futur`, `corr_flux_taux_passe`, `corr_flux_taux_futur` |
 
 ### Introductions en bourse
-| Table | Utilisation |
+| Table | Colonnes |
 |---|---|
-| `analytics.ipo_performance` | Performance de chaque IPO à 5 séances, 1 mois, depuis l'IPO, écart avec le MASI |
-| `analytics.ipo_operations` (seed) | Prix, sursouscription, date de cotation. 7 lignes dont Laprophan, sans date : le site affiche seulement les IPO cotées (6) |
+| `analytics.ipo_performance` (1 ligne par IPO cotée) | Identité : `ticker`, `societe`, `date_premiere_cotation`, `prix_ipo`, `montant_mdh`, `type_operation`, `sursouscription`, `nb_souscripteurs`, `taux_satisfaction_pct`. Cours : `nb_seances`, `date_dernier_cours`, `dernier_cours`. Rendement depuis le prix d'IPO (%) : `rdt_j1_pct`, `rdt_j5_pct`, `rdt_1m_pct`, `rdt_6m_pct`, `rdt_1a_pct`, `rdt_depuis_ipo_pct`. MASI : `masi_depuis_ipo_pct`. Écart avec le MASI (points) : `anormal_j1_pts`, `anormal_j5_pts`, `anormal_1m_pts`, `anormal_6m_pts`, `anormal_1a_pts`, `anormal_depuis_ipo_pts`. Gain : `gain_pour_100_dh_demandes`. Achat en bourse à la 20e séance (tâche A8) : `cours_j20`, `rdt_achat_j20_pct` |
+| `analytics.ipo_operations` (seed, saisie à la main) | `ticker`, `societe`, `date_premiere_cotation` (vide = pas encore cotée), `prix_ipo`, `montant_mdh`, `type_operation`, `sursouscription`, `nb_souscripteurs`, `taux_satisfaction_pct`, `source` |
+
+Horizons de `ipo_performance` : en **séances** de bourse (J1, J5, « 1 mois » = 20e séance, 6 mois = 120,
+1 an = 250). Une colonne est vide (`NULL`) si l'IPO n'a pas encore atteint cet horizon.
+Le rendement d'un achat à la 20e séance (résultat 14) est dans `rdt_achat_j20_pct` (tâche A8).
+
+### Incertitudes relevées à la tâche A2
+À confirmer avant de les utiliser dans le site :
+1. **Tables AMMC** : décrites à la tâche A5 (`sql/01_staging_ammc.sql`, relevé de la base locale). Les
+   montants sont en `NUMERIC(20,2)`, `indice` et les variations en `DOUBLE PRECISION`.
+2. **Unité de `actif_net`, `souscriptions`, `rachats`, `flux_net`** : pas écrite dans le dépôt, mais les
+   dirhams (MAD) sont confirmés indirectement : la somme annuelle des flux Actions divisée par 10⁹ redonne
+   les +1,1 / +10,6 / −0,6 Md MAD du README (tâche A8).
+3. **Majuscules** : `decisions_bam.type_decision` est en minuscules (`hausse`), alors que
+   `taux_autour_decisions_bam.decision` a une majuscule (`Hausse`). Le site doit gérer les deux.
+4. **`gain_pour_100_dh_demandes`** : formule `(dernier cours / prix IPO − 1) × taux_satisfaction_pct`.
+   L'unité du résultat n'est pas documentée, et la colonne est vide pour les IPO sans taux de satisfaction
+   (3 sur 6 d'après la section « Points à trancher »).
+5. **`dw.v_indices_*`** : elles lisent tous les indices de `staging.bvc_indices`, pas seulement MASI et
+   MASI 20. Les valeurs réellement présentes sont à vérifier avant de proposer un choix d'indice.
+6. **`var_quotidienne_pct`** (`dw.fact_masi_quotidien`) vient telle quelle de la source : unité non vérifiée.
+7. **`analytics.taux_directeur_quotidien`** s'étend jusqu'à `current_date` à chaque `dbt build` : le nombre
+   de lignes change chaque jour, sans nouvelle donnée.
+8. **Dernière semaine MASI** : réglé à la tâche A9. `dw.fact_masi_hebdo` s'arrête à la dernière séance MASI
+   en base (30/10/2026 au 06/11/2026) : une semaine AMMC plus récente que le MASI n'y apparaît pas
+   (donc pas non plus dans `dw.v_actions_vs_masi` ni `dw.v_kpi_timing`).
+9. **Décision BAM « maintien »** : la moyenne à 20 séances est +0,35 point (9 maintiens), pas +0,7 comme
+   dans le README (déjà signalé dans « Points à trancher »). Seule la valeur des baisses (+4,2) est confirmée.
 
 ## Quelle source pour quel chiffre
 Plusieurs méthodes valables donnent des chiffres différents. Le site suit ce tableau.
@@ -94,10 +176,19 @@ Plusieurs méthodes valables donnent des chiffres différents. Le site suit ce t
 | Résultat 11 : corrélation flux 0,15 (MLT) et 0,43 (Actions) | 0,15 : flux en dirhams. 0,43 : flux en % de l'actif net | Mesures différentes : le site le signale s'il les compare |
 | Résultat 15 : placements | `analytics.synthese_classes_actifs` (9 lignes, 7 dans le README). Sharpe du Monétaire : stocké `0,00`, affiché `—` | — |
 
-## Chiffres à fournir par la base (tâche A8)
-Ces chiffres n'existent encore dans aucune colonne, et le site n'a pas le droit de les calculer :
-achat d'une IPO au 20e jour (résultat 14), flux annuels des fonds actions (résultat 1), moyennes
-après décision BAM (résultat 7), « 58 % du rendement » (carte vedette de l'accueil).
+## Chiffres ajoutés en dbt (tâche A8)
+Ces 4 chiffres n'existaient dans aucune colonne, et le site n'a pas le droit de les calculer. Ils sont
+maintenant fournis par la base, et leurs valeurs sont celles du README sur la copie figée au 03/11/2026.
+
+| Chiffre | Table et colonne | Valeur de contrôle |
+|---|---|---|
+| Résultat 14 : achat d'une IPO à la 20e séance | `analytics.ipo_performance.rdt_achat_j20_pct` (cours d'achat : `cours_j20`) | SGTM −40,9 % ; Vicenne −36,9 % ; Cash Plus −32,5 % ; CMGP −28,8 % ; T2S −15,1 % ; CFG Bank +20,2 % |
+| Résultat 1 : flux annuels des fonds Actions | `analytics.flux_opcvm_annuel` (`flux_net_md`, en Md MAD, par catégorie et par année) | 2024 +1,1 ; 2025 +10,6 ; 2026 −0,6 (jusqu'au 16/10) |
+| Résultat 7 : moyennes après décision BAM | `analytics.masi_moyennes_decisions_bam` (`rendement_anormal_20_moyen_pct`, `rendement_anormal_5_moyen_pct`) | Baisses : +4,2 points (3 décisions) à 20 séances |
+| « 58 % du rendement » (carte vedette de l'accueil) | `analytics.synthese_classes_actifs.part_rdt_masi_pct` (rendement annualisé en % de celui du MASI) ; `part_risque_masi_pct` pour « la moitié de son risque » | Portefeuille équilibré : 58,3 % du rendement (arrondi `58 %` dans le README), 49,5 % du risque |
+
+« 58 % » compare les rendements **annualisés** (7,43 % / 12,73 %). Avec les rendements cumulés on
+obtiendrait 55,5 % : le site doit utiliser la colonne `part_rdt_masi_pct`, pas recalculer.
 
 ## Points à trancher par Ahmed
 - Résultat 7 : le README indique +0,7 point après un maintien, la base donne +0,35 (9 maintiens).

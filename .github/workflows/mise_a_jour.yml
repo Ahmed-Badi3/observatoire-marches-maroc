@@ -1,0 +1,103 @@
+# Mise à jour hebdomadaire de la base Supabase (tâche C4).
+# Image : un employé fait le tour chaque samedi. Il récupère les nouveautés AMMC et Bank Al-Maghrib,
+# met la base en ligne à jour, reconstruit les résultats dbt, puis laisse un mot (un commit) avec les CSV.
+#
+# Secret à créer une fois : Settings > Secrets and variables > Actions > DATABASE_URL
+# (URL Session pooler de Supabase, avec le rôle postgres.<identifiant du projet>). Jamais dans le code.
+#
+# Si une étape échoue, tout s'arrête et GitHub envoie un e-mail : rien n'est enregistré à moitié.
+
+name: Mise à jour hebdomadaire
+
+on:
+  schedule:
+    - cron: "0 6 * * 6"      # chaque samedi à 6 h UTC (7 h au Maroc)
+  workflow_dispatch:          # lancement manuel depuis l'onglet Actions
+
+permissions:
+  contents: write             # nécessaire seulement pour enregistrer les CSV mis à jour
+
+concurrency:
+  group: mise-a-jour
+  cancel-in-progress: false   # un lancement en cours n'est jamais coupé par un autre
+
+jobs:
+  mise-a-jour:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}   # lue par scripts/connexion.py
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+
+      - name: Préparer la connexion (secret DATABASE_URL vers variables dbt)
+        run: |
+          python - <<'PY'
+          import os, sys
+          from urllib.parse import unquote, urlparse
+
+          url = os.environ.get("DATABASE_URL", "")
+          if not url:
+              sys.exit("Le secret DATABASE_URL est absent : voir l'en-tête de ce fichier.")
+          p = urlparse(url)
+          mot_de_passe = unquote(p.password or "")
+          print(f"::add-mask::{mot_de_passe}")   # le mot de passe n'apparaîtra jamais dans les journaux
+          with open(os.environ["GITHUB_ENV"], "a") as f:
+              f.write(f"SUPABASE_DB_HOST={p.hostname}\n")
+              f.write(f"SUPABASE_DB_PORT={p.port or 5432}\n")
+              f.write(f"SUPABASE_DB_USER={unquote(p.username or '')}\n")
+              f.write(f"SUPABASE_DB_PASSWORD={mot_de_passe}\n")
+              f.write(f"SUPABASE_DB_NAME={p.path.lstrip('/') or 'postgres'}\n")
+          PY
+
+      # ---------- AMMC : statistiques hebdomadaires des OPCVM ----------
+      - name: AMMC, télécharger les nouveaux fichiers (01)
+        run: python scripts/01_telecharger_ammc.py
+
+      - name: AMMC, ajouter les nouvelles semaines aux CSV (11)
+        run: python scripts/11_ajouter_semaines_ammc.py
+
+      - name: AMMC, recharger les tables staging depuis les CSV (04)
+        run: python scripts/04_charger_postgres.py
+
+      # ---------- Bank Al-Maghrib : courbe des taux ----------
+      - name: BAM, collecter les jours manquants (07)
+        run: python scripts/07_collecter_courbe_bam.py
+
+      - name: BAM, charger dans la base (08)
+        run: |
+          if [ -f data/raw/taux/courbe_bam_brut.csv ]; then
+            python scripts/08_charger_courbe_bam.py
+          else
+            echo "Aucune courbe nouvelle : rien à charger."
+          fi
+
+      # ---------- Résultats dbt ----------
+      - name: dbt, reconstruire et tester (cible supabase)
+        working-directory: observatoire_dbt
+        run: dbt build --target supabase --profiles-dir ci
+
+      # ---------- Garder la trace dans le dépôt ----------
+      - name: Enregistrer les CSV AMMC mis à jour
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/processed/ammc_*.csv data/processed/inventaire_ammc.csv
+          if git diff --cached --quiet; then
+            echo "Aucune nouvelle semaine AMMC : rien à enregistrer."
+          else
+            git commit -m "Mise à jour hebdomadaire des données AMMC ($(date -u +%F))"
+            git push || (git pull --rebase && git push)
+          fi

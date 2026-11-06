@@ -14,7 +14,7 @@ import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
 
-from config import PG
+from connexion import PG
 
 DOSSIER = Path(__file__).resolve().parent.parent / "data" / "raw" / "macro"
 

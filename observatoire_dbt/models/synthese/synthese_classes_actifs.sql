@@ -45,6 +45,12 @@ monetaire as (
     select rdt_annualise as rdt_mon
     from stats
     where actif = 'Monétaire'
+),
+
+masi as (
+    select rdt_annualise as rdt_masi, vol_annualisee as vol_masi
+    from stats
+    where actif = 'MASI'
 )
 
 select
@@ -58,8 +64,12 @@ select
     round((p.pire_baisse * 100)::numeric, 2)                                  as pire_baisse_pct,
     round((s.pire_semaine * 100)::numeric, 2)                                 as pire_semaine_pct,
     round((s.part_semaines_negatives * 100)::numeric, 1)                      as semaines_negatives_pct,
-    round(((s.rdt_annualise - m.rdt_mon) / nullif(s.vol_annualisee, 0))::numeric, 2) as ratio_rendement_risque
+    round(((s.rdt_annualise - m.rdt_mon) / nullif(s.vol_annualisee, 0))::numeric, 2) as ratio_rendement_risque,
+    -- part du rendement annualisé et du risque du MASI (MASI = 100 %), ex. portefeuille équilibré : 58 % du rendement
+    round((s.rdt_annualise / nullif(ma.rdt_masi, 0) * 100)::numeric, 1)       as part_rdt_masi_pct,
+    round((s.vol_annualisee / nullif(ma.vol_masi, 0) * 100)::numeric, 1)      as part_risque_masi_pct
 from stats s
 join pires p using (actif)
 cross join monetaire m
+cross join masi ma
 order by s.rdt_annualise desc

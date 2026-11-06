@@ -2,10 +2,10 @@
 from pathlib import Path
 
 import pandas as pd
-from sqlalchemy import URL, create_engine, text
+from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
-from config import PG
+from connexion import url_sqlalchemy
 
 RACINE = Path(__file__).resolve().parent.parent
 DOSSIER = RACINE / "data" / "raw" / "masi"
@@ -63,9 +63,7 @@ df["date"] = df["date"].dt.date
 df.to_csv(SORTIE, index=False, encoding="utf-8-sig")
 
 # 4) Charger dans PostgreSQL
-url = URL.create("postgresql+psycopg", username=PG["user"], password=PG["password"],
-                 host=PG["host"], port=PG["port"], database=PG["dbname"])
-engine = create_engine(url)
+engine = create_engine(url_sqlalchemy())
 
 CREATION = """
 CREATE TABLE IF NOT EXISTS staging.bvc_indices (

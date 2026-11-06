@@ -9,6 +9,14 @@ models:
           - unique
           - not_null
 
+  - name: masi_moyennes_decisions_bam
+    description: "Moyenne du rendement anormal du MASI à 5 et 20 séances, par type de décision de BAM (baisse, maintien)"
+    columns:
+      - name: type_decision
+        tests:
+          - unique
+          - not_null
+
   - name: masi_rendement_reel
     description: "MASI nominal et réel (déflaté par l'IPC du HCP), base 100, fin de mois"
     columns:

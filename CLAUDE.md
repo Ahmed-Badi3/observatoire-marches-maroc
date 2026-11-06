@@ -15,9 +15,14 @@ avec une image concrète avant le terme technique.
 @docs/TASKS.md
 
 ## Structure du dépôt
-- `scripts/` : collecte et chargement, numérotés 01 à 09, à lancer dans l'ordre.
-  Connexion via `scripts/config.py` (ignoré par Git, modèle : `config.example.py`).
-- `sql/` : tables de `staging` et vues en étoile de `dw`, fichiers 01 à 06. Les schémas se créent à part.
+- `scripts/` : collecte et chargement, numérotés 01 à 09, à lancer dans l'ordre, plus
+  `10_charger_valorisation.py` (PER et dividendes, depuis `data/processed/valorisation_marche.csv`)
+  et `11_ajouter_semaines_ammc.py` (ajoute les nouvelles semaines AMMC aux CSV, après le 01).
+  Connexion par `scripts/connexion.py` : `DATABASE_URL` si elle existe, sinon `scripts/config.py`
+  (ignoré par Git, modèle : `config.example.py`).
+- `sql/` : tables de `staging` et vues en étoile de `dw`, fichiers 01 à 07
+  (`07_site_lecture.sql` : rôle `site_lecture` et vue `dw.v_valorisation`). `sql/local/` : fichiers pour la base
+  locale seulement (droits de l'agent IA, copie figée). Les schémas se créent à part.
 - `observatoire_dbt/` : projet dbt, schéma `analytics` (modules macro, obligations, ipo, synthese).
 - `data/processed/` : CSV nettoyés (sur GitHub). `data/raw/` : fichiers bruts (PAS sur GitHub).
 - `dashboard/` : Power BI (.pbix) + `theme_observatoire.json` (couleurs de référence).
@@ -27,6 +32,8 @@ avec une image concrète avant le terme technique.
 
 ## Bases de données
 - Locale : PostgreSQL 18, base `observatoire_maroc`.
+- Locale, copie figée au 03/11/2026 : base `observatoire_fige` (lecture seule, rôle `site_lecture` local),
+  pour comparer le site aux valeurs de contrôle.
 - En ligne : Supabase, mêmes schémas `staging`, `dw`, `analytics`.
 - Le site se connecte avec le rôle `site_lecture` (SELECT seulement sur `dw` et `analytics`).
 

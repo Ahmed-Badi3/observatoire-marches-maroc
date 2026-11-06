@@ -2,17 +2,15 @@
 from pathlib import Path
 
 import pandas as pd
-from sqlalchemy import URL, create_engine, text
+from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
-from config import PG
+from connexion import url_sqlalchemy
 
 SORTIE = Path(__file__).resolve().parent.parent / "data" / "processed"
 
-# URL.create gère les mots de passe avec caractères spéciaux (@, :, /...)
-url = URL.create("postgresql+psycopg", username=PG["user"], password=PG["password"],
-                 host=PG["host"], port=PG["port"], database=PG["dbname"])
-engine = create_engine(url)
+# La connexion (locale ou DATABASE_URL) est choisie par scripts/connexion.py
+engine = create_engine(url_sqlalchemy())
 
 TABLES = {
     "ammc_actif_net.csv": "ammc_actif_net",

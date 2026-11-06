@@ -4,62 +4,62 @@ Règle : une tâche = une session Claude Code. Cocher seulement après vérifica
 Chaque tâche indique comment je vérifie qu'elle est terminée.
 
 ## Phase A — Préparer le dépôt
-- [ ] **A1** Compléter `.gitignore` : `.env.local`, `node_modules/`, `.next/`, `logs/`.
+- [x] **A1** Compléter `.gitignore` : `.env.local`, `node_modules/`, `.next/`, `logs/`.
   Retirer `logs/dbt.log` du suivi Git. *Vérif : `git status` ne montre plus ces fichiers.*
-- [ ] **A2** Compléter `docs/DATA.md` : colonnes exactes de chaque table listée,
+- [x] **A2** Compléter `docs/DATA.md` : colonnes exactes de chaque table listée,
   à partir de `sql/` et des `.yml` dbt. Signaler toute incertitude. *Vérif : je relis.*
-- [ ] **A3** Créer `scripts/connexion.py` : utilise `DATABASE_URL` si elle existe,
+- [x] **A3** Créer `scripts/connexion.py` : utilise `DATABASE_URL` si elle existe,
   sinon `config.py`. Il doit servir les deux chemins existants : SQLAlchemy et psycopg (04, 05),
   psycopg2 (06, 08, 09). Le 07 l'utilisera à la tâche C3.
   *Vérif : chaque script tourne toujours en local, mêmes nombres de lignes.*
-- [ ] **A4** Mesurer la taille de la base locale
+- [x] **A4** Mesurer la taille de la base locale
   (`SELECT pg_size_pretty(pg_database_size('observatoire_maroc'));`).
   *Vérif : moins de 500 Mo, noté dans DECISIONS.md.*
-- [ ] **A5** Écrire `sql/01_staging_ammc.sql` (vide aujourd'hui) à partir de la structure des 4 tables
+- [x] **A5** Écrire `sql/01_staging_ammc.sql` (vide aujourd'hui) à partir de la structure des 4 tables
   AMMC de la base locale. Dans `sql/06`, remplacer `DROP TABLE` par `CREATE TABLE IF NOT EXISTS` et
   retirer le `GRANT` à `agent_lecture` vers un fichier réservé au local.
   *Vérif : sur une base de test vide, `sql/01`, `04`, `05`, `06` s'exécutent sans erreur.*
-- [ ] **A6** Compléter `requirements.txt` avec `psycopg2-binary` et `dbt-postgres`, versions à valider.
+- [x] **A6** Compléter `requirements.txt` avec `psycopg2-binary` et `dbt-postgres`, versions à valider.
   *Vérif : installation dans un environnement neuf, les scripts et `dbt --version` démarrent.*
-- [ ] **A7** Exporter `staging.valorisation_marche` dans un CSV suivi par Git, ajouter la date de
+- [x] **A7** Exporter `staging.valorisation_marche` dans un CSV suivi par Git, ajouter la date de
   publication de chaque étude et créer un script de chargement (ajouter ce script dans la structure de
   `CLAUDE.md`). `n8n/` ne change pas. *Vérif : 21 lignes rechargées, 19,4x daté de mai 2025, 18,0x
   d'octobre 2026.*
-- [ ] **A8** Ajouter en dbt les chiffres absents de la base : achat d'une IPO au 20e jour, flux annuels
+- [x] **A8** Ajouter en dbt les chiffres absents de la base : achat d'une IPO au 20e jour, flux annuels
   des fonds actions, moyennes après décision BAM, « 58 % du rendement ». *Vérif : SGTM −40,9 %,
   flux 2025 +10,6 Md, baisses +4,2, 58 %.*
-- [ ] **A9** Arrêter `dw.fact_masi_hebdo` à la dernière date couverte par le MASI, pour éviter de répéter
+- [x] **A9** Arrêter `dw.fact_masi_hebdo` à la dernière date couverte par le MASI, pour éviter de répéter
   une clôture figée sur les nouvelles semaines AMMC. *Vérif : corrélations +0,43 et −0,08 inchangées.*
 
 ## Phase B — La base dans Supabase
-- [ ] **B1** Créer le projet Supabase (région Europe), connecter le MCP Supabase.
+- [x] **B1** Créer le projet Supabase (région Europe), connecter le MCP Supabase.
   *Vérif : Claude liste les schémas du projet.*
-- [ ] **B2** Créer les schémas `staging` et `dw`, exécuter `sql/01`, `04`, `05` et `06`.
+- [x] **B2** Créer les schémas `staging` et `dw`, exécuter `sql/01`, `04`, `05` et `06`.
   Les vues de `sql/02` et `03` attendent la tâche B3, car elles lisent des tables créées par les scripts.
   *Vérif : les tables existent, vides.*
-- [ ] **B3** Depuis mon PC, avec `DATABASE_URL` vers Supabase, relancer les chargements
+- [x] **B3** Depuis mon PC, avec `DATABASE_URL` vers Supabase, relancer les chargements
   (04, 05, 06, 08, 09 et le chargeur PER de A7), puis exécuter `sql/02` et `sql/03`.
   *Vérif : nombre de lignes identique au local, table par table, et les vues `dw` répondent.*
-- [ ] **B4** Ajouter la cible `supabase` dans `profiles.yml` (hors dépôt), lancer
+- [x] **B4** Ajouter la cible `supabase` dans `profiles.yml` (hors dépôt), lancer
   `dbt build --target supabase`. *Vérif : tous les tests dbt passent.*
-- [ ] **B5** Contrôle des chiffres : requêtes sur Supabase pour 4 valeurs de contrôle
+- [x] **B5** Contrôle des chiffres : requêtes sur Supabase pour 4 valeurs de contrôle
   (MASI +42,3 % et Sharpe 0,66 ; corrélation flux +0,43 ; CFG Bank +66,4 %).
   *Vérif : identiques au README.*
-- [ ] **B6** Créer le rôle `site_lecture` (SELECT sur `dw` et `analytics`) et une vue
+- [x] **B6** Créer le rôle `site_lecture` (SELECT sur `dw` et `analytics`) et une vue
   `dw.v_valorisation` pour les PER, avec leur date de publication. Vérifier que ces droits survivent
   à `dbt build`, sinon les déclarer dans dbt. *Vérif : `site_lecture` lit une vue et ne peut pas
   écrire, y compris après un nouveau `dbt build --target supabase`.*
-- [ ] **B7** Créer en local une copie figée de la base (données au 03/11/2026), pour comparer le site
+- [x] **B7** Créer en local une copie figée de la base (données au 03/11/2026), pour comparer le site
   aux valeurs de contrôle même quand Supabase aura évolué. Le site de vérification s'y connecte avec un
   rôle en lecture seule. *Vérif : les 12 lignes de contrôle de DATA.md s'y retrouvent.*
 
 ## Phase C — La mise à jour hebdomadaire
-- [ ] **C1** Vérifier les conditions d'utilisation des sites AMMC et Bank Al-Maghrib
+- [x] **C1** Vérifier les conditions d'utilisation des sites AMMC et Bank Al-Maghrib
   pour une collecte automatique hebdomadaire. *Vérif : noté dans DATA.md.*
-- [ ] **C2** Adapter la collecte AMMC pour ne télécharger que les nouvelles semaines
+- [x] **C2** Adapter la collecte AMMC pour ne télécharger que les nouvelles semaines
   et **ajouter** ces semaines aux CSV de `data/processed/`, sans les réécrire depuis `data/raw/`,
   absent de GitHub. *Vérif : relancer deux fois n'ajoute rien, l'historique reste complet.*
-- [ ] **C3** Adapter `07_collecter_courbe_bam.py` pour reprendre depuis la dernière date
+- [x] **C3** Adapter `07_collecter_courbe_bam.py` pour reprendre depuis la dernière date
   en base (et plus depuis le fichier brut local). *Vérif : il ne collecte que les jours manquants.*
 - [ ] **C4** Créer `.github/workflows/mise_a_jour.yml` : chaque samedi, AMMC (C2) + courbe
   (C3) + `dbt build --target supabase` ; `DATABASE_URL` dans les Secrets GitHub. Ajouter un profil dbt

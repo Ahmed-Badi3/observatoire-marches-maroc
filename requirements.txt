@@ -6,3 +6,6 @@ xlrd
 python-calamine
 sqlalchemy
 psycopg[binary]
+psycopg2-binary>=2.9
+dbt-core>=1.11,<1.12
+dbt-postgres>=1.11,<1.12

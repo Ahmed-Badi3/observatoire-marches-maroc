@@ -9,7 +9,7 @@ import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
 
-from config import PG
+from connexion import PG
 
 FICHIER_CSV = Path(__file__).resolve().parent.parent / "data" / "raw" / "taux" / "courbe_bam_brut.csv"
 COLONNES = ["date_courbe", "date_echeance", "transaction_mmad", "taux_pct", "date_valeur"]

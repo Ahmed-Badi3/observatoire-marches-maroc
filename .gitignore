@@ -9,6 +9,14 @@ __pycache__/
 # Données brutes téléchargées (213 fichiers AMMC, régénérables avec les scripts)
 data/raw/
 
+# Site web (web/) : secrets et dossiers générés
+.env.local
+node_modules/
+.next/
+
+# Journaux (dbt, etc.) : régénérés à chaque exécution
+logs/
+
 # Fichiers temporaires
 *.tmp
 ~$*

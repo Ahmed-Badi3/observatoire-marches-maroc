@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: flux_opcvm_annuel
+    description: "Flux net annuel (souscriptions − rachats) de chaque catégorie d'OPCVM, en MAD et en milliards (flux_net_md). 1re et dernière année partielles (nb_semaines)."
+    columns:
+      - name: categorie
+        tests:
+          - not_null
+      - name: annee
+        tests:
+          - not_null
+      - name: flux_net_md
+        tests:
+          - not_null
