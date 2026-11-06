@@ -3,9 +3,9 @@
 //
 // Trois détails typographiques :
 // - le signe moins est le vrai « − » (U+2212), pas le tiret « - » ;
-// - l'espace des milliers est l'espace fine insécable de Intl (U+202F) ;
-// - l'espace avant %, pts, pb, x ou Md est insécable (U+00A0) : le chiffre et son
-//   unité ne sont jamais séparés par un retour à la ligne.
+// - l'espace des milliers et celle avant %, pts, pb ou Md sont des espaces insécables (U+00A0) :
+//   un chiffre n'est jamais coupé par un retour à la ligne. (Intl met une espace fine U+202F
+//   pour les milliers, mais la police du site la rend presque invisible : on la remplace.)
 //
 // Les colonnes `_pct` de la base sont DÉJÀ en pourcentage : 42.26 devient « +42,3 % ».
 // Une valeur manquante (null, vide, non numérique) s'affiche « — » au lieu de planter.
@@ -33,7 +33,9 @@ function formaterNombre(v: Valeur, { decimales = 1, signe = false }: Options = {
   const texte = new Intl.NumberFormat("fr-FR", {
     minimumFractionDigits: decimales,
     maximumFractionDigits: decimales,
-  }).format(Math.abs(n));
+  })
+    .format(Math.abs(n))
+    .replace(/ /g, ESPACE);
   const estZero = !/[1-9]/.test(texte);
   if (estZero) return texte;
   if (n < 0) return MOINS + texte;

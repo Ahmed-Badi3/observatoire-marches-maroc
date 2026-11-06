@@ -33,6 +33,7 @@ export const URL_GITHUB =
 export const MENTION_LEGALE =
   "Projet personnel à but pédagogique. Données publiques (AMMC, Bourse de Casablanca, Bank Al-Maghrib, HCP). Ne constitue pas un conseil en investissement.";
 
-export function pageCourante(chemin: string): PageSite {
-  return PAGES.find((p) => p.href === chemin) ?? PAGES[0];
+// null pour une page hors menu (pages de démonstration).
+export function pageCourante(chemin: string): PageSite | null {
+  return PAGES.find((p) => p.href === chemin) ?? null;
 }

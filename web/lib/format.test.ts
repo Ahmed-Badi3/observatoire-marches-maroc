@@ -13,8 +13,7 @@ import {
 } from "./format";
 
 // Caractères invisibles écrits explicitement, pour que le test voie la différence :
-const NBSP = " "; // espace insécable avant l'unité
-const FINE = " "; // espace fine insécable des milliers
+const NBSP = " "; // espace insécable : milliers et avant l'unité
 const MOINS = "−"; // vrai signe moins
 
 describe("pourcentages", () => {
@@ -55,16 +54,16 @@ describe("points, points de base, multiples, milliards", () => {
 
 describe("nombres et montants", () => {
   it("séparateurs français", () => {
-    expect(formatNombre(16537.91)).toBe(`16${FINE}537,91`);
+    expect(formatNombre(16537.91)).toBe(`16${NBSP}537,91`);
     expect(formatNombre(0.66)).toBe("0,66");
-    expect(formatNombre(1234567.891, { decimales: 0 })).toBe(`1${FINE}234${FINE}568`);
+    expect(formatNombre(1234567.891, { decimales: 0 })).toBe(`1${NBSP}234${NBSP}568`);
   });
   it("corrélation avec signe", () => {
     expect(formatNombre(0.43, { signe: true })).toBe("+0,43");
     expect(formatNombre(-0.08, { signe: true })).toBe(`${MOINS}0,08`);
   });
   it("montant en dirhams", () => {
-    expect(formatMontant(16537.91)).toBe(`16${FINE}537,91${NBSP}MAD`);
+    expect(formatMontant(16537.91)).toBe(`16${NBSP}537,91${NBSP}MAD`);
   });
 });
 

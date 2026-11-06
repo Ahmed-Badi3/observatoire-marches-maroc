@@ -119,9 +119,9 @@ export function AppShell({
           <div className="min-w-0">
             <p className="truncate text-xs text-texte-secondaire">
               Observatoire
-              {page.href !== "/" && <> / {page.titre}</>}
+              {page?.href !== "/" && <> / {page?.titre ?? "Hors menu"}</>}
             </p>
-            <h1 className="truncate text-2xl font-semibold text-texte">{page.titre}</h1>
+            <h1 className="truncate text-2xl font-semibold text-texte">{page?.titre ?? "Page hors menu"}</h1>
           </div>
         </header>
 
