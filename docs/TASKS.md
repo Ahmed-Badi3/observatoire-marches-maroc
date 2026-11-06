@@ -92,23 +92,23 @@ Chaque tâche indique comment je vérifie qu'elle est terminée.
 - [x] **E1** Composants communs : carte KPI, carte vedette, carte de résultat, onglets,
   tableau triable, squelette de chargement. *Vérif : page de démonstration.*
 - [x] **E2** Accueil : bandeau, 2 cartes vedettes, 4 cartes KPI.
-- [ ] **E3** Accueil : nuage rendement / risque + tableau triable des placements + rangée des 6 modules.
-- [ ] **E4** OPCVM et marché actions : résultats 1 et 2 (flux vs MASI, timing, volatilité, drawdown).
-- [ ] **E5** OPCVM et marché actions : résultats 3 et 4 (MASI vs MASI 20, PER).
-- [ ] **E6** Contexte économique : résultats 5 à 7, bascule nominal / réel.
-- [ ] **E7** Taux et obligations : résultats 8 et 9 (fonds par année, sensibilité).
-- [ ] **E8** Taux et obligations : résultats 10 et 11 (anticipations, flux) + courbe des taux.
-- [ ] **E9** Introductions en bourse : résultats 12 à 14, tableau triable des 6 IPO.
-- [ ] **E10** Synthèse : résultats 15 et 16, choix du portefeuille type.
-- [ ] **E11** Synthèse : résultats 17 et 18, carte de chaleur des corrélations.
-- [ ] **E12** Méthode et sources : architecture, qualité des données, limites, sources.
+- [x] **E3** Accueil : nuage rendement / risque + tableau triable des placements + rangée des 6 modules.
+- [x] **E4** OPCVM et marché actions : résultats 1 et 2 (flux vs MASI, timing, volatilité, drawdown).
+- [x] **E5** OPCVM et marché actions : résultats 3 et 4 (MASI vs MASI 20, PER).
+- [x] **E6** Contexte économique : résultats 5 à 7, bascule nominal / réel.
+- [x] **E7** Taux et obligations : résultats 8 et 9 (fonds par année, sensibilité).
+- [x] **E8** Taux et obligations : résultats 10 et 11 (anticipations, flux) + courbe des taux.
+- [x] **E9** Introductions en bourse : résultats 12 à 14, tableau triable des 6 IPO.
+- [x] **E10** Synthèse : résultats 15 et 16, choix du portefeuille type.
+- [x] **E11** Synthèse : résultats 17 et 18, carte de chaleur des corrélations.
+- [x] **E12** Méthode et sources : architecture, qualité des données, limites, sources.
 
 *Vérif pour chaque tâche E : capture Playwright ordinateur et téléphone, et, sur la copie figée de
 la base (B7), chaque chiffre identique à la valeur de contrôle de DATA.md.*
 
 ## Phase F — Vérification, mise en ligne, vitrine
-- [ ] **F1** Revue complète : téléphone, console sans erreur, donnée manquante gérée, accessibilité clavier.
-- [ ] **F2** README : lien du site en haut, captures, feuille de route mise à jour
+- [x] **F1** Revue complète : téléphone, console sans erreur, donnée manquante gérée, accessibilité clavier.
+- [x] **F2** README : lien du site en haut, captures, feuille de route mise à jour
   (« dashboard public » = le site).
 - [ ] **F3** Test réel : ajouter l'IPO de Laprophan (fin novembre 2026) avec la procédure
   manuelle. *Vérif : la page IPO l'affiche après le prochain build.*

@@ -4,7 +4,7 @@
 // Usage (le site doit tourner, par exemple `npm run build` puis `npx next start -p 3100`) :
 //   node outils/capture.mjs <dossier-de-sortie> <chemin> [<chemin> ...]
 // Exemple :
-//   node outils/capture.mjs ../captures /demo-composants /synthese
+//   node outils/capture.mjs ../captures /opcvm-actions /synthese
 //
 // Variable facultative : SITE_URL (par défaut http://localhost:3100).
 
