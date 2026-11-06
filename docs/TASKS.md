@@ -89,7 +89,7 @@ Chaque tâche indique comment je vérifie qu'elle est terminée.
   *Vérif : le site en ligne affiche la même date.*
 
 ## Phase E — Les pages
-- [ ] **E1** Composants communs : carte KPI, carte vedette, carte de résultat, onglets,
+- [x] **E1** Composants communs : carte KPI, carte vedette, carte de résultat, onglets,
   tableau triable, squelette de chargement. *Vérif : page de démonstration.*
 - [ ] **E2** Accueil : bandeau, 2 cartes vedettes, 4 cartes KPI.
 - [ ] **E3** Accueil : nuage rendement / risque + tableau triable des placements + rangée des 6 modules.
