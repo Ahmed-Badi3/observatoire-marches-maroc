@@ -85,7 +85,7 @@ Chaque tâche indique comment je vérifie qu'elle est terminée.
 - [x] **D5** Fonctions de format français (pourcentages, montants, pb, pts, multiples, dates) avec tests.
   Les colonnes `_pct` sont déjà en pourcentage. *Vérif : tests verts, `42.26` → `+42,3 %`,
   `37.55` → `+37,6 %`, `17.25` → `+17,3 pts`, `18` → `18,0x`.*
-- [ ] **D6** Déployer sur Vercel (dossier racine `web`, variables d'environnement).
+- [x] **D6** Déployer sur Vercel (dossier racine `web`, variables d'environnement).
   *Vérif : le site en ligne affiche la même date.*
 
 ## Phase E — Les pages
