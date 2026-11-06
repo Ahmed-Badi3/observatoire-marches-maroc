@@ -10,7 +10,25 @@ import { MENTION_LEGALE, PAGES, URL_GITHUB, pageCourante } from "@/lib/pages";
 
 // La « coque » du site : barre latérale, barre du haut, contenu, pied de page.
 // Image : le cadre d'un tableau. Les pages ne changent que la peinture à l'intérieur.
-export function AppShell({ children }: { children: React.ReactNode }) {
+// Date AAAA-MM-JJ -> « 23 octobre 2026 ». Lue en UTC pour éviter tout décalage de fuseau.
+// (Les fonctions de format français complètes arrivent à la tâche D5.)
+function dateEnFrancais(iso: string): string {
+  const [a, m, j] = iso.split("-").map(Number);
+  return new Date(Date.UTC(a, m - 1, j)).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+export function AppShell({
+  children,
+  dateAmmc,
+}: {
+  children: React.ReactNode;
+  dateAmmc: string | null;
+}) {
   const chemin = usePathname();
   const [menuOuvert, setMenuOuvert] = useState(false);
   const page = pageCourante(chemin);
@@ -83,8 +101,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="space-y-2 border-t border-separateur p-6 text-xs text-texte-secondaire">
-          {/* La date réelle arrive à la tâche D4 (lue dans la base) */}
-          <p>Dernière mise à jour : —</p>
+          <p>
+            Données AMMC jusqu&apos;au {dateAmmc ? dateEnFrancais(dateAmmc) : "—"}
+          </p>
           <a
             href={URL_GITHUB}
             target="_blank"

@@ -76,11 +76,11 @@ Chaque tâche indique comment je vérifie qu'elle est terminée.
   installer shadcn/ui, Recharts, lucide-react et la police Plus Jakarta Sans.
   Le client PostgreSQL (D4), l'outil de test (D5) et Playwright (tâches E) restent à me faire valider
   avant installation. *Vérif : `npm run dev` affiche la page par défaut.*
-- [ ] **D2** Couleurs, police, rayons et ombres de DESIGN.md en variables CSS / Tailwind.
+- [x] **D2** Couleurs, police, rayons et ombres de DESIGN.md en variables CSS / Tailwind.
   *Vérif : une page de test montre chaque couleur.*
-- [ ] **D3** Mise en page commune : barre latérale (7 pages), barre du haut, pied de page
+- [x] **D3** Mise en page commune : barre latérale (7 pages), barre du haut, pied de page
   avec mention légale. Pages vides. *Vérif : navigation entre les 7 pages, ordinateur et téléphone.*
-- [ ] **D4** Connexion à Supabase côté serveur avec `site_lecture` (`web/.env.local`),
+- [x] **D4** Connexion à Supabase côté serveur avec `site_lecture` (`web/.env.local`),
   revalidation 24 h. *Vérif : la date de la dernière semaine AMMC s'affiche dans la barre latérale.*
 - [ ] **D5** Fonctions de format français (pourcentages, montants, pb, pts, multiples, dates) avec tests.
   Les colonnes `_pct` sont déjà en pourcentage. *Vérif : tests verts, `42.26` → `+42,3 %`,

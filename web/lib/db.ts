@@ -1,0 +1,38 @@
+import postgres from "postgres";
+
+// Connexion à Supabase, côté serveur uniquement (ce fichier n'est jamais envoyé au navigateur
+// tant qu'il n'est importé que par des composants serveur et par lib/donnees.ts).
+// L'adresse vient de web/.env.local (variable DATABASE_URL), jamais du code.
+// Elle utilise le rôle `site_lecture` : SELECT seulement sur dw et analytics.
+//
+// Image : le pooler de Supabase est un standard téléphonique partagé. En mode « transaction »,
+// chaque requête peut tomber sur une ligne différente : on désactive donc les requêtes
+// préparées à l'avance (prepare: false).
+
+declare global {
+  var __sqlObservatoire: ReturnType<typeof postgres> | undefined;
+}
+
+function creerConnexion() {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error(
+      "DATABASE_URL est absente : créez web/.env.local (voir docs/DATA.md).",
+    );
+  }
+  return postgres(url, {
+    ssl: "require",
+    prepare: false,
+    max: 1, // une fonction serverless = une connexion
+    idle_timeout: 20,
+    connect_timeout: 10,
+  });
+}
+
+// En développement, Next recharge les fichiers souvent : on garde une seule connexion ouverte.
+export function sql() {
+  if (!globalThis.__sqlObservatoire) {
+    globalThis.__sqlObservatoire = creerConnexion();
+  }
+  return globalThis.__sqlObservatoire;
+}
