@@ -4,7 +4,7 @@
 | Source | Données | Script(s) | Fréquence | Automatique ? |
 |---|---|---|---|---|
 | AMMC | Statistiques hebdomadaires OPCVM (actif net, indices, flux) | 01 → 02 → 03 → 04 | Hebdomadaire | Oui, GitHub Actions (phase C). Mise à jour : 01 (nouveautés) → 11 (ajoute les semaines aux CSV) → 04 |
-| Bank Al-Maghrib | Courbe des taux de référence (BDT) | 07 → 08 | Quotidienne (jours ouvrés) | Oui, seulement les nouveaux jours (phase C) |
+| Bank Al-Maghrib | Courbe des taux de référence (BDT) | 07 → 08 | Quotidienne (jours ouvrés) | **Non, depuis le PC** : BAM répond 403 aux serveurs de GitHub (voir « Courbe BAM : routine hebdomadaire ») |
 | Bourse de Casablanca | MASI, MASI 20 (historique 3 ans maximum) vers `staging.bvc_indices` | 05 | Export manuel | Non |
 | Bourse de Casablanca | Cours quotidiens des IPO **et du MASI** vers `staging.bvc_cours_titres` | 09 + seed `ipo_operations.csv` | Manuel | Non |
 | HCP | Inflation (mensuelle), PIB et chômage (trimestriels) | 06 | Mensuelle / trimestrielle | Non |
@@ -38,6 +38,26 @@ des indicateurs calculés, avec la source citée.
    calculés, avec « Source : AMMC » ou « Source : Bank Al-Maghrib » et un lien vers la page d'origine.
 4. **Plan B** : en cas de refus ou de demande d'arrêt, la collecte s'arrête et la procédure manuelle
    (tâche C6) prend le relais. En l'absence de réponse, le site reste en collecte discrète (mesures 2 et 3).
+
+**Constat du 06/11/2026 (première exécution du workflow C4)** : le site de Bank Al-Maghrib répond
+`403 Forbidden` aux serveurs de GitHub Actions (3 jours testés, 3 tentatives chacun), alors qu'une même requête
+avec le même `User-Agent` honnête, depuis un PC, répond `200` avec la courbe. Le refus vient donc de
+l'adresse des serveurs, pas de notre identifiant. Un 403 est un refus : on ne le contourne pas
+(pas de faux navigateur, pas de proxy). Le plan B s'applique pour BAM : la courbe est collectée depuis le PC.
+Le script 07 s'arrête dès le premier 403 au lieu d'insister. L'AMMC, elle, répond normalement à GitHub.
+
+## Courbe BAM : routine hebdomadaire (depuis le PC)
+À faire chaque semaine, après la publication de la courbe de la semaine (idéalement avant le samedi 7 h,
+heure du Maroc, pour que le build dbt automatique la prenne en compte). Dans un terminal, à la racine du
+projet, avec `DATABASE_URL` pointant vers Supabase (URL Session pooler, saisie masquée comme en B3) :
+
+```powershell
+python scripts/07_collecter_courbe_bam.py   # collecte les jours manquants (depuis la dernière date en base)
+python scripts/08_charger_courbe_bam.py     # charge dans staging.bam_courbe_taux (upsert, sans doublon)
+```
+Si ce n'est pas fait avant le build du samedi, ajouter ensuite `cd observatoire_dbt` puis
+`dbt build --target supabase` (profil local, voir `CLAUDE.md`). Rien n'est à pousser dans Git : le fichier
+brut `data/raw/taux/` n'est pas suivi.
 
 **Le MASI vit dans deux tables.** Imagine deux carnets qui notent le même cours :
 `bvc_indices` sert aux vues `dw` et aux modèles `macro`, `bvc_cours_titres` à la synthèse

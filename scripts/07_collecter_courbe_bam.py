@@ -56,6 +56,10 @@ FICHIER_CSV = RACINE / "data" / "raw" / "taux" / "courbe_bam_brut.csv"
 COLONNES = ["date_courbe", "date_echeance", "transaction_mmad", "taux_pct", "date_valeur"]
 
 
+class AccesRefuse(Exception):
+    """Le site répond 403 Forbidden : il refuse cet accès. On s'arrête, sans insister ni contourner."""
+
+
 def nombre_fr(texte):
     """'2,170%' -> 2.17 ; '1 234,56' -> 1234.56 ; '' ou '-' -> None"""
     t = texte.replace("%", "").replace("\xa0", "").replace(" ", "").replace(",", ".")
@@ -73,6 +77,11 @@ def lire_courbe(jour, session):
             reponse = session.get(URL, params=params, headers=HEADERS, timeout=30)
             reponse.raise_for_status()
             break
+        except requests.HTTPError as erreur:
+            if erreur.response is not None and erreur.response.status_code == 403:
+                raise AccesRefuse(str(erreur))     # un « non » du serveur : on n'insiste pas
+            print(f"  {jour:%d/%m/%Y} : tentative {tentative} échouée ({erreur})")
+            time.sleep(5)
         except requests.RequestException as erreur:
             print(f"  {jour:%d/%m/%Y} : tentative {tentative} échouée ({erreur})")
             time.sleep(5)
@@ -176,8 +185,14 @@ def main():
     # 3. Boucle de collecte
     session = requests.Session()
     lignes, jours_vides, nb_collectees = [], [], 0
+    refus = False
     for i, jour in enumerate(jours, start=1):
-        resultat = lire_courbe(jour, session)
+        try:
+            resultat = lire_courbe(jour, session)
+        except AccesRefuse:
+            refus = True
+            print(f"  {jour:%d/%m/%Y} : 403 Forbidden, le site refuse l'accès. Arrêt immédiat, sans insister.")
+            break
         if resultat:
             lignes.extend(resultat)
             nb_collectees += len(resultat)
@@ -206,6 +221,11 @@ def main():
     if jours_vides:
         print(f"Jours sans courbe ({len(jours_vides)}) : {', '.join(jours_vides[:20])}"
               + (" ..." if len(jours_vides) > 20 else ""))
+
+    if refus:
+        print("\nERREUR : Bank Al-Maghrib refuse l'accès (403). C'est typique des serveurs de GitHub Actions : "
+              "lancez ce script depuis votre PC (voir docs/DATA.md).")
+        return 1
 
     # Garde-fou : si le site a changé ou ne répond plus, on ne veut pas un « succès » silencieux
     if nb_collectees == 0 and len(jours) >= SEUIL_ALERTE_JOURS:

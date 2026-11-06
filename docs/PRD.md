@@ -53,7 +53,9 @@ Le chiffre de cette phrase (+42 %) est lu dans la base, comme tous les autres.
 ## Critères de réussite
 - Sur la copie figée des données au 03/11/2026, chaque chiffre affiché est identique au
   README. En ligne, les chiffres évoluent avec les données et leur date est affichée.
-- Les données AMMC et la courbe des taux BAM se mettent à jour chaque semaine sans intervention.
+- Les données AMMC se mettent à jour chaque semaine sans intervention (GitHub Actions). La courbe des
+  taux BAM se met à jour par une commande hebdomadaire depuis un PC, car le site de BAM refuse les
+  serveurs de GitHub (constaté le 06/11/2026, voir `docs/DATA.md`).
 - La date de dernière mise à jour est visible.
 - Le site s'affiche correctement sur téléphone.
 - Un recruteur comprend le projet en 30 secondes sur la page d'accueil.

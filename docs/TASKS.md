@@ -61,8 +61,8 @@ Chaque tâche indique comment je vérifie qu'elle est terminée.
   absent de GitHub. *Vérif : relancer deux fois n'ajoute rien, l'historique reste complet.*
 - [x] **C3** Adapter `07_collecter_courbe_bam.py` pour reprendre depuis la dernière date
   en base (et plus depuis le fichier brut local). *Vérif : il ne collecte que les jours manquants.*
-- [ ] **C4** Créer `.github/workflows/mise_a_jour.yml` : chaque samedi, AMMC (C2) + courbe
-  (C3) + `dbt build --target supabase` ; `DATABASE_URL` dans les Secrets GitHub. Ajouter un profil dbt
+- [ ] **C4** Créer `.github/workflows/mise_a_jour.yml` : chaque samedi, AMMC (C2) +
+  `dbt build --target supabase` (la courbe BAM de C3 reste manuelle : BAM refuse GitHub, voir DATA.md) ; `DATABASE_URL` dans les Secrets GitHub. Ajouter un profil dbt
   sans secret, qui lit ses valeurs dans les variables d'environnement, et faire committer les CSV mis
   à jour par le workflow. *Vérif : lancement manuel réussi depuis l'onglet Actions, et les CSV du
   dépôt contiennent la nouvelle semaine.*

@@ -1,6 +1,7 @@
 # Mise à jour hebdomadaire de la base Supabase (tâche C4).
-# Image : un employé fait le tour chaque samedi. Il récupère les nouveautés AMMC et Bank Al-Maghrib,
-# met la base en ligne à jour, reconstruit les résultats dbt, puis laisse un mot (un commit) avec les CSV.
+# Image : un employé fait le tour chaque samedi. Il récupère les nouveautés de l'AMMC, met la base en ligne
+# à jour, reconstruit les résultats dbt, puis laisse un mot (un commit) avec les CSV.
+# (La courbe Bank Al-Maghrib, elle, est mise à jour à la main depuis le PC : voir plus bas.)
 #
 # Secret à créer une fois : Settings > Secrets and variables > Actions > DATABASE_URL
 # (URL Session pooler de Supabase, avec le rôle postgres.<identifiant du projet>). Jamais dans le code.
@@ -72,17 +73,10 @@ jobs:
       - name: AMMC, recharger les tables staging depuis les CSV (04)
         run: python scripts/04_charger_postgres.py
 
-      # ---------- Bank Al-Maghrib : courbe des taux ----------
-      - name: BAM, collecter les jours manquants (07)
-        run: python scripts/07_collecter_courbe_bam.py
-
-      - name: BAM, charger dans la base (08)
-        run: |
-          if [ -f data/raw/taux/courbe_bam_brut.csv ]; then
-            python scripts/08_charger_courbe_bam.py
-          else
-            echo "Aucune courbe nouvelle : rien à charger."
-          fi
+      # La courbe des taux de Bank Al-Maghrib n'est PAS collectée ici : le site de BAM répond « 403 Forbidden »
+      # aux serveurs de GitHub (constaté le 06/11/2026, alors qu'il répond depuis un PC). On ne contourne pas ce
+      # refus. La courbe se met à jour depuis ton PC (scripts 07 puis 08), voir docs/DATA.md.
+      # Ce build dbt utilise donc les données BAM déjà présentes dans Supabase.
 
       # ---------- Résultats dbt ----------
       - name: dbt, reconstruire et tester (cible supabase)
