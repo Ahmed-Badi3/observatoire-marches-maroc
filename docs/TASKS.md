@@ -72,7 +72,7 @@ Chaque tâche indique comment je vérifie qu'elle est terminée.
 - [ ] **C7** Laisser tourner deux samedis. *Vérif : la nouvelle semaine AMMC apparaît dans Supabase.*
 
 ## Phase D — Le squelette du site
-- [ ] **D1** Créer l'app Next.js dans `web/` (TypeScript, Tailwind CSS, App Router),
+- [x] **D1** Créer l'app Next.js dans `web/` (TypeScript, Tailwind CSS, App Router),
   installer shadcn/ui, Recharts, lucide-react et la police Plus Jakarta Sans.
   Le client PostgreSQL (D4), l'outil de test (D5) et Playwright (tâches E) restent à me faire valider
   avant installation. *Vérif : `npm run dev` affiche la page par défaut.*
