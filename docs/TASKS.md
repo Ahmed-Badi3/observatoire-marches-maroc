@@ -66,7 +66,7 @@ Chaque tâche indique comment je vérifie qu'elle est terminée.
   sans secret, qui lit ses valeurs dans les variables d'environnement, et faire committer les CSV mis
   à jour par le workflow. *Vérif : lancement manuel réussi depuis l'onglet Actions, et les CSV du
   dépôt contiennent la nouvelle semaine.*
-- [ ] **C5** Ajouter le maintien du mercredi (`SELECT 1`). *Vérif : exécution verte.*
+- [x] **C5** Ajouter le maintien du mercredi (`SELECT 1`). *Vérif : exécution verte.*
 - [x] **C6** Écrire dans DATA.md la procédure manuelle (MASI par les scripts 05 et 09, IPO, HCP, PER).
   *Vérif : je peux la suivre seul.*
 - [ ] **C7** Laisser tourner deux samedis. *Vérif : la nouvelle semaine AMMC apparaît dans Supabase.*

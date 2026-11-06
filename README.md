@@ -8,7 +8,7 @@ Projet d'analyse de données de bout en bout : collecte automatisée (scraping),
 
 ## Le site
 
-**Site interactif : <!-- À COMPLÉTER (tâche F2) : adresse Vercel du site --> adresse à ajouter.**
+**Site interactif : [observatoire-marches-maroc.vercel.app](https://observatoire-marches-maroc.vercel.app/)**
 Il présente ces résultats en 7 pages (accueil, OPCVM et marché actions, contexte économique, taux et obligations, introductions en bourse, synthèse, méthode) avec des graphiques interactifs : filtre de période, choix de catégorie ou de portefeuille, bascule nominal / réel, tableaux triables. Il se met à jour chaque semaine sans intervention pour les données de l'AMMC. Le site ne calcule rien : tous les chiffres viennent de la base Supabase (vues `dw` et modèles dbt `analytics`), en lecture seule.
 
 ![Accueil du site](docs/images/site_accueil.png)
