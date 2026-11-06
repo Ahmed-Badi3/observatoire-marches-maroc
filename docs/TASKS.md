@@ -82,7 +82,7 @@ Chaque tâche indique comment je vérifie qu'elle est terminée.
   avec mention légale. Pages vides. *Vérif : navigation entre les 7 pages, ordinateur et téléphone.*
 - [x] **D4** Connexion à Supabase côté serveur avec `site_lecture` (`web/.env.local`),
   revalidation 24 h. *Vérif : la date de la dernière semaine AMMC s'affiche dans la barre latérale.*
-- [ ] **D5** Fonctions de format français (pourcentages, montants, pb, pts, multiples, dates) avec tests.
+- [x] **D5** Fonctions de format français (pourcentages, montants, pb, pts, multiples, dates) avec tests.
   Les colonnes `_pct` sont déjà en pourcentage. *Vérif : tests verts, `42.26` → `+42,3 %`,
   `37.55` → `+37,6 %`, `17.25` → `+17,3 pts`, `18` → `18,0x`.*
 - [ ] **D6** Déployer sur Vercel (dossier racine `web`, variables d'environnement).
