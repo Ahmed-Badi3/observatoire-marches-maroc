@@ -1,0 +1,46 @@
+# Maintien de Supabase (tâche C5).
+# Image : on frappe à la porte une fois par semaine pour que le projet gratuit ne s'endorme pas
+# (Supabase met en pause un projet gratuit resté sans activité pendant 1 semaine).
+# Le robot du samedi (mise_a_jour.yml) fait déjà de l'activité ; le mercredi, ce petit robot ajoute un
+# « SELECT 1 » pour que la semaine ne soit jamais vide, même si le samedi échoue ou saute.
+#
+# Utilise le même secret DATABASE_URL que mise_a_jour.yml. Ne lit ni n'écrit aucune donnée.
+
+name: Maintien de Supabase
+
+on:
+  schedule:
+    - cron: "0 6 * * 3"      # chaque mercredi à 6 h UTC
+  workflow_dispatch:          # lancement manuel depuis l'onglet Actions
+
+permissions: {}               # ce robot n'a besoin d'aucun droit sur le dépôt
+
+jobs:
+  maintien:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    steps:
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Installer le pilote PostgreSQL
+        run: pip install psycopg2-binary
+
+      - name: SELECT 1
+        run: |
+          python - <<'PY'
+          import os, sys
+          import psycopg2
+
+          url = os.environ.get("DATABASE_URL", "")
+          if not url:
+              sys.exit("Le secret DATABASE_URL est absent (voir mise_a_jour.yml).")
+          with psycopg2.connect(url, sslmode="require", connect_timeout=30) as conn, conn.cursor() as cur:
+              cur.execute("SELECT 1")
+              print("Supabase répond :", cur.fetchone())
+          PY

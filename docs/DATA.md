@@ -64,6 +64,73 @@ brut `data/raw/taux/` n'est pas suivi.
 et aux IPO. Une mise à jour manuelle du MASI doit donc passer par les scripts 05 **et** 09.
 Dernières dates au 06/11/2026 : AMMC 16/10, `bvc_indices` 30/10, `bvc_cours_titres` 03/11.
 
+## Procédure manuelle (tâche C6)
+Ce que le robot du samedi ne fait pas : le MASI, les IPO, le HCP, le taux directeur, les PER et la
+courbe BAM (voir plus haut). Chaque source se met à jour à la main depuis le PC, puis la base en ligne
+se reconstruit avec dbt. Les fichiers de `data/raw/` ne sont PAS sur GitHub.
+
+### 0. Se connecter à Supabase (une fois par fenêtre de terminal)
+À la racine du projet, dans PowerShell. Le mot de passe se saisit sans s'afficher :
+```powershell
+$p = Read-Host "Mot de passe Supabase" -AsSecureString
+$pw = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($p))
+$env:DATABASE_URL = "postgresql://postgres.zljkjurzphcipfhshqce:$pw@aws-1-eu-central-1.pooler.supabase.com:5432/postgres"
+Remove-Variable p, pw
+```
+Tous les scripts (04 à 10) chargent alors vers Supabase. Pour viser la base locale : `Remove-Item Env:DATABASE_URL`.
+Pour dbt sur Supabase, il faut en plus les variables `SUPABASE_DB_*` :
+```powershell
+$u = [uri]$env:DATABASE_URL
+$env:SUPABASE_DB_HOST = $u.Host; $env:SUPABASE_DB_PORT = $u.Port
+$env:SUPABASE_DB_USER = [uri]::UnescapeDataString($u.UserInfo.Split(':')[0])
+$env:SUPABASE_DB_PASSWORD = [uri]::UnescapeDataString($u.UserInfo.Substring($u.UserInfo.IndexOf(':') + 1))
+$env:SUPABASE_DB_NAME = $u.AbsolutePath.TrimStart('/')
+```
+
+### 1. MASI et MASI 20 (Bourse de Casablanca), deux tables à tenir à jour
+1. Exporter l'historique (CSV, séparateur `;`, colonnes `Séance;Indice;Valeur indice;Plus haut;Plus bas;Variation
+   quotidienne;Variation annuelle`) dans `data/raw/masi/` (les fichiers du dossier sont tous lus et empilés).
+2. `python scripts/05_charger_masi.py` : recharge `staging.bvc_indices` (MASI et MASI 20) et réécrit
+   `data/processed/masi_quotidien.csv` (suivi par Git : le committer s'il a changé).
+3. Exporter la série du MASI en CSV ou Excel sous `data/raw/ipo/MASI.csv` (le nom du fichier est le ticker), puis
+   `python scripts/09_charger_cours_ipo.py` : recharge `staging.bvc_cours_titres` (upsert, sans doublon).
+4. `cd observatoire_dbt` puis `dbt build --target supabase`.
+
+### 2. IPO (nouvelle cotation, ex. Laprophan, tâche F3)
+1. Ouvrir `observatoire_dbt/seeds/ipo_operations.csv` : la ligne de la société existe peut-être déjà
+   (Laprophan : `date_premiere_cotation` vide tant qu'elle n'est pas cotée). Renseigner la date de première
+   cotation, le prix, le montant, la sursouscription, le nombre de souscripteurs, et la `source` (lien).
+   Sinon ajouter une ligne (une société = un ticker, en majuscules).
+2. Exporter les cours quotidiens de l'action dans `data/raw/ipo/<TICKER>.csv` (ou `.xlsx`) : une colonne de
+   date et une colonne de clôture (« Dernier cours » ou « Clôture »).
+3. `python scripts/09_charger_cours_ipo.py` : il lit tous les fichiers du dossier et affiche, par ticker, le nombre de
+   séances et un avertissement si un saut dépasse 15 % (division du nominal possible).
+4. `cd observatoire_dbt` puis `dbt build --target supabase` (le seed est rechargé par le build).
+5. Committer le seed modifié.
+
+### 3. HCP (inflation, PIB, chômage) et taux directeur BAM
+1. Inflation : exporter « IPC … mensuel » depuis hcp.ma. PIB et chômage trimestriels : bds.hcp.ma. Les mettre
+   dans `data/raw/macro/` avec des noms qui suivent les modèles du script : `IPC*mensuel*.xlsx`,
+   `*composition*PIB*.xlsx`, `*ch*mage*Trimestriel*.xlsx`.
+2. Taux directeur : à chaque décision de BAM, ajouter une ligne à `data/raw/macro/taux_directeur_bam.csv`
+   (colonnes `date_effet,taux_pct,source`, la date étant celle de l'entrée en vigueur).
+3. `python scripts/06_extraire_macro.py` (upsert), puis `dbt build --target supabase` dans `observatoire_dbt`.
+
+### 4. PER et dividendes (presse)
+1. Le workflow n8n (local) écrit dans la base **locale** `staging.valorisation_marche`.
+2. Exporter vers le CSV suivi par Git : `Remove-Item Env:DATABASE_URL` (base locale), puis
+   `python scripts/10_charger_valorisation.py --exporter`. Vérifier que chaque ligne a sa `date_article`.
+3. Committer et pousser `data/processed/valorisation_marche.csv`.
+4. Se connecter à Supabase (étape 0), puis `python scripts/10_charger_valorisation.py` (upsert, relançable).
+   La vue `dw.v_valorisation` lit la table directement : pas besoin de dbt.
+
+### 5. Courbe BAM
+Voir « Courbe BAM : routine hebdomadaire » plus haut (scripts 07 puis 08).
+
+### Vérifier après une mise à jour
+Dans Supabase (éditeur SQL), regarder la dernière date de la table concernée, par exemple
+`select max(date) from staging.bvc_indices;`, et vérifier que `dbt build` termine avec `ERROR=0`.
+
 ## Comment les scripts écrivent en base (important pour l'automatisation)
 - `04_charger_postgres.py` : vide (`TRUNCATE`) puis recharge les 4 tables AMMC
   depuis `data/processed/` → il faut des CSV complets.
