@@ -37,14 +37,28 @@ GitHub Actions ──────────┘  chaque samedi : AMMC + courbe 
 - En local : `scripts/config.py` (comme aujourd'hui).
 - Dans GitHub Actions : variable d'environnement `DATABASE_URL` (Secret du dépôt).
 - Règle : si `DATABASE_URL` existe, les scripts l'utilisent ; sinon, `config.py`.
+- Les scripts parlent à la base par deux chemins : SQLAlchemy et psycopg (04, 05), psycopg2
+  (06, 08, 09). `scripts/connexion.py` doit servir les deux.
+- dbt n'utilise pas `DATABASE_URL` : son profil lit l'hôte, l'utilisateur et le mot de passe
+  séparément. Dans GitHub Actions, il faut un profil sans secret dans le dépôt, qui lit ces valeurs
+  dans des variables d'environnement (tâche C4).
 
 ## Ce qui reste manuel
-Export du MASI, cours des IPO, données HCP, taux directeur, PER (n8n). Procédure :
+Export du MASI, cours des IPO, données HCP, taux directeur, PER. Procédure :
 lancer le script en local avec `DATABASE_URL` pointant vers Supabase, puis
 `dbt build --target supabase`.
+- MASI : scripts 05 **et** 09, car il alimente deux tables.
+- PER : n8n écrit toujours dans la base locale. On exporte ensuite les lignes dans le CSV suivi par
+  Git, puis on lance le chargeur vers Supabase (tâche A7).
+
+## Fraîcheur des données
+- AMMC et courbe BAM sont automatiques, le MASI est manuel. Les vues qui croisent AMMC et MASI
+  s'arrêtent à la dernière semaine couverte par le MASI (tâche A9).
+- Les valeurs de contrôle se comparent sur une copie figée de la base, pas sur le site en ligne (tâche B7).
 
 ## Sécurité
 - `site_lecture` : `GRANT USAGE` et `GRANT SELECT` sur `dw` et `analytics`, rien d'autre.
+  Ces droits doivent survivre à `dbt build` (à vérifier à la tâche B6).
 - Secrets : `scripts/config.py`, `web/.env.local`, Secrets GitHub, variables Vercel.
 - Dépôt public : aucun secret dans un fichier suivi par Git.
 

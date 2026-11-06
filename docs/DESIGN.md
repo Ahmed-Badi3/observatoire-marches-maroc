@@ -30,7 +30,8 @@ les noms ni les images.
 | Neutre / avertissement | `#F2B84B` |
 
 **Séries de graphiques, dans cet ordre :** `#2A9DB0`, `#E8836B`, `#1B6F7E`, `#2E9E5B`,
-`#F2B84B`, `#7A8CA3`, `#9ED3DE`, `#C9D3DA`.
+`#F2B84B`, `#7A8CA3`, `#9ED3DE`, `#C9D3DA`. Même palette que le thème Power BI, dans un ordre
+différent : pour le site, c'est cet ordre qui compte.
 
 **Dégradés des cartes vedettes :**
 - Carte 1 : `#1B6F7E` → `#2A9DB0` (texte blanc)
@@ -77,11 +78,14 @@ parce qu'il est rare.
 1. Bandeau : titre « Où fallait-il placer son argent au Maroc entre 2023 et 2026 ? »
    et la phrase clé du PRD.
 2. Deux cartes vedettes en dégradé : « MASI +42,3 % » et « Portefeuille équilibré :
-   58 % du rendement pour la moitié du risque ».
+   58 % du rendement pour la moitié du risque ». Ces chiffres viennent de la base
+   (tâche A8), jamais écrits dans le code.
 3. Rangée de 4 cartes KPI : rendement annualisé du MASI, volatilité, pire baisse, Sharpe.
 4. Graphique rendement / risque (nuage de points) de tous les placements.
-5. Rangée de 6 cartes « modules » (style rangée de petites cartes de Moderno) qui
-   mènent aux pages.
+5. Tableau triable des placements.
+6. Rangée de 6 cartes « modules » (style rangée de petites cartes de Moderno) qui
+   mènent aux pages. OPCVM et marché actions partagent la même page : leurs deux
+   cartes ouvrent chacune le bon onglet.
 
 ## Pages de module (même gabarit pour les 5)
 1. Titre + une phrase de conclusion.

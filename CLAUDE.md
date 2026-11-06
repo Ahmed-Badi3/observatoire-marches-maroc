@@ -17,7 +17,7 @@ avec une image concrète avant le terme technique.
 ## Structure du dépôt
 - `scripts/` : collecte et chargement, numérotés 01 à 09, à lancer dans l'ordre.
   Connexion via `scripts/config.py` (ignoré par Git, modèle : `config.example.py`).
-- `sql/` : création des schémas `staging` et `dw` (vues en étoile), fichiers 01 à 06.
+- `sql/` : tables de `staging` et vues en étoile de `dw`, fichiers 01 à 06. Les schémas se créent à part.
 - `observatoire_dbt/` : projet dbt, schéma `analytics` (modules macro, obligations, ipo, synthese).
 - `data/processed/` : CSV nettoyés (sur GitHub). `data/raw/` : fichiers bruts (PAS sur GitHub).
 - `dashboard/` : Power BI (.pbix) + `theme_observatoire.json` (couleurs de référence).
@@ -40,8 +40,9 @@ avec une image concrète avant le terme technique.
 - Une seule tâche de `docs/TASKS.md` à la fois. Coche-la seulement quand je l'ai validée.
 - Lis `docs/DATA.md` avant de toucher aux données, `docs/DESIGN.md` avant l'interface.
 - Le site lit seulement `dw` et `analytics`, en lecture seule. Tout calcul reste en SQL ou dbt.
-- Aucun chiffre écrit en dur dans le site : tout vient de la base.
-- Chaque chiffre affiché doit être identique au README (valeurs de contrôle dans `docs/DATA.md`).
+- Aucun chiffre écrit en dur dans le site, y compris dans les phrases : tout vient de la base.
+- Sur la copie figée des données au 03/11/2026, chaque chiffre affiché doit être identique au README
+  (valeurs de contrôle dans `docs/DATA.md`). En ligne, les chiffres évoluent et leur date est affichée.
 - Nombres au format français : `16 537,91`, `+42,3 %`, `−19,0 %`, `0,66`, `+68 pb`.
 - Ne modifie pas `n8n/`, `dashboard/` ni les scripts 01 à 09 sans me le demander.
   Si une tâche l'exige, explique d'abord pourquoi.

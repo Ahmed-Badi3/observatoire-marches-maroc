@@ -105,3 +105,33 @@ Runtime Error
 [0m12:08:58.165891 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D9EEAD3E10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D9EECF83B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D9EEBFABE0>]}
 [0m12:08:58.166680 [debug] [MainThread]: Flushing usage events
 [0m12:08:59.791444 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m11:18:04.962499 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002D6313AE270>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002D62DC67890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002D63344FB10>]}
+
+
+============================== 11:18:04.984176 | c760e8d7-8a45-4b9f-8bf9-39d388b2456e ==============================
+[0m11:18:04.984176 [info ] [MainThread]: Running with dbt=1.11.16
+[0m11:18:04.986654 [debug] [MainThread]: running dbt with arguments {'version_check': 'True', 'no_print': 'None', 'static_parser': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'target_path': 'None', 'printer_width': '80', 'write_json': 'True', 'empty': 'False', 'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'log_format': 'default', 'debug': 'False', 'fail_fast': 'False', 'profiles_dir': 'C:\\Users\\Hafid\\.dbt', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'indirect_selection': 'eager', 'use_colors': 'True', 'invocation_command': 'dbt build --select courbe_taux_quotidienne', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m11:18:04.988722 [error] [MainThread]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\Hafid\OneDrive\Bureau\gogo\observatoire-marches-maroc\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m11:18:04.992255 [debug] [MainThread]: Command `dbt build` failed at 11:18:04.991833 after 0.36 seconds
+[0m11:18:04.993486 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002D6332D3E10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002D6334FC3B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002D6333FABE0>]}
+[0m11:18:04.995121 [debug] [MainThread]: Flushing usage events
+[0m11:18:06.232943 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m13:26:08.673156 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001E728AAE270>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001E7252F7890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001E72AB4FB10>]}
+
+
+============================== 13:26:08.956572 | c54d836a-f5bc-4836-810c-a82ad7af9b20 ==============================
+[0m13:26:08.956572 [info ] [MainThread]: Running with dbt=1.11.16
+[0m13:26:08.959937 [debug] [MainThread]: running dbt with arguments {'static_parser': 'True', 'no_print': 'None', 'version_check': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'target_path': 'None', 'printer_width': '80', 'write_json': 'True', 'empty': 'False', 'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'fail_fast': 'False', 'debug': 'False', 'log_format': 'default', 'profiles_dir': 'C:\\Users\\Hafid\\.dbt', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'indirect_selection': 'eager', 'use_colors': 'True', 'invocation_command': 'dbt build --select path:models/synthese', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m13:26:08.961918 [error] [MainThread]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\Hafid\OneDrive\Bureau\gogo\observatoire-marches-maroc\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m13:26:08.967025 [debug] [MainThread]: Command `dbt build` failed at 13:26:08.966392 after 1.11 seconds
+[0m13:26:08.969001 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001E72A9D3E10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001E72ABFC3B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001E72AAFABE0>]}
+[0m13:26:08.970778 [debug] [MainThread]: Flushing usage events
+[0m13:26:11.604553 [debug] [MainThread]: An error was encountered while trying to flush usage events

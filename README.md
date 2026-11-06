@@ -45,7 +45,7 @@ Le PER prévu pour 2026 (BMCE Capital Global Research, Scope 40) est passé de *
 Au 2e trimestre 2025, le MASI gagnait **+37,6 %** sur un an pour une croissance du PIB de **5,8 %** ; la baisse de 2026 s'explique par la valorisation (PER de 19,7x à 18,0x), pas par un ralentissement économique.
 
 **6. L'inflation a peu pesé sur le rendement des actions.**
-Fin octobre 2023 → fin septembre 2026 : MASI **+50,5 %** en nominal, **+47,4 %** en réel. Après le pic d'inflation de **+10,1 %** (février 2023), l'inflation est revenue autour de 0,5 % ; le vrai risque de la période a été la volatilité.
+Fin novembre 2023 → fin septembre 2026 : MASI **+50,5 %** en nominal, **+47,4 %** en réel. Après le pic d'inflation de **+10,1 %** (février 2023), l'inflation est revenue autour de 0,5 % ; le vrai risque de la période a été la volatilité.
 
 **7. Les baisses du taux directeur ont été suivies d'une hausse du MASI.**
 Sur 20 séances après l'annonce, le MASI fait **+4,2 points** de mieux qu'en temps normal après une baisse, contre +0,7 point après un maintien (3 baisses seulement : corrélation, pas causalité).
@@ -238,7 +238,7 @@ Leçons tirées :
 
 ## Reproduire le projet
 
-1. Installer PostgreSQL, Python 3.13 et les dépendances : `pip install -r requirements.txt` (dont `dbt-postgres` 1.11)
+1. Installer PostgreSQL, Python 3.13 et les dépendances : `pip install -r requirements.txt`, puis `pip install "dbt-postgres==1.11.*"` (il installe aussi `psycopg2`, utilisé par les scripts 06, 08 et 09)
 2. Créer la base `observatoire_maroc` et les schémas `staging` et `dw`
 3. Copier `scripts/config.example.py` en `scripts/config.py` et renseigner le mot de passe
 4. Exécuter `sql/01_staging_ammc.sql`, puis les scripts `01` à `05` dans l'ordre

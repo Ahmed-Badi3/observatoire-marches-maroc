@@ -11,6 +11,8 @@ placements ont un rendement par unité de risque presque identique : il fallait
 choisir son niveau de risque, diversifier avec des fonds de taux, et ne pas acheter
 après la hausse.
 
+Le chiffre de cette phrase (+42 %) est lu dans la base, comme tous les autres.
+
 ## Public
 1. **Recruteurs Data Analyst / Finance** (public principal) : comprendre le projet en
    30 secondes, voir la qualité des données et de la démarche.
@@ -30,7 +32,8 @@ après la hausse.
 | Méthode et sources | Architecture, qualité des données, limites, sources, lien GitHub | — |
 
 ## Interactivité (ce qui rend le site « interactif »)
-- Filtre de période sur les graphiques temporels : 1 an / 3 ans / Tout.
+- Filtre de période sur les graphiques temporels : 1 an / 3 ans / Tout. Le MASI ayant
+  3 ans d'historique, « 3 ans » et « Tout » peuvent y donner le même résultat.
 - Choix de l'indice (MASI ou MASI 20) et de la catégorie d'OPCVM.
 - Bascule nominal / réel sur la page Contexte économique.
 - Choix du portefeuille type (prudent, équilibré, dynamique) sur la page Synthèse.
@@ -48,7 +51,8 @@ après la hausse.
 - Saisie ou modification de données depuis le site.
 
 ## Critères de réussite
-- Chaque chiffre affiché est identique au README.
+- Sur la copie figée des données au 03/11/2026, chaque chiffre affiché est identique au
+  README. En ligne, les chiffres évoluent avec les données et leur date est affichée.
 - Les données AMMC et la courbe des taux BAM se mettent à jour chaque semaine sans intervention.
 - La date de dernière mise à jour est visible.
 - Le site s'affiche correctement sur téléphone.
