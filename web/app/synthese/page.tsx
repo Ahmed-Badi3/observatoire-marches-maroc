@@ -16,7 +16,7 @@ import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-
 import { placements, type Placement } from "@/lib/donnees";
 import { correlations, sharpeExtremes, syntheseAnnuel, type Ligne } from "@/lib/donnees-pages";
 import { formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
-import { enNombre, type Jeu } from "@/lib/graphiques";
+import { enNombre, etiqueterAnnees, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "Synthèse quantitative" };
 
@@ -113,9 +113,11 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
 /* ---------- Résultat 16 : année par année, avec choix du portefeuille ---------- */
 function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined) {
   if (!annuel || annuel.length === 0) return <Indisponible />;
-  const annees = [...new Set(annuel.map((l) => String(l.annee)))].sort();
+  // « 2026 » devient « 2026 (janv.–oct.) » quand la base déclare l'année partielle.
+  const etiquetes = etiqueterAnnees(annuel);
+  const annees = [...new Set(etiquetes.map((l) => l.annee))].sort();
   const valeur = (actif: string, annee: string) =>
-    enNombre(annuel.find((l) => l.actif === actif && String(l.annee) === annee)?.rendement_pct);
+    enNombre(etiquetes.find((l) => l.actif === actif && l.annee === annee)?.rendement_pct);
   const presents = PORTEFEUILLES.filter((p) => annuel.some((l) => l.actif === p));
 
   const jeux: Jeu[] = presents.map((p) => ({
@@ -135,9 +137,9 @@ function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined) {
   }));
 
   const derniere = annees[annees.length - 1];
-  const prudent = annuel.find((l) => l.actif === PORTEFEUILLES[0] && String(l.annee) === derniere);
-  const dynamique = annuel.find((l) => l.actif === PORTEFEUILLES[2] && String(l.annee) === derniere);
-  const actions = annuel.find((l) => l.actif === FONDS_ACTIONS && String(l.annee) === derniere);
+  const prudent = etiquetes.find((l) => l.actif === PORTEFEUILLES[0] && l.annee === derniere);
+  const dynamique = etiquetes.find((l) => l.actif === PORTEFEUILLES[2] && l.annee === derniere);
+  const actions = etiquetes.find((l) => l.actif === FONDS_ACTIONS && l.annee === derniere);
 
   const colonnes: Colonne[] = [
     { cle: "annee", libelle: "Année" },
@@ -161,13 +163,13 @@ function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined) {
           phrase="Le classement des placements change d'une année à l'autre."
           chiffre={formatPourcentage(actions?.rendement_pct)}
           precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
-          legende={`Fonds Actions en ${derniere} (année en cours). Sur la même période : portefeuille prudent ${formatPourcentage(prudent?.rendement_pct)}, portefeuille dynamique ${formatPourcentage(dynamique?.rendement_pct)}. Choisissez un portefeuille à droite pour le comparer au MASI et aux fonds Actions.`}
+          legende={`Fonds Actions en ${derniere}. Sur la même période : portefeuille prudent ${formatPourcentage(prudent?.rendement_pct)}, portefeuille dynamique ${formatPourcentage(dynamique?.rendement_pct)}. Choisissez un portefeuille à droite pour le comparer au MASI et aux fonds Actions.`}
         />
       }
       graphiques={
         <CarteGraphique
           titre="Un portefeuille prudent limite les années de baisse, au prix des années de hausse"
-          note="Rendement par année civile, sur les vendredis AMMC : la première et la dernière année sont partielles. Les portefeuilles types sont construits à partir des fonds (voir « Méthode et sources »)."
+          note="Rendement par année civile, sur les vendredis AMMC. Entre parenthèses, les mois couverts quand l'année est incomplète. Les portefeuilles types sont construits à partir des fonds (voir « Méthode et sources »)."
         >
           <GraphiqueBarres
             jeux={jeux}
@@ -184,7 +186,7 @@ function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined) {
           <TitreTableau>Rendement par année</TitreTableau>
           <TableauTriable colonnes={colonnes} lignes={lignes} legende="Rendement annuel de chaque placement et portefeuille" />
           <p className="mt-2 text-xs text-texte-secondaire">
-            {formatPeriode(masi?.debut, masi?.fin, "hebdo")}. La première et la dernière année sont partielles.
+            {formatPeriode(masi?.debut, masi?.fin, "hebdo")}.
           </p>
         </div>
       }

@@ -28,6 +28,7 @@ import {
   formatPeriode,
   formatPoints,
   formatPourcentage,
+  formatTrimestre,
 } from "@/lib/format";
 import { numeriser, type Jeu } from "@/lib/graphiques";
 
@@ -36,9 +37,12 @@ export const metadata: Metadata = { title: "Contexte économique" };
 const MAJUSCULE = (t: unknown) => String(t).charAt(0).toUpperCase() + String(t).slice(1);
 
 /* ---------- Résultat 5 : MASI vs PIB ---------- */
-function ongletPib(macro: Ligne[] | null, pic: Ligne[] | null) {
-  if (!macro || macro.length === 0) return <Indisponible />;
-  const p = pic?.[0];
+function ongletPib(lignesMacro: Ligne[] | null, lignesPic: Ligne[] | null) {
+  if (!lignesMacro || lignesMacro.length === 0) return <Indisponible />;
+  // « 2026 T4 », ou « 2026 T4 (en cours) » si la base signale le trimestre comme non terminé.
+  const avecPeriode = (l: Ligne): Ligne => ({ ...l, periode: formatTrimestre(l.annee, l.trimestre, l.trimestre_en_cours) });
+  const macro = lignesMacro.map(avecPeriode);
+  const p = lignesPic?.[0] ? avecPeriode(lignesPic[0]) : undefined;
   const jeu: Jeu = {
     id: "pib",
     libelle: "MASI et PIB",

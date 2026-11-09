@@ -4,6 +4,14 @@ models:
   - name: masi_vs_macro_trimestriel
     description: "Performance trimestrielle et annuelle du MASI face à la croissance du PIB et au chômage"
     columns:
+      - name: derniere_seance
+        description: "Séance qui sert de fin de trimestre"
+        tests:
+          - not_null
+      - name: trimestre_en_cours
+        description: "Vrai si la dernière séance tombe avant les 10 derniers jours du trimestre"
+        tests:
+          - not_null
       - name: date_ref
         tests:
           - unique

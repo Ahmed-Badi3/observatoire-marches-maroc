@@ -13,6 +13,9 @@ SELECT
 FROM dw.fact_masi_quotidien;
 
 -- ---------- Annuel : rendement, volatilité, pire drawdown ----------
+-- premiere_date, derniere_date, annee_partielle : pour l'étiquette « 2026 (jan.–oct.) » du site.
+-- Règle « partielle » identique à la macro dbt annee_partielle : début après le 10/01 ou fin avant le 20/12.
+-- Les nouvelles colonnes sont À LA FIN : CREATE OR REPLACE VIEW n'accepte que des colonnes ajoutées en fin.
 CREATE OR REPLACE VIEW dw.v_masi_annuel AS
 WITH par_annee AS (
     SELECT
@@ -21,7 +24,9 @@ WITH par_annee AS (
         (ARRAY_AGG(cloture ORDER BY date))[1]              AS premiere_cloture,
         (ARRAY_AGG(cloture ORDER BY date DESC))[1]         AS derniere_cloture,
         STDDEV_SAMP(rendement_jour) * SQRT(252) * 100      AS volatilite_annualisee_pct,
-        MIN(drawdown_pct)                                  AS pire_drawdown_pct
+        MIN(drawdown_pct)                                  AS pire_drawdown_pct,
+        MIN(date)                                          AS premiere_date,
+        MAX(date)                                          AS derniere_date
     FROM dw.v_masi_drawdown
     GROUP BY 1
 )
@@ -32,7 +37,10 @@ SELECT
     ROUND(((derniere_cloture / COALESCE(LAG(derniere_cloture) OVER (ORDER BY annee),
                                         premiere_cloture) - 1) * 100)::numeric, 1) AS rendement_pct,
     ROUND(volatilite_annualisee_pct::numeric, 1)                                 AS volatilite_annualisee_pct,
-    ROUND(pire_drawdown_pct::numeric, 1)                                         AS pire_drawdown_pct
+    ROUND(pire_drawdown_pct::numeric, 1)                                         AS pire_drawdown_pct,
+    premiere_date,
+    derniere_date,
+    (premiere_date > MAKE_DATE(annee, 1, 10) OR derniere_date < MAKE_DATE(annee, 12, 20)) AS annee_partielle
 FROM par_annee
 ORDER BY annee;
 

@@ -13,3 +13,15 @@ models:
       - name: flux_net_md
         tests:
           - not_null
+      - name: premiere_date
+        description: "1re date de l'année prise en compte"
+        tests:
+          - not_null
+      - name: derniere_date
+        description: "Dernière date de l'année prise en compte"
+        tests:
+          - not_null
+      - name: annee_partielle
+        description: "Vrai si l'année n'est pas couverte en entier (macro annee_partielle)"
+        tests:
+          - not_null

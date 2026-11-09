@@ -31,7 +31,7 @@ import {
   formatPointsDeBase,
   formatPourcentage,
 } from "@/lib/format";
-import { numeriser, pivoter, type Jeu } from "@/lib/graphiques";
+import { etiqueterAnnees, numeriser, pivoter, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "Taux et obligations" };
 
@@ -42,7 +42,9 @@ const CT = "Obligations CT";
 /* ---------- Résultat 8 : fonds par année ---------- */
 function ongletAnnees(fonds: Ligne[] | null) {
   if (!fonds || fonds.length === 0) return <Indisponible />;
-  const { donnees, series } = pivoter(fonds, "annee", "categorie", "rendement_pct");
+  // « 2026 » devient « 2026 (janv.–oct.) » quand la base déclare l'année partielle.
+  const fondsEtiquetes = etiqueterAnnees(fonds);
+  const { donnees, series } = pivoter(fondsEtiquetes, "annee", "categorie", "rendement_pct");
   const jeu: Jeu = {
     id: "annees",
     libelle: "Rendement",
@@ -53,7 +55,7 @@ function ongletAnnees(fonds: Ligne[] | null) {
   // Tableau : une ligne par année, avec la variation du taux à 10 ans (la même pour toutes les catégories).
   const lignes = donnees.map((r) => ({
     ...r,
-    var_taux_10a_pb: fonds.find((f) => String(f.annee) === String(r.annee))?.var_taux_10a_pb ?? null,
+    var_taux_10a_pb: fondsEtiquetes.find((f) => f.annee === String(r.annee))?.var_taux_10a_pb ?? null,
   }));
   const colonnes: Colonne[] = [
     { cle: "annee", libelle: "Année" },
@@ -75,7 +77,7 @@ function ongletAnnees(fonds: Ligne[] | null) {
       graphiques={
         <CarteGraphique
           titre="Quand les taux baissent, les fonds longs gagnent le plus ; quand ils montent, ils perdent"
-          note="Rendement des fonds par année civile (la dernière année est en cours). Sources : AMMC, Bank Al-Maghrib."
+          note="Rendement des fonds par année civile. Entre parenthèses, les mois couverts quand l'année est incomplète. Sources : AMMC, Bank Al-Maghrib."
         >
           <GraphiqueBarres
             jeux={[jeu]}
@@ -231,7 +233,7 @@ function ongletAnticipations(decisions: Ligne[] | null, resume: Ligne[] | null) 
 /* ---------- Résultat 11 : flux ---------- */
 function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] | null) {
   if (!flux || flux.length === 0) return <Indisponible />;
-  const { donnees, series } = pivoter(flux, "annee", "categorie", "flux_net_md");
+  const { donnees, series } = pivoter(etiqueterAnnees(flux), "annee", "categorie", "flux_net_md");
   const jeu: Jeu = {
     id: "flux",
     libelle: "Flux",
@@ -258,7 +260,7 @@ function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] |
       graphiques={
         <CarteGraphique
           titre="Les capitaux ont quitté les fonds MLT quand les taux ont remonté"
-          note="Flux net = souscriptions − rachats, en milliards de dirhams, par année civile (la dernière est en cours). Source : AMMC."
+          note="Flux net = souscriptions − rachats, en milliards de dirhams, par année civile. Entre parenthèses, les mois couverts quand l'année est incomplète. Source : AMMC."
         >
           <GraphiqueBarres
             jeux={[jeu]}

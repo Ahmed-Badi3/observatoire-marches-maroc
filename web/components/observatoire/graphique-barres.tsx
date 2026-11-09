@@ -17,6 +17,29 @@ import { couleurSerie, enNombre, formateur, type FormatValeur, type Jeu } from "
 import { InfoBulle, Legende } from "./graphique-commun";
 import { Segments } from "./segments";
 
+// Étiquette sous une barre, sur deux lignes quand elle contient une précision entre parenthèses :
+// « 2026 (janv.–oct.) » devient « 2026 » puis, en dessous et plus petit, « (janv.–oct.) ».
+// Image : le nom d'un produit sur une étiquette, et son grammage écrit plus petit juste en dessous.
+// Sur deux lignes, cinq années tiennent côte à côte même sur un téléphone.
+function EtiquetteX({ x, y, payload }: { x?: number; y?: number; payload?: { value: unknown } }) {
+  const texte = String(payload?.value ?? "");
+  const coupure = texte.indexOf(" (");
+  const ligne1 = coupure < 0 ? texte : texte.slice(0, coupure);
+  const ligne2 = coupure < 0 ? null : texte.slice(coupure + 1);
+  return (
+    <text x={x} y={y} textAnchor="middle" fill="var(--texte-secondaire)">
+      <tspan x={x} dy={12} fontSize={12}>
+        {ligne1}
+      </tspan>
+      {ligne2 && (
+        <tspan x={x} dy={14} fontSize={10}>
+          {ligne2}
+        </tspan>
+      )}
+    </text>
+  );
+}
+
 // Graphique en barres arrondies en haut. Une seule série avec `colorerSigne` : vert si positif, rouge si négatif
 // (le signe + ou − reste affiché dans l'info-bulle : la couleur n'est jamais seule).
 export function GraphiqueBarres({
@@ -55,6 +78,8 @@ export function GraphiqueBarres({
   // Beaucoup de catégories : on incline les noms pour qu'ils restent tous lisibles.
   const nbX = jeu.donnees.length;
   const incline = nbX > 5;
+  // Étiquettes avec précision (« 2026 (janv.–oct.) ») : deux lignes, sauf si les noms sont inclinés.
+  const deuxLignes = !incline && jeu.donnees.some((r) => String(r[cleX]).includes(" ("));
   const libelles = Object.fromEntries(jeu.series.map((s) => [s.cle, s.libelle]));
   const formatInfo = formateur(format, { decimales: decimalesInfo, signe: signeInfo });
   const formatAxe = formateur(format, { decimales: decimalesAxe, signe: false });
@@ -88,14 +113,14 @@ export function GraphiqueBarres({
             <XAxis
               dataKey={cleX}
               tickFormatter={(v: string) => String(v)}
-              tick={{ fontSize: 12, fill: "var(--texte-secondaire)" }}
+              tick={deuxLignes ? <EtiquetteX /> : { fontSize: 12, fill: "var(--texte-secondaire)" }}
               axisLine={false}
               tickLine={false}
               interval={nbX <= 12 ? 0 : "preserveStartEnd"}
               minTickGap={8}
               angle={incline ? -30 : 0}
               textAnchor={incline ? "end" : "middle"}
-              height={incline ? 64 : 30}
+              height={incline ? 80 : deuxLignes ? 44 : 30}
             />
             <YAxis
               width={52}

@@ -45,6 +45,18 @@ models:
       - name: rendement_pct
         tests:
           - not_null
+      - name: premiere_date
+        description: "1re date de l'année prise en compte"
+        tests:
+          - not_null
+      - name: derniere_date
+        description: "Dernière date de l'année prise en compte"
+        tests:
+          - not_null
+      - name: annee_partielle
+        description: "Vrai si l'année n'est pas couverte en entier (macro annee_partielle)"
+        tests:
+          - not_null
 
   - name: sensibilite_fonds_taux
     description: "Q2 : sensibilité implicite (−pente de régression) des fonds de taux à la variation du taux 10 ans"
@@ -83,5 +95,17 @@ models:
         tests:
           - not_null
       - name: annee
+        tests:
+          - not_null
+      - name: premiere_date
+        description: "1re date de l'année prise en compte"
+        tests:
+          - not_null
+      - name: derniere_date
+        description: "Dernière date de l'année prise en compte"
+        tests:
+          - not_null
+      - name: annee_partielle
+        description: "Vrai si l'année n'est pas couverte en entier (macro annee_partielle)"
         tests:
           - not_null

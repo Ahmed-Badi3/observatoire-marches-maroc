@@ -25,7 +25,7 @@ Même problème pour la pire baisse (−16,2 % en hebdo sur l'accueil, −19,0 %
 
 ### Priorité 2 — années et trimestres partiels
 
-- [ ] Étiqueter directement sous les barres : « 2022 (oct.–déc.) », « 2026 (jan.–oct.) », « 2026 T4 (en cours) », au lieu de la seule note de bas de graphique.
+- [x] Étiqueter directement sous les barres : « 2022 (oct.–déc.) », « 2026 (jan.–oct.) », « 2026 T4 (en cours) », au lieu de la seule note de bas de graphique.
 
 ### Priorité 3 — courbes lissées
 
@@ -134,7 +134,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 ### Onglet MASI et PIB (Résultat 5)
 
-- [ ] Étiqueter « 2026 T4 (en cours) » : la barre −12,3 % ne couvre qu'octobre.
+- [x] Étiqueter « 2026 T4 (en cours) » : la barre −12,3 % ne couvre qu'octobre.
 - [ ] Remplacer « Le recul récent du MASI ne vient pas d'un ralentissement économique mais de la valorisation » (raisonnement circulaire) par : « Le recul du MASI en 2026 ne s'explique pas par l'économie, qui croît encore de 4 % : il suit deux années de forte hausse et la remontée des taux. »
 - [ ] Ajouter dans « Méthode et sources » : le PIB est une croissance réelle (hors inflation), le MASI une variation nominale ; l'inflation étant très basse, le message ne change pas.
 - [ ] Ne pas affirmer que la Bourse « annonce » l'économie : écrire « à tester sur une période plus longue » (seulement 8 à 9 trimestres).
@@ -184,7 +184,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 ### Onglet Flux des épargnants (Résultat 11)
 
 - [ ] Rendre la comparaison avec les fonds Actions possible : recalculer la corrélation des fonds de taux avec les flux en % de l'actif net (comme pour les Actions, 0,43), ou celle des Actions en dirhams. Puis retirer la phrase « les deux chiffres ne se comparent pas exactement ».
-- [ ] Étiqueter « 2022 (3 mois) » et « 2026 (jan.–oct.) » sous les barres.
+- [x] Étiqueter « 2022 (3 mois) » et « 2026 (jan.–oct.) » sous les barres.
 - [ ] Nuancer le titre « Les capitaux ont quitté les fonds MLT quand les taux ont remonté » : vrai en 2026 (−17 Md), mais en 2023 les taux ont aussi monté (+68 pb) et les OMLT ont reçu +18 Md. Ajouter : « En 2023, les épargnants ont acheté à taux élevés : bon timing avant le rallye de 2024 (+8,2 %). »
 - [ ] Ajouter le constat de rotation 2026 : « L'argent est passé des fonds longs (OMLT −17 Md) vers les fonds courts (Monétaire ≈ +37 Md, OCT ≈ +25 Md). »
 - [ ] Qualifier les corrélations : 0,15 et 0,09 sont faibles ; écrire « léger suivi de tendance » plutôt qu'un lien net.
@@ -251,7 +251,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 - [ ] La carte ne démontre pas son titre : « Le classement change d'une année à l'autre » avec en gros −8,7 % (fonds Actions 2026). Mettre plutôt en gros le changement de classement, ex. « Fonds Actions : 1er en 2024 (+22,6 %), dernier en 2026 (−8,7 %) ».
 - [ ] Ajouter au tableau Monétaire, OCT, OMLT et Diversifiés : sans eux, on ne voit pas le « classement » (en 2026, OCT ≈ +2,1 % et Monétaire ≈ +2,0 % passent en tête). Option : afficher le rang (1er…9e) dans chaque case.
-- [ ] Étiqueter « 2023 (≈ 6 semaines, depuis le 17/11) » et « 2026 (jan.–oct.) » dans le graphique et le tableau.
+- [x] Étiqueter « 2023 (≈ 6 semaines, depuis le 17/11) » et « 2026 (jan.–oct.) » dans le graphique et le tableau.
 - [x] MASI 2026 = −7,7 % ici, −8,0 % et −12,2 % ailleurs : voir Priorité 1.
 - [ ] Ajouter une phrase sous le graphique : « Le prudent a perdu presque rien en 2026 (−0,5 %) mais n'a gagné qu'un tiers des actions en 2024–2025. »
 

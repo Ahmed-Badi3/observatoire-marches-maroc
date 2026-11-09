@@ -125,6 +125,35 @@ export function formatDateCourte(v: Valeur): string {
   });
 }
 
+// Étiquette d'une année sous une barre (Priorité 2 de docs/CORRECTIONS.md).
+// Année complète : « 2024 ». Année partielle : « 2026 (janv.–oct.) », ou « 2023 (déc.) » sur un seul mois.
+// Dire si l'année est partielle est un calcul : il est fait dans la base (colonne annee_partielle).
+// Ici, on écrit seulement les mois de la 1re et de la dernière date reçues.
+function moisCourt(v: Valeur): string {
+  const date = enDate(v);
+  if (!date) return MANQUANT;
+  return date.toLocaleDateString("fr-FR", { month: "short", timeZone: "UTC" });
+}
+
+function vrai(v: unknown): boolean {
+  // postgres.js renvoie un booléen ; on accepte aussi « true » / « t » par prudence.
+  return v === true || v === "true" || v === "t";
+}
+
+export function formatAnnee(annee: Valeur, premiere: Valeur, derniere: Valeur, partielle: unknown): string {
+  const a = annee === null || annee === undefined ? MANQUANT : String(annee);
+  if (!vrai(partielle)) return a;
+  const debut = moisCourt(premiere);
+  const fin = moisCourt(derniere);
+  return debut === fin ? `${a} (${debut})` : `${a} (${debut}–${fin})`;
+}
+
+// « 2026 T4 », ou « 2026 T4 (en cours) » si la base signale le trimestre comme non terminé.
+export function formatTrimestre(annee: Valeur, trimestre: Valeur, enCours: unknown): string {
+  const t = `${annee ?? MANQUANT} T${trimestre ?? MANQUANT}`;
+  return vrai(enCours) ? `${t} (en cours)` : t;
+}
+
 // Période et fréquence d'un chiffre du MASI (Priorité 1 de docs/CORRECTIONS.md).
 // Image : l'étiquette d'un bocal de confiture, qui dit de quand à quand il a été rempli et comment.
 // Le même MASI donne des chiffres différents selon qu'on le regarde chaque séance, chaque vendredi

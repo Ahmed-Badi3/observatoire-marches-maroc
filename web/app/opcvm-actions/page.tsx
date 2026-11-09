@@ -26,7 +26,7 @@ import {
 } from "@/lib/donnees-pages";
 import { placements, type Placement } from "@/lib/donnees";
 import { formatDate, formatMultiple, formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
-import { enNombre, pivoter, type Jeu } from "@/lib/graphiques";
+import { enNombre, etiqueterAnnees, pivoter, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "OPCVM et marché actions" };
 
@@ -44,6 +44,8 @@ function ongletFlux(
 ) {
   if (!flux || !timing || timing.length === 0) return <Indisponible />;
   const t = timing[0];
+  // « 2026 » devient « 2026 (janv.–oct.) » quand la base déclare l'année partielle.
+  const fluxEtiquetes = etiqueterAnnees(flux);
   // Le MASI de ce tableau est relevé chaque vendredi AMMC, comme les flux (analytics.synthese_annuel).
   // Ses dates de début et de fin sont celles de la synthèse : même série hebdomadaire.
   const precisionMasi = formatPeriode(masiHebdo?.debut, masiHebdo?.fin, "hebdo");
@@ -56,16 +58,17 @@ function ongletFlux(
     id: c,
     libelle: c,
     series: [{ cle: "flux", libelle: `Flux net, fonds ${c}` }],
-    donnees: flux
+    donnees: fluxEtiquetes
       .filter((l) => l.categorie === c)
-      .map((l) => ({ annee: String(l.annee), flux: enNombre(l.flux_net_md) })),
+      .map((l) => ({ annee: l.annee, flux: enNombre(l.flux_net_md) })),
   }));
 
-  const lignesTableau = flux
+  // Le rapprochement flux / MASI se fait sur l'année d'origine (annee_brute), pas sur l'étiquette.
+  const lignesTableau = fluxEtiquetes
     .filter((l) => l.categorie === "Actions")
     .map((l) => ({
-      annee: String(l.annee),
-      masi: masiAn?.find((m) => String(m.annee) === String(l.annee))?.rendement_pct ?? null,
+      annee: l.annee,
+      masi: masiAn?.find((m) => String(m.annee) === l.annee_brute)?.rendement_pct ?? null,
       flux: l.flux_net_md,
     }));
   const colonnes: Colonne[] = [
@@ -87,7 +90,7 @@ function ongletFlux(
       graphiques={
         <CarteGraphique
           titre="L'argent est arrivé en masse après la hausse, et reparti quand le marché baissait"
-          note="Flux net = souscriptions − rachats, en milliards de dirhams (Md MAD). La première et la dernière année sont partielles. Source : AMMC."
+          note="Flux net = souscriptions − rachats, en milliards de dirhams (Md MAD). Entre parenthèses, les mois couverts quand l'année est incomplète. Source : AMMC."
         >
           <GraphiqueBarres
             jeux={jeux}
@@ -109,7 +112,8 @@ function ongletFlux(
             legende="Rendement annuel du MASI et flux net vers les fonds Actions"
           />
           <p className="mt-2 text-xs text-texte-secondaire">
-            MASI : {precisionMasi}. La première et la dernière année sont partielles.
+            MASI : {precisionMasi}. L&apos;année indiquée est celle des flux : la 1re année du MASI ne commence
+            qu&apos;à la date ci-dessus.
           </p>
         </div>
       }
@@ -132,7 +136,7 @@ function ongletVolatilite(
     id: "vol",
     libelle: "Volatilité",
     series: [{ cle: "vol", libelle: "Volatilité annualisée du MASI", couleur: COULEUR_MASI }],
-    donnees: annuel.map((l) => ({ annee: String(l.annee), vol: enNombre(l.volatilite_annualisee_pct) })),
+    donnees: etiqueterAnnees(annuel).map((l) => ({ annee: l.annee, vol: enNombre(l.volatilite_annualisee_pct) })),
   };
   const baisse: Jeu = {
     id: "dd",
@@ -155,7 +159,7 @@ function ongletVolatilite(
         <>
           <CarteGraphique
             titre="Le marché bouge de plus en plus d'une année à l'autre"
-            note="Volatilité = amplitude des variations quotidiennes, ramenée à un an. La première année est partielle. Source : Bourse de Casablanca."
+            note="Volatilité = amplitude des variations quotidiennes, ramenée à un an. Entre parenthèses, les mois couverts quand l'année est incomplète. Source : Bourse de Casablanca."
           >
             <GraphiqueBarres
               jeux={[volatilite]}

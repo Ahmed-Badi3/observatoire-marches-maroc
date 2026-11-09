@@ -167,7 +167,7 @@ Période commune : vendredis AMMC couverts par l'historique du MASI. Valeurs de 
 | Table | Colonnes |
 |---|---|
 | `analytics.synthese_classes_actifs` (1 ligne par placement ou portefeuille) | `actif`, `nb_semaines`, `debut`, `fin`, `rdt_cumule_pct`, `rdt_annualise_pct`, `volatilite_pct`, `pire_baisse_pct`, `pire_semaine_pct`, `semaines_negatives_pct`, `ratio_rendement_risque` (Sharpe), `part_rdt_masi_pct`, `part_risque_masi_pct` (rendement annualisé et volatilité en % de ceux du MASI, tâche A8) |
-| `analytics.synthese_annuel` | `actif`, `annee`, `nb_semaines` (1re et dernière année partielles), `rendement_pct` |
+| `analytics.synthese_annuel` | `actif`, `annee`, `nb_semaines` (1re et dernière année partielles), `rendement_pct`, `premiere_date`, `derniere_date`, `annee_partielle` (Priorité 2 des corrections : étiquette « 2026 (janv.–oct.) ») |
 | `analytics.synthese_correlations` (chaque paire une fois, `actif_1 < actif_2` par ordre alphabétique, hors portefeuilles) | `actif_1`, `actif_2`, `nb_semaines`, `correlation` (de −1 à 1, pas un %) |
 | `analytics.synthese_rendements_hebdo` | `date`, `actif`, `rendement_hebdo` (**fraction**, 0,01 = 1 %) |
 
@@ -175,7 +175,7 @@ Période commune : vendredis AMMC couverts par l'historique du MASI. Valeurs de 
 | Table | Colonnes |
 |---|---|
 | `dw.fact_opcvm_hebdo` (semaine × catégorie, sans la catégorie `Total`) | `date`, `categorie`, `nb_opcvm`, `actif_net`, `souscriptions`, `rachats`, `flux_net` (souscriptions − rachats), `indice_perf`, `perf_hebdo_pct` |
-| `analytics.flux_opcvm_annuel` (tâche A8, par catégorie et par année civile, 1re et dernière année partielles) | `categorie`, `annee`, `nb_semaines`, `flux_net` (MAD), `flux_net_md` (milliards MAD) |
+| `analytics.flux_opcvm_annuel` (tâche A8, par catégorie et par année civile, 1re et dernière année partielles) | `categorie`, `annee`, `nb_semaines`, `flux_net` (MAD), `flux_net_md` (milliards MAD), `premiere_date`, `derniere_date`, `annee_partielle` (Priorité 2 des corrections : étiquette « 2026 (janv.–oct.) ») |
 | `dw.dim_categorie` | `categorie`, `ordre_risque` (1 à 6), `profil` (Prudent, Équilibré, Dynamique, Autre) |
 | `dw.dim_date` (un jour par ligne, du 01/01/2022 au 31/12/2027) | `date`, `annee`, `trimestre`, `mois`, `annee_mois` (texte `AAAA-MM`), `semaine_iso`, `jour_semaine` (1 = lundi) |
 | `dw.v_kpi_timing` (1 seule ligne) | `corr_passe`, `corr_futur` (corrélations flux / MASI, résultat +0,43 et −0,08), `masi_moyen_achat`, `masi_moyen_vente` (niveaux du MASI, pondérés par les flux mensuels) |
@@ -183,7 +183,7 @@ Période commune : vendredis AMMC couverts par l'historique du MASI. Valeurs de 
 | `dw.fact_masi_quotidien` | `date`, `cloture`, `plus_haut`, `plus_bas`, `var_quotidienne_pct` |
 | `dw.fact_masi_hebdo` (dates AMMC, dernière clôture MASI connue) | `date`, `date_seance`, `masi`, `masi_perf_hebdo_pct` |
 | `dw.v_masi_drawdown` | `date`, `cloture`, `rendement_jour` (**fraction**), `plus_haut_atteint`, `drawdown_pct` |
-| `dw.v_masi_annuel` | `annee`, `nb_seances`, `cloture_fin`, `rendement_pct`, `volatilite_annualisee_pct`, `pire_drawdown_pct` |
+| `dw.v_masi_annuel` | `annee`, `nb_seances`, `cloture_fin`, `rendement_pct`, `volatilite_annualisee_pct`, `pire_drawdown_pct`, `premiere_date`, `derniere_date`, `annee_partielle` (Priorité 2 des corrections : étiquette « 2026 (janv.–oct.) ») |
 | `dw.v_indices_quotidien` (par indice) | `indice`, `date`, `cloture`, `rendement_jour` (**fraction**), `base_100`, `drawdown_pct` |
 | `dw.v_indices_annuel` | `indice`, `annee`, `nb_seances`, `cloture_fin`, `rendement_pct`, `volatilite_annualisee_pct`, `pire_drawdown_pct` |
 | `dw.v_indices_synthese` (1 ligne par indice) | `indice`, `debut`, `fin`, `rendement_total_pct`, `volatilite_annualisee_pct`, `pire_drawdown_pct`, `drawdown_actuel_pct` |
@@ -194,7 +194,7 @@ Valeurs de `indice` : `MASI`, `MASI 20` (la table `staging.bvc_indices` peut en 
 ### Contexte économique
 | Table | Colonnes |
 |---|---|
-| `analytics.masi_vs_macro_trimestriel` | `date_ref` (1er jour du trimestre), `annee`, `trimestre`, `masi_fin_trimestre`, `perf_masi_trimestre_pct`, `perf_masi_annuelle_pct`, `croissance_pib_pct`, `chomage_national_pct` |
+| `analytics.masi_vs_macro_trimestriel` | `date_ref` (1er jour du trimestre), `annee`, `trimestre`, `masi_fin_trimestre`, `perf_masi_trimestre_pct`, `perf_masi_annuelle_pct`, `croissance_pib_pct`, `chomage_national_pct`, `derniere_seance`, `trimestre_en_cours` (dernière séance avant les 10 derniers jours du trimestre : « 2026 T4 (en cours) ») |
 | `analytics.masi_rendement_reel` (fin de mois) | `mois`, `derniere_seance`, `masi`, `ipc`, `masi_nominal_base100`, `masi_reel_base100` |
 | `analytics.inflation_mensuelle` | `date_ref` (1er jour du mois), `indice_general` (IPC base 2017 = 100), `inflation_annuelle_pct`, `inflation_mensuelle_pct`, `inflation_alimentaire_pct`, `inflation_non_alimentaire_pct` (glissement annuel) |
 | `analytics.croissance_pib` | `date_ref`, `annee`, `trimestre`, `pib_volume`, `croissance_annuelle_pct`, `croissance_trimestrielle_pct` |
@@ -212,11 +212,11 @@ Valeurs de `maturite` : `13 sem`, `1 an`, `2 ans`, `5 ans`, `10 ans`.
 | Table | Colonnes |
 |---|---|
 | `analytics.courbe_taux_quotidienne` | `date_courbe`, `maturite`, `cible_ans`, `taux_pct`, `maturite_bas_ans`, `maturite_haut_ans` (les deux dernières : points réels encadrant la maturité cible, pour l'interpolation) |
-| `analytics.fonds_taux_annuel` | `categorie`, `annee`, `date_debut`, `date_fin`, `rendement_pct`, `taux_10a_debut`, `taux_10a_fin`, `var_taux_10a_pb` |
+| `analytics.fonds_taux_annuel` | `categorie`, `annee`, `date_debut`, `date_fin`, `rendement_pct`, `taux_10a_debut`, `taux_10a_fin`, `var_taux_10a_pb`, `premiere_date` (1re semaine qui compte, la semaine de base `date_debut` exclue), `derniere_date`, `annee_partielle` |
 | `analytics.obligations_vs_taux_hebdo` | `date_semaine`, `categorie`, `indice`, `rendement_hebdo_pct`, `date_courbe`, `taux_13s`, `taux_2a`, `taux_5a`, `taux_10a`, `var_taux_10a_pb`, `var_taux_5a_pb`, `pente_10a_13s_pt` |
 | `analytics.sensibilite_fonds_taux` (2 périodes × 3 catégories) | `periode` (`Toute la période` ou `Depuis le 24/03/2023 (nouvelle méthode BAM)`), `categorie`, `nb_semaines`, `sensibilite_implicite`, `correlation`, `r2` |
 | `analytics.taux_autour_decisions_bam` | `date_effet`, `decision` (`Hausse`, `Baisse`, `Maintien`, avec majuscule), `taux_avant`, `taux_apres`, `date_courbe_veille`, `taux_13s_veille`, `ecart_13s_vs_directeur_pb`, `var_13s_30j_pb`, `pente_10a_13s_pt` |
-| `analytics.flux_fonds_taux_annuel` | `categorie`, `annee`, `rendement_pct`, `var_taux_10a_pb`, `flux_net` |
+| `analytics.flux_fonds_taux_annuel` | `categorie`, `annee`, `rendement_pct`, `var_taux_10a_pb`, `flux_net`, `premiere_date`, `derniere_date`, `annee_partielle` (repris de `fonds_taux_annuel`) |
 | `analytics.flux_fonds_taux_timing` (1 ligne par catégorie) | `categorie`, `nb_semaines`, `corr_flux_rend_passe`, `corr_flux_rend_futur`, `corr_flux_taux_passe`, `corr_flux_taux_futur` |
 
 ### Introductions en bourse
@@ -251,6 +251,14 @@ Le rendement d'un achat à la 20e séance (résultat 14) est dans `rdt_achat_j20
    (donc pas non plus dans `dw.v_actions_vs_masi` ni `dw.v_kpi_timing`).
 9. **Décision BAM « maintien »** : la moyenne à 20 séances est +0,35 point (9 maintiens), pas +0,7 comme
    dans le README (déjà signalé dans « Points à trancher »). Seule la valeur des baisses (+4,2) est confirmée.
+
+## Années partielles (macro dbt `annee_partielle`)
+Une année est partielle si ses données commencent après le 10 janvier ou s'arrêtent avant le 20 décembre
+(macro `observatoire_dbt/macros/annee_partielle.sql`, même règle écrite dans `sql/03` pour `dw.v_masi_annuel`).
+Le site écrit alors les mois couverts sous la barre : « 2026 (janv.–oct.) ». Les flux AMMC de 2022
+commencent à la semaine du 30/09 (« sept.–déc. ») ; les rendements et flux des fonds de taux, eux, à la
+semaine suivante, car le 30/09 sert de base au calcul (« oct.–déc. »).
+La copie figée `observatoire_fige` n'a pas encore ces colonnes (elle est en lecture seule).
 
 ## Quelle source pour quel chiffre
 Plusieurs méthodes valables donnent des chiffres différents. Le site suit ce tableau.

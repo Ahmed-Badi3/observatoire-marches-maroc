@@ -33,7 +33,8 @@ async function lireFluxAnnuel() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   return plat(await sql()`
-    SELECT categorie, annee, nb_semaines, flux_net_md
+    SELECT categorie, annee, nb_semaines, flux_net_md,
+           to_char(premiere_date, 'YYYY-MM-DD') AS premiere_date, to_char(derniere_date, 'YYYY-MM-DD') AS derniere_date, annee_partielle
     FROM analytics.flux_opcvm_annuel ORDER BY categorie, annee`);
 }
 export const fluxAnnuel = () => sur("flux annuels", lireFluxAnnuel);
@@ -42,7 +43,8 @@ async function lireRendementsMasiAnnuels() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   return plat(await sql()`
-    SELECT annee, nb_semaines, rendement_pct
+    SELECT annee, nb_semaines, rendement_pct,
+           to_char(premiere_date, 'YYYY-MM-DD') AS premiere_date, to_char(derniere_date, 'YYYY-MM-DD') AS derniere_date, annee_partielle
     FROM analytics.synthese_annuel WHERE actif = 'MASI' ORDER BY annee`);
 }
 export const rendementsMasiAnnuels = () => sur("rendements MASI annuels", lireRendementsMasiAnnuels);
@@ -59,7 +61,8 @@ async function lireMasiAnnuel() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   return plat(await sql()`
-    SELECT annee, nb_seances, rendement_pct, volatilite_annualisee_pct, pire_drawdown_pct
+    SELECT annee, nb_seances, rendement_pct, volatilite_annualisee_pct, pire_drawdown_pct,
+           to_char(premiere_date, 'YYYY-MM-DD') AS premiere_date, to_char(derniere_date, 'YYYY-MM-DD') AS derniere_date, annee_partielle
     FROM dw.v_masi_annuel ORDER BY annee`);
 }
 export const masiAnnuel = () => sur("MASI annuel", lireMasiAnnuel);
@@ -118,7 +121,7 @@ async function lireMacroTrimestriel() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   return plat(await sql()`
-    SELECT annee || ' T' || trimestre AS periode, perf_masi_annuelle_pct, croissance_pib_pct
+    SELECT annee, trimestre, trimestre_en_cours, perf_masi_annuelle_pct, croissance_pib_pct
     FROM analytics.masi_vs_macro_trimestriel
     WHERE perf_masi_annuelle_pct IS NOT NULL ORDER BY date_ref`);
 }
@@ -128,7 +131,7 @@ async function lireMacroPic() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   return plat(await sql()`
-    SELECT annee || ' T' || trimestre AS periode, perf_masi_annuelle_pct, croissance_pib_pct
+    SELECT annee, trimestre, trimestre_en_cours, perf_masi_annuelle_pct, croissance_pib_pct
     FROM analytics.masi_vs_macro_trimestriel
     WHERE perf_masi_annuelle_pct IS NOT NULL AND croissance_pib_pct IS NOT NULL
     ORDER BY perf_masi_annuelle_pct DESC LIMIT 1`);
@@ -197,7 +200,8 @@ async function lireFondsTauxAnnuel() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   return plat(await sql()`
-    SELECT categorie, annee, rendement_pct, var_taux_10a_pb
+    SELECT categorie, annee, rendement_pct, var_taux_10a_pb,
+           to_char(premiere_date, 'YYYY-MM-DD') AS premiere_date, to_char(derniere_date, 'YYYY-MM-DD') AS derniere_date, annee_partielle
     FROM analytics.fonds_taux_annuel ORDER BY annee, categorie`);
 }
 export const fondsTauxAnnuel = () => sur("fonds de taux par année", lireFondsTauxAnnuel);
@@ -236,7 +240,8 @@ async function lireFluxFondsTaux() {
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   // `/ 1e9` : les flux sont en dirhams dans la base ; on les lit en milliards (Md MAD) directement en SQL.
   return plat(await sql()`
-    SELECT categorie, annee, flux_net / 1e9 AS flux_net_md
+    SELECT categorie, annee, flux_net / 1e9 AS flux_net_md,
+           to_char(premiere_date, 'YYYY-MM-DD') AS premiere_date, to_char(derniere_date, 'YYYY-MM-DD') AS derniere_date, annee_partielle
     FROM analytics.flux_fonds_taux_annuel ORDER BY annee, categorie`);
 }
 export const fluxFondsTaux = () => sur("flux des fonds de taux", lireFluxFondsTaux);
@@ -315,7 +320,8 @@ async function lireSyntheseAnnuel() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   return plat(await sql()`
-    SELECT actif, annee, nb_semaines, rendement_pct
+    SELECT actif, annee, nb_semaines, rendement_pct,
+           to_char(premiere_date, 'YYYY-MM-DD') AS premiere_date, to_char(derniere_date, 'YYYY-MM-DD') AS derniere_date, annee_partielle
     FROM analytics.synthese_annuel ORDER BY annee, actif`);
 }
 export const syntheseAnnuel = () => sur("synthèse annuelle", lireSyntheseAnnuel);

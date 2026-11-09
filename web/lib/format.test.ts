@@ -10,8 +10,10 @@ import {
   formatNombre,
   formatPoints,
   formatPointsDeBase,
+  formatAnnee,
   formatPeriode,
   formatPourcentage,
+  formatTrimestre,
 } from "./format";
 
 // Caractères invisibles écrits explicitement, pour que le test voie la différence :
@@ -91,6 +93,23 @@ describe("dates", () => {
   });
   it("date invalide", () => {
     expect(formatDate("pas une date")).toBe("—");
+  });
+});
+
+describe("années et trimestres partiels", () => {
+  it("année complète : l'année seule", () => {
+    expect(formatAnnee(2024, "2024-01-05", "2024-12-27", false)).toBe("2024");
+  });
+  it("année partielle : les mois couverts", () => {
+    expect(formatAnnee(2026, "2026-01-02", "2026-10-23", true)).toBe("2026 (janv.–oct.)");
+    expect(formatAnnee("2022", "2022-10-07", "2022-12-30", "true")).toBe("2022 (oct.–déc.)");
+  });
+  it("un seul mois", () => {
+    expect(formatAnnee(2023, "2023-12-01", "2023-12-29", true)).toBe("2023 (déc.)");
+  });
+  it("trimestre en cours ou terminé", () => {
+    expect(formatTrimestre(2026, 4, true)).toBe("2026 T4 (en cours)");
+    expect(formatTrimestre(2026, 3, false)).toBe("2026 T3");
   });
 });
 

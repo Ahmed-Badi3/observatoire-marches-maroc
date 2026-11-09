@@ -1,10 +1,12 @@
 import {
+  formatAnnee,
   formatMilliards,
   formatMultiple,
   formatNombre,
   formatPoints,
   formatPointsDeBase,
   formatPourcentage,
+  type Valeur,
 } from "@/lib/format";
 
 // Outils communs aux graphiques. Ici on ne fait que REMETTRE EN FORME des lignes déjà lues en base
@@ -93,4 +95,25 @@ export function pivoter(
     parX.set(x, rangee);
   }
   return { donnees: [...parX.values()], series };
+}
+
+// Remplace l'année de chaque ligne par son étiquette : « 2024 », ou « 2026 (janv.–oct.) » si la base la
+// déclare partielle (colonnes premiere_date, derniere_date, annee_partielle). L'année d'origine reste
+// dans `annee_brute`, pour rapprocher deux tables (ex. flux et MASI de la même année).
+// Toutes les lignes d'une même année reçoivent la même étiquette (celle de la 1re ligne rencontrée) :
+// un pivot par année ne peut donc jamais créer deux barres pour une seule année.
+export function etiqueterAnnees<T extends Record<string, unknown>>(
+  lignes: T[],
+): (T & { annee: string; annee_brute: string })[] {
+  const etiquettes = new Map<string, string>();
+  for (const l of lignes) {
+    const a = String(l.annee);
+    if (!etiquettes.has(a)) {
+      etiquettes.set(
+        a,
+        formatAnnee(l.annee as Valeur, l.premiere_date as Valeur, l.derniere_date as Valeur, l.annee_partielle),
+      );
+    }
+  }
+  return lignes.map((l) => ({ ...l, annee: etiquettes.get(String(l.annee)) ?? String(l.annee), annee_brute: String(l.annee) }));
 }

@@ -33,3 +33,16 @@ models:
 
   - name: synthese_annuel
     description: Rendement de chaque placement et portefeuille par année civile (2026 = jusqu'à la dernière semaine disponible).
+    columns:
+      - name: premiere_date
+        description: "1re date de l'année prise en compte"
+        tests:
+          - not_null
+      - name: derniere_date
+        description: "Dernière date de l'année prise en compte"
+        tests:
+          - not_null
+      - name: annee_partielle
+        description: "Vrai si l'année n'est pas couverte en entier (macro annee_partielle)"
+        tests:
+          - not_null
