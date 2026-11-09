@@ -53,7 +53,8 @@ avec une image concrète avant le terme technique.
 - Nombres au format français : `16 537,91`, `+42,3 %`, `−19,0 %`, `0,66`, `+68 pb`.
 - Ne modifie pas `n8n/`, `dashboard/` ni les scripts 01 à 09 sans me le demander.
   Si une tâche l'exige, explique d'abord pourquoi.
-- Secrets : `scripts/config.py`, `web/.env.local` ou Secrets GitHub. Jamais dans le code.
+- Secrets : `scripts/config.py`, `web/.env.local` (`DATABASE_URL`, `GEMINI_API_KEY` de l'assistant IA)
+  ou Secrets GitHub / variables de Vercel. Jamais dans le code.
 - N'installe aucune nouvelle dépendance sans me demander.
 - Quand tu modifies un fichier de configuration ou de code que je dois relire,
   montre-moi le contenu complet du fichier, pas seulement le passage modifié.

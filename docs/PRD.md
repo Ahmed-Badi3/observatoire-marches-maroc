@@ -41,10 +41,14 @@ Le chiffre de cette phrase (+42 %) est lu dans la base, comme tous les autres.
 - Onglets dans chaque page pour passer d'un résultat à l'autre sans recharger.
 - Tableaux triables (IPO, placements).
 - Date de dernière mise à jour visible sur chaque page.
+- Assistant IA « Poser une question » (ajouté le 09/11/2026, Priorité 7 des corrections) : répond en
+  français à partir des résultats déjà calculés du site (Gemini, offre gratuite, appelé côté serveur),
+  cite le chiffre et sa période, dit « je ne sais pas » sinon, refuse tout conseil d'investissement.
 
 ## Hors périmètre (pas dans le MVP)
 - Comptes utilisateurs, connexion, favoris.
-- Agent IA en ligne (l'agent analyste reste dans n8n en local) : idée pour la V2.
+- Agent IA avec accès SQL à la base (l'agent analyste reste dans n8n en local) : idée pour la V2.
+  La version 1 du site répond seulement à partir d'une fiche de résultats, sans SQL.
 - Conseils d'investissement ou prédictions : le site décrit le passé, il ne recommande rien.
 - Données en temps réel ou intrajournalières.
 - Version anglaise : idée pour la V2.

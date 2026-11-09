@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ExternalLink, Menu, X } from "lucide-react";
 
+import { Assistant } from "@/components/observatoire/assistant";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
 import { AUTEUR, MENTION_LEGALE, PAGES, URL_GITHUB, pageCourante } from "@/lib/pages";
@@ -155,6 +156,8 @@ export function AppShell({
           {MENTION_LEGALE}
         </footer>
       </div>
+      {/* Assistant IA : bouton en bas à droite de chaque page (Priorité 7) */}
+      <Assistant />
     </div>
   );
 }

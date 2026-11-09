@@ -6,6 +6,7 @@ import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-
 import { placements } from "@/lib/donnees";
 import { fraicheur, indicesSynthese, rendementReel, type Ligne } from "@/lib/donnees-pages";
 import { LIBELLE_FREQUENCE, formatPeriode, formatPourcentage, type Frequence, type Valeur } from "@/lib/format";
+import { LIMITES } from "@/lib/methode";
 import { URL_GITHUB } from "@/lib/pages";
 
 export const metadata: Metadata = { title: "Méthode et sources" };
@@ -61,18 +62,6 @@ const QUALITE = [
     probleme: "Plusieurs chiffres légitimes pour une même mesure du MASI (chaque séance, chaque vendredi, fin de mois)",
     solution: "Sous chaque chiffre du MASI, le site indique sa fréquence et sa période (voir « Pourquoi le MASI a plusieurs chiffres »).",
   },
-];
-
-const LIMITES = [
-  "Corrélation n'est pas causalité, et les fenêtres de quatre semaines qui se chevauchent surestiment la significativité.",
-  "Le MASI sert d'approximation de la valeur des fonds Actions : les dividendes n'y sont pas comptés.",
-  "L'historique gratuit du MASI est court, et la période étudiée contient deux années de forte hausse.",
-  "Les PER et rendements du dividende sont des prévisions de sociétés de bourse, aux périmètres et méthodes différents.",
-  "Peu de décisions de Bank Al-Maghrib dans la période : les conclusions sont fragiles.",
-  "Le taux à 13 semaines dépend aussi des besoins de financement du Trésor, pas seulement des anticipations de taux.",
-  "Peu d'introductions en bourse, saisies depuis la presse : aucun classement fiable.",
-  "Les portefeuilles types sont des constructions théoriques à partir des indices de catégorie de l'AMMC ; ni frais d'entrée ni impôts.",
-  "Le site décrit le passé : il ne prédit rien et ne constitue pas un conseil en investissement.",
 ];
 
 const SOURCES = [
@@ -268,6 +257,29 @@ export default async function PageMethode() {
           Les statistiques de l&apos;AMMC se mettent à jour chaque semaine automatiquement ; la courbe des taux, le MASI,
           les introductions en bourse, les données du HCP et les PER se mettent à jour à la main, d&apos;où ces écarts de dates.
         </p>
+      </CarteGraphique>
+
+      <CarteGraphique titre="L'assistant IA : comment il répond">
+        <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-texte">
+          <li>
+            Le bouton « Poser une question » envoie votre question à un modèle de langage de Google (Gemini, offre
+            gratuite), depuis le serveur du site : la clé d&apos;accès n&apos;est jamais envoyée au navigateur.
+          </li>
+          <li>
+            Le modèle reçoit une fiche avec les résultats déjà calculés dans la base (les mêmes que ceux des pages),
+            les définitions et les limites ci-dessous. Il n&apos;a aucun accès direct à la base de données.
+          </li>
+          <li>
+            Il doit citer le chiffre et sa période, dire « je ne sais pas » si la réponse n&apos;est pas dans la fiche,
+            et refuser tout conseil d&apos;investissement personnalisé.
+          </li>
+          <li>
+            Limites : un modèle de langage peut se tromper en reformulant un chiffre ; vérifiez sur la page concernée.
+            Le nombre de questions est limité par visiteur et par jour, et l&apos;offre gratuite peut être
+            momentanément saturée. Le site n&apos;enregistre pas les questions ; Google peut utiliser les échanges de son
+            offre gratuite pour améliorer ses services : n&apos;y écrivez rien de personnel.
+          </li>
+        </ul>
       </CarteGraphique>
 
       <CarteGraphique titre="Limites : ce que les chiffres ne disent pas">

@@ -56,12 +56,12 @@ Problème : on ne comprend ce que désigne le grand chiffre qu'après avoir lu l
 
 Objectif : un visiteur pose une question en français (« Quel placement a le mieux résisté en 2026 ? ») et l'assistant répond à partir des résultats du site.
 
-- [ ] Interface : bouton « Poser une question » ouvrant un panneau de chat (dans le thème bleu) + 4 questions suggérées cliquables.
-- [ ] Architecture recommandée (version 1, sûre et peu coûteuse) : une route API Next.js côté serveur appelle le modèle de langage (Gemini, déjà utilisé dans n8n, ou l'API Claude). On lui donne en contexte les résultats déjà calculés (export JSON des vues analytics + définitions + limites de la page Méthode). Pas de SQL libre.
+- [x] Interface : bouton « Poser une question » ouvrant un panneau de chat (dans le thème bleu) + 4 questions suggérées cliquables.
+- [x] Architecture recommandée (version 1, sûre et peu coûteuse) : une route API Next.js côté serveur appelle le modèle de langage (Gemini, déjà utilisé dans n8n, ou l'API Claude). On lui donne en contexte les résultats déjà calculés (export JSON des vues analytics + définitions + limites de la page Méthode). Pas de SQL libre.
 - [ ] Version 2 (optionnelle) : outil SQL en lecture seule, limité à une liste blanche de vues analytics, avec le rôle agent\_lecture (comme l'agent n8n de la phase 1).
-- [ ] Sécurité : clé API uniquement côté serveur (variable d'environnement Vercel), jamais dans le navigateur ; limite de requêtes par visiteur ; longueur de question limitée.
-- [ ] Consignes de l'assistant : répondre seulement sur les données du site, citer le chiffre et sa période, dire « je ne sais pas » sinon, refuser tout conseil d'investissement personnalisé, rappeler les limites (échantillons courts, MASI hors dividendes).
-- [ ] Ajouter dans « Méthode et sources » comment fonctionne l'assistant (modèle utilisé, données fournies, limites).
+- [x] Sécurité : clé API uniquement côté serveur (variable d'environnement Vercel), jamais dans le navigateur ; limite de requêtes par visiteur ; longueur de question limitée.
+- [x] Consignes de l'assistant : répondre seulement sur les données du site, citer le chiffre et sa période, dire « je ne sais pas » sinon, refuser tout conseil d'investissement personnalisé, rappeler les limites (échantillons courts, MASI hors dividendes).
+- [x] Ajouter dans « Méthode et sources » comment fonctionne l'assistant (modèle utilisé, données fournies, limites).
 
 ### Priorité 8 — inspiration visuelle
 
