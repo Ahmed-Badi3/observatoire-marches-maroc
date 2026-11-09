@@ -14,6 +14,7 @@ import {
   formatPointsDeBase,
   formatPourcentage,
 } from "@/lib/format";
+import { interpreterCorrelation } from "@/lib/interpretation";
 import { COULEUR_TEXTE_TON, tonDe } from "./variation";
 
 // Tableau triable. Une page serveur ne peut pas envoyer de fonctions à un composant client :
@@ -28,6 +29,7 @@ export type TypeColonne =
   | "pb"
   | "multiple"
   | "milliards"
+  | "correlation" // chiffre + mot d'interprétation (« lien net »), trié sur le chiffre
   | "date";
 
 export type Colonne = {
@@ -42,12 +44,14 @@ export type Colonne = {
 export type Ligne = Record<string, string | number | null>;
 type Tri = { cle: string; sens: "asc" | "desc" };
 
-const NUMERIQUES: TypeColonne[] = ["nombre", "pourcentage", "points", "pb", "multiple", "milliards"];
+const NUMERIQUES: TypeColonne[] = ["nombre", "pourcentage", "points", "pb", "multiple", "milliards", "correlation"];
 
 function formater(col: Colonne, v: string | number | null): string {
   switch (col.type ?? "texte") {
     case "nombre":
       return formatNombre(v, { decimales: col.decimales, signe: col.signe });
+    case "correlation":
+      return formatNombre(v, { decimales: col.decimales ?? 2, signe: col.signe ?? true });
     case "pourcentage":
       return formatPourcentage(v, { decimales: col.decimales, signe: col.signe });
     case "points":
@@ -130,8 +134,10 @@ export function TableauTriable({
                     type="button"
                     onClick={() => trierPar(col.cle)}
                     className={cn(
-                      "inline-flex w-full items-center gap-1 whitespace-nowrap transition-colors duration-150 hover:text-texte",
-                      numerique ? "justify-end" : "justify-start",
+                      // Les intitulés longs (« Flux net ↔ rendement… ») passent sur deux lignes au lieu d'élargir le tableau
+                      "inline-flex w-full items-center gap-1 transition-colors duration-150 hover:text-texte",
+                      numerique ? "justify-end text-right" : "justify-start text-left",
+                      col.libelle.length > 24 && "min-w-[11rem]",
                       actif && "text-accent-fonce",
                     )}
                   >
@@ -168,6 +174,11 @@ export function TableauTriable({
                     )}
                   >
                     {formater(col, v)}
+                    {col.type === "correlation" && interpreterCorrelation(v) && (
+                      <span className="ml-1.5 text-xs font-normal text-texte-secondaire">
+                        · {interpreterCorrelation(v)}
+                      </span>
+                    )}
                   </td>
                 );
               })}

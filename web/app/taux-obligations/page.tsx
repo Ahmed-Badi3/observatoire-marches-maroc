@@ -143,7 +143,7 @@ function ongletSensibilite(sens: Ligne[] | null) {
     { cle: "categorie", libelle: "Catégorie" },
     { cle: "nb_semaines", libelle: "Semaines", type: "nombre", decimales: 0 },
     { cle: "sensibilite_implicite", libelle: "Sensibilité", type: "nombre" },
-    { cle: "correlation", libelle: "Corrélation", type: "nombre", signe: true },
+    { cle: "correlation", libelle: "Rendement hebdo du fonds ↔ variation du taux à 10 ans", type: "correlation" },
     { cle: "r2", libelle: "R²", type: "nombre" },
   ];
   return (
@@ -293,8 +293,8 @@ function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] |
   const colonnes: Colonne[] = [
     { cle: "categorie", libelle: "Catégorie" },
     { cle: "nb_semaines", libelle: "Semaines", type: "nombre", decimales: 0 },
-    { cle: "corr_flux_rend_passe", libelle: "Corrélation avec la performance passée", type: "nombre", signe: true },
-    { cle: "corr_flux_rend_futur", libelle: "Corrélation avec la performance future", type: "nombre", signe: true },
+    { cle: "corr_flux_rend_passe", libelle: "Flux net hebdo ↔ rendement du fonds, 4 semaines précédentes", type: "correlation" },
+    { cle: "corr_flux_rend_futur", libelle: "Flux net hebdo ↔ rendement du fonds, 4 semaines suivantes", type: "correlation" },
   ];
   return (
     <MiseEnPageResultat
@@ -306,12 +306,12 @@ function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] |
           constat="Les épargnants obligataires suivent moins la tendance que ceux des fonds actions."
           tuiles={[
             {
-              etiquette: "Flux des fonds MLT ↔ leur performance passée",
+              etiquette: "Flux net hebdo des fonds MLT ↔ leur rendement des 4 semaines précédentes",
               valeur: formatNombre(mlt?.corr_flux_rend_passe, { signe: true }),
               interpretation: interpreterCorrelation(mlt?.corr_flux_rend_passe),
             },
             {
-              etiquette: "Achats des fonds Actions ↔ MASI des 4 semaines précédentes",
+              etiquette: "Achats nets des fonds Actions ↔ MASI des 4 semaines précédentes",
               valeur: formatNombre(kpi?.[0]?.corr_passe, { signe: true }),
               interpretation: interpreterCorrelation(kpi?.[0]?.corr_passe),
             },
@@ -338,7 +338,7 @@ function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] |
         timing && (
           <div>
             <TitreTableau>Les flux suivent-ils la performance ?</TitreTableau>
-            <TableauTriable colonnes={colonnes} lignes={timing} legende="Corrélation des flux des fonds de taux avec leur performance" />
+            <TableauTriable colonnes={colonnes} lignes={timing} legende="Corrélation entre le flux net hebdomadaire de chaque fonds de taux et son rendement des 4 semaines précédentes ou suivantes" />
           </div>
         )
       }

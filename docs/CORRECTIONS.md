@@ -48,9 +48,9 @@ Problème : on ne comprend ce que désigne le grand chiffre qu'après avoir lu l
 
 ### Priorité 6 — corrélations : toujours dire « entre quoi et quoi »
 
-- [ ] Partout où une corrélation est affichée (cartes, tableaux, notes), écrire les deux variables : « Corrélation entre \[variable A\] et \[variable B\] ». Exemples : « achats nets des fonds Actions ↔ MASI des 4 semaines précédentes » ; « rendement hebdo des fonds OMLT ↔ variation du taux à 10 ans » ; « MASI ↔ fonds OMLT (rendements hebdomadaires) ».
-- [ ] Ajouter un mot d'interprétation à côté de chaque valeur : < 0,2 « aucun lien » ; 0,2–0,4 « lien faible » ; 0,4–0,7 « lien net » ; > 0,7 « lien fort » (et « sens inverse » si négatif).
-- [ ] Colonnes de tableau : remplacer « Corrélation avec la performance passée » par l'intitulé complet des deux variables.
+- [x] Partout où une corrélation est affichée (cartes, tableaux, notes), écrire les deux variables : « Corrélation entre \[variable A\] et \[variable B\] ». Exemples : « achats nets des fonds Actions ↔ MASI des 4 semaines précédentes » ; « rendement hebdo des fonds OMLT ↔ variation du taux à 10 ans » ; « MASI ↔ fonds OMLT (rendements hebdomadaires) ».
+- [x] Ajouter un mot d'interprétation à côté de chaque valeur : < 0,2 « aucun lien » ; 0,2–0,4 « lien faible » ; 0,4–0,7 « lien net » ; > 0,7 « lien fort » (et « sens inverse » si négatif).
+- [x] Colonnes de tableau : remplacer « Corrélation avec la performance passée » par l'intitulé complet des deux variables.
 
 ### Priorité 7 — assistant IA pour questionner les données (demande d'Ahmed)
 

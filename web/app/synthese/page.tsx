@@ -244,18 +244,18 @@ function ongletCorrelations(paires: Ligne[] | null, masi: Placement | undefined)
           ]}
           precision={`Corrélations des rendements · ${formatPeriode(masi?.debut, masi?.fin, "hebdo", { horsDividendes: false })}`}
           conclusion="Les fonds de taux bougent bien moins avec le MASI que les fonds Actions : c'est ce qui amortit les chutes."
-          details={`Avec les fonds obligataires CT (OCT) : ${formatNombre(corr(MASI, "OCT"))}. Plus la corrélation est proche de 0, plus deux placements bougent indépendamment.`}
+          details={`MASI ↔ fonds obligataires CT (OCT) : ${formatNombre(corr(MASI, "OCT"))}, ${interpreterCorrelation(corr(MASI, "OCT")) ?? "—"}. Plus la corrélation est proche de 0, plus deux placements bougent indépendamment.`}
         />
       }
       graphiques={
         <CarteGraphique
           titre="Le MASI ressemble aux fonds Actions, beaucoup moins aux fonds de taux"
-          note="Corrélation des rendements hebdomadaires, de −1 à +1. OMLT = obligations moyen et long terme, OCT = obligations court terme. Source : AMMC, Bourse de Casablanca."
+          note="Corrélation entre les rendements hebdomadaires du placement en ligne et de celui en colonne, de −1 à +1. OMLT = obligations moyen et long terme, OCT = obligations court terme. Source : AMMC, Bourse de Casablanca."
         >
           <CarteChaleur
             etiquettes={presents}
             cellules={cellules}
-            legende="Corrélation des rendements hebdomadaires entre les placements"
+            legende="Corrélation entre les rendements hebdomadaires de chaque paire de placements"
           />
         </CarteGraphique>
       }

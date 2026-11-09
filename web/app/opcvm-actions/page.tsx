@@ -97,12 +97,12 @@ function ongletFlux(
           constat="Les épargnants courent après la performance."
           tuiles={[
             {
-              etiquette: "Achats des fonds Actions ↔ MASI des 4 semaines précédentes",
+              etiquette: "Achats nets des fonds Actions ↔ MASI des 4 semaines précédentes",
               valeur: formatNombre(t.corr_passe, { signe: true }),
               interpretation: interpreterCorrelation(t.corr_passe),
             },
             {
-              etiquette: "Achats des fonds Actions ↔ MASI des 4 semaines suivantes",
+              etiquette: "Achats nets des fonds Actions ↔ MASI des 4 semaines suivantes",
               valeur: formatNombre(t.corr_futur, { signe: true }),
               interpretation: interpreterCorrelation(t.corr_futur),
             },
