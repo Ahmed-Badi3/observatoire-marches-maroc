@@ -95,6 +95,7 @@ export default async function PageAccueil() {
             { decimales: 0, signe: false },
           )} de son risque`}
           valeur={formatPourcentage(equilibre?.part_rdt_masi_pct, { decimales: 0, signe: false })}
+          jauge={{ part: equilibre?.part_rdt_masi_pct, total: 100 }}
           pastilles={[
             { libelle: "Rendement annualisé", valeur: formatPourcentage(equilibre?.rdt_annualise_pct) },
             {

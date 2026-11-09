@@ -51,6 +51,7 @@ function ongletPerformance(lignes: Ligne[], resume: Ligne) {
             {
               etiquette: "IPO qui font mieux que le MASI depuis leur introduction",
               valeur: `${formatNombre(resume.nb_battent, { decimales: 0 })} sur ${formatNombre(resume.nb, { decimales: 0 })}`,
+              jauge: { part: resume.nb_battent, total: resume.nb },
             },
             {
               etiquette: "Avance sur le MASI, de la plus petite à la plus grande",
@@ -153,6 +154,7 @@ function ongletAchat(lignes: Ligne[], resume: Ligne) {
             {
               etiquette: "IPO gagnantes si achetées à la 20e séance",
               valeur: `${formatNombre(resume.nb_gagnent_j20, { decimales: 0 })} sur ${formatNombre(resume.nb, { decimales: 0 })}`,
+              jauge: { part: resume.nb_gagnent_j20, total: resume.nb },
             },
             { etiquette: `Pire cas : ${resume.j20_pire}`, valeur: formatPourcentage(resume.j20_min) },
           ]}

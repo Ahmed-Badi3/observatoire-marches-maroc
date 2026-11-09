@@ -296,21 +296,22 @@ function ongletPer(valo: Ligne[] | null) {
   const scope = valo.filter(
     (l) => l.perimetre === "Scope 40" && Number(l.annee) === anneeCible && l.per !== null,
   );
-  const moyenne = valo.filter((l) => String(l.perimetre).startsWith("moyenne historique") && l.per !== null);
+  const premier = scope[0];
+  const dernier = scope[scope.length - 1];
+  // Moyenne historique de la MÊME source et du même périmètre que le PER Scope 40 (BMCE Capital Global
+  // Research) : on ne mélange plus Scope 40 et marché total sur le graphique (CORRECTIONS.md, Résultat 4).
+  // La moyenne CFG (marché total) reste dans le tableau ci-dessous.
+  const moyenne = valo.filter(
+    (l) => String(l.perimetre).startsWith("moyenne historique") && l.source === dernier?.source && l.per !== null,
+  );
+  const moyenneRecente = moyenne[moyenne.length - 1];
   const libelleScope = `PER ${anneeCible} prévu (Scope 40)`;
-  const libelleMoyenne = "Moyenne historique sur 10 ans";
   const { donnees } = pivoter(
-    [
-      ...scope.map((l) => ({ date: l.date_article, serie: libelleScope, per: l.per })),
-      ...moyenne.map((l) => ({ date: l.date_article, serie: libelleMoyenne, per: l.per })),
-    ].sort((a, b) => String(a.date).localeCompare(String(b.date))),
+    scope.map((l) => ({ date: l.date_article, serie: libelleScope, per: l.per })),
     "date",
     "serie",
     "per",
   );
-  const premier = scope[0];
-  const dernier = scope[scope.length - 1];
-  const moyenneRecente = moyenne[moyenne.length - 1];
 
   const colonnes: Colonne[] = [
     { cle: "date_article", libelle: "Publication", type: "date" },
@@ -349,7 +350,7 @@ function ongletPer(valo: Ligne[] | null) {
       graphiques={
         <CarteGraphique
           titre="Le PER prévu recule et passe sous sa moyenne de long terme"
-          note="PER = prix d'une action divisé par le bénéfice par action attendu : combien d'années de bénéfices on paie. Chaque point est la date de publication d'une étude de presse (BMCE Capital Global Research, CFG)."
+          note="PER = prix d'une action divisé par le bénéfice par action attendu : combien d'années de bénéfices on paie. Chaque point est la date de publication d'une étude ; en pointillé, la moyenne historique sur 10 ans de la même source et du même périmètre (Scope 40). Les chiffres d'autres sources sont dans le tableau."
         >
           <GraphiqueLignes
             jeux={[
@@ -357,18 +358,19 @@ function ongletPer(valo: Ligne[] | null) {
                 id: "per",
                 libelle: "PER",
                 donnees,
-                series: [
-                  { cle: libelleScope, libelle: libelleScope, couleur: COULEUR_MASI20 },
-                  { cle: libelleMoyenne, libelle: libelleMoyenne, couleur: "var(--serie-6)" },
-                ],
+                series: [{ cle: libelleScope, libelle: libelleScope, couleur: COULEUR_MASI20 }],
               },
             ]}
             format="multiple"
             filtrePeriode={false}
             decimalesAxe={1}
             decimalesInfo={1}
-            description="PER prévu du Scope 40 et moyenne historique sur 10 ans, selon la date de publication"
+            description="PER prévu du Scope 40 selon la date de publication, avec sa moyenne historique sur 10 ans en pointillé"
             points
+            reference={{
+              valeur: moyenneRecente ? Number(moyenneRecente.per) : null,
+              libelle: `Moyenne sur 10 ans : ${formatMultiple(moyenneRecente?.per)}`,
+            }}
           />
         </CarteGraphique>
       }

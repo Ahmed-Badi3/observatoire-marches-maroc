@@ -171,6 +171,16 @@
   }
 }
 
+/* Jauge en demi-cercle : l'arc se remplit à l'apparition (Priorité 8, lot B) */
+@keyframes jauge-remplir {
+  from {
+    stroke-dasharray: 0 126;
+  }
+}
+.jauge-remplissage {
+  animation: jauge-remplir 900ms ease-out;
+}
+
 /* Pas d'animation si l'utilisateur l'a désactivée (DESIGN.md, Mouvement) */
 @media (prefers-reduced-motion: reduce) {
   *,

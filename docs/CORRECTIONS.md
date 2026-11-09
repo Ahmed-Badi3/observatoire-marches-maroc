@@ -67,15 +67,15 @@ Objectif : un visiteur pose une question en français (« Quel placement a le mi
 
 Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_and\_chill). On reprend le style, pas les couleurs : on garde le thème bleu (sarcelle #2A9DB0, bleu foncé, corail #E8836B, ambre #F2B84B).
 
-- [ ] Fond de page clair et chaud (blanc cassé), titres de page à gauche en grand.
-- [ ] Navigation par pilules en haut de chaque page (onglets arrondis, l'actif rempli en bleu foncé).
+- [ ] Fond de page clair et chaud (blanc cassé), titres de page à gauche en grand. *(Non retenu le 09/11/2026 : Ahmed garde la colonne bleu vif et le contenu blanc bleuté.)*
+- [ ] Navigation par pilules en haut de chaque page (onglets arrondis, l'actif rempli en bleu foncé). *(Lot A, non retenu le 09/11/2026.)*
 - [ ] Bandeau de KPI en haut de page : icône ronde + grand chiffre + petite légende dessous + pastille colorée de variation (ex. « +22 % vs 2024 »).
-- [ ] Cartes de résultats PLEINES et colorées (bleu foncé, sarcelle, corail, ambre) avec texte blanc : étiquette courte en haut (ce que mesure le chiffre, « Achats ↔ MASI du mois passé »), titre en une ligne, grand chiffre en bas à gauche, pastille d'interprétation en bas à droite (« lien net »). Coins très arrondis (≈ 16 px). Grille de 2 à 3 cartes.
-- [ ] Clic sur une carte : elle s'agrandit en panneau détaillé animé (comme la carte jaune de la vidéo) avec l'explication complète, la méthode et les limites. Le texte long quitte donc la carte.
-- [ ] Graphiques : boutons segmentés en pilule (1 an / 3 ans / Tout), infobulle au survol, ligne de référence en pointillé (ex. moyenne PER 20,3x).
-- [ ] Jauge en demi-cercle pour les résultats en proportion (ex. « 5 IPO sur 6 battent le MASI », « 58 % du rendement du MASI »).
+- [x] Cartes de résultats PLEINES et colorées (bleu foncé, sarcelle, corail, ambre) avec texte blanc : étiquette courte en haut (ce que mesure le chiffre, « Achats ↔ MASI du mois passé »), titre en une ligne, grand chiffre en bas à gauche, pastille d'interprétation en bas à droite (« lien net »). Coins très arrondis (≈ 16 px). Grille de 2 à 3 cartes.
+- [x] Clic sur une carte : elle s'agrandit en panneau détaillé animé (comme la carte jaune de la vidéo) avec l'explication complète, la méthode et les limites. Le texte long quitte donc la carte.
+- [x] Graphiques : boutons segmentés en pilule (1 an / 3 ans / Tout), infobulle au survol, ligne de référence en pointillé (ex. moyenne PER 20,3x).
+- [x] Jauge en demi-cercle pour les résultats en proportion (ex. « 5 IPO sur 6 battent le MASI », « 58 % du rendement du MASI »).
 - [ ] Barre empilée horizontale pour les répartitions (ex. composition des portefeuilles prudent / équilibré / dynamique).
-- [ ] Animations légères : apparition des cartes, chiffres qui défilent jusqu'à leur valeur, transition entre onglets.
+- [x] Animations légères : apparition des cartes, chiffres qui défilent jusqu'à leur valeur, transition entre onglets. *(Sans la transition entre onglets, prévue au lot A non retenu.)*
 
 ## Page Accueil
 
@@ -125,9 +125,9 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 ### Onglet PER (Résultat 4)
 
-- [ ] La ligne grise « moyenne historique sur 10 ans » relie deux valeurs de sources et de périmètres différents (18,0x CFG marché total ; 20,3x BMCE Scope 40) : la remplacer par une ligne horizontale plate à 20,3x (BMCE, Scope 40, même périmètre que la ligne bleue). Garder 18,0x dans le tableau seulement.
+- [x] La ligne grise « moyenne historique sur 10 ans » relie deux valeurs de sources et de périmètres différents (18,0x CFG marché total ; 20,3x BMCE Scope 40) : la remplacer par une ligne horizontale plate à 20,3x (BMCE, Scope 40, même périmètre que la ligne bleue). Garder 18,0x dans le tableau seulement.
 - [x] Ligne bleue : segments droits avec les points visibles (seulement 3 points).
-- [ ] Ne pas mélanger Scope 40 et marché total sur un même graphique.
+- [x] Ne pas mélanger Scope 40 et marché total sur un même graphique.
 - [ ] Message final de la carte : « Le PER 2026 prévu (Scope 40) est passé de 19,4x à 18,0x, sous sa moyenne de 10 ans de 20,3x. » Ajouter : « Moins cher ne veut pas dire bonne affaire : si les bénéfices baissent, le PER remontera. »
 
 ## Page Contexte économique

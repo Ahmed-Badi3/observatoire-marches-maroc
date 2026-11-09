@@ -49,6 +49,7 @@ export function GraphiqueLignes({
   filtrePeriode = true,
   escalier = false,
   points = false,
+  reference,
   ligneZero = false,
   decimalesAxe = 0,
   decimalesInfo,
@@ -64,6 +65,7 @@ export function GraphiqueLignes({
   filtrePeriode?: boolean;
   escalier?: boolean; // marches d'escalier (ex. taux directeur)
   points?: boolean; // un point visible sur chaque donnée
+  reference?: { valeur: number | null; libelle: string }; // ligne horizontale en pointillé (ex. PER moyen)
   ligneZero?: boolean;
   decimalesAxe?: number;
   decimalesInfo?: number;
@@ -149,6 +151,21 @@ export function GraphiqueLignes({
               domain={["auto", "auto"]}
             />
             {ligneZero && <ReferenceLine y={0} stroke="var(--texte-secondaire)" strokeDasharray="4 4" />}
+            {reference && reference.valeur !== null && (
+              <ReferenceLine
+                y={reference.valeur}
+                stroke="var(--serie-6)"
+                strokeDasharray="6 4"
+                strokeWidth={1.5}
+                ifOverflow="extendDomain"
+                label={{
+                  value: reference.libelle,
+                  position: "insideTopRight",
+                  fontSize: 12,
+                  fill: "var(--texte-secondaire)",
+                }}
+              />
+            )}
             <Tooltip
               content={
                 <InfoBulle formatValeur={formatInfo} libelles={libelles} typeX={avecDates ? "date" : "texte"} />

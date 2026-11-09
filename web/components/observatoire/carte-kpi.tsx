@@ -1,3 +1,4 @@
+import { ChiffreAnime } from "./chiffre-anime";
 import { Variation, type Ton } from "./variation";
 
 // Mini-courbe (sparkline) en SVG pur : une ligne sans axes, pour voir la tendance d'un coup d'œil.
@@ -45,9 +46,11 @@ export function CarteKpi({
   precision?: string;
 }) {
   return (
-    <div className="flex flex-col gap-2 rounded-carte bg-carte p-6 shadow-carte">
+    <div className="flex flex-col gap-2 rounded-carte bg-carte p-6 shadow-carte animate-in fade-in slide-in-from-bottom-2 duration-500">
       <p className="text-sm text-texte-secondaire">{libelle}</p>
-      <p className="text-[32px] font-semibold leading-tight text-texte">{valeur}</p>
+      <p className="text-[32px] font-semibold leading-tight text-texte">
+        <ChiffreAnime texte={valeur} />
+      </p>
       {variation && (
         <div>
           <Variation texte={variation.texte} ton={variation.ton} />
