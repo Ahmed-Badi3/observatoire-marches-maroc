@@ -7,7 +7,21 @@ import { ExternalLink, Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
-import { MENTION_LEGALE, PAGES, URL_GITHUB, pageCourante } from "@/lib/pages";
+import { AUTEUR, MENTION_LEGALE, PAGES, URL_GITHUB, pageCourante } from "@/lib/pages";
+
+// Un lien externe de la colonne de gauche : texte + petite flèche, ouvert dans un nouvel onglet.
+function LienExterne({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 font-medium text-accent-fonce hover:underline"
+    >
+      {children} <ExternalLink className="size-3" aria-hidden="true" />
+    </a>
+  );
+}
 
 // La « coque » du site : barre latérale, barre du haut, contenu, pied de page.
 // Image : le cadre d'un tableau. Les pages ne changent que la peinture à l'intérieur.
@@ -43,7 +57,8 @@ export function AppShell({
       <aside
         id="menu-lateral"
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex w-60 flex-col bg-carte shadow-carte transition-transform duration-200",
+          // overflow-y-auto : sur un écran bas, la colonne défile au lieu de couper le bloc auteur.
+          "fixed inset-y-0 left-0 z-40 flex w-60 flex-col overflow-y-auto bg-carte shadow-carte transition-transform duration-200",
           "lg:sticky lg:top-0 lg:h-screen lg:shrink-0 lg:translate-x-0 lg:shadow-none lg:border-r lg:border-separateur",
           menuOuvert ? "translate-x-0" : "max-lg:invisible max-lg:-translate-x-full",
         )}
@@ -93,14 +108,17 @@ export function AppShell({
           <p>
             Données AMMC jusqu&apos;au {formatDate(dateAmmc)}
           </p>
-          <a
-            href={URL_GITHUB}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 font-medium text-accent-fonce hover:underline"
-          >
-            Code sur GitHub <ExternalLink className="size-3" />
-          </a>
+          <LienExterne href={URL_GITHUB}>Code sur GitHub</LienExterne>
+
+          {/* L'auteur : un recruteur doit pouvoir me joindre en un clic. */}
+          <div className="mt-4 space-y-1.5 border-t border-separateur pt-4">
+            <p className="text-sm font-semibold text-texte">{AUTEUR.nom}</p>
+            <p className="leading-snug">{AUTEUR.titre}</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1">
+              <LienExterne href={AUTEUR.linkedin}>LinkedIn</LienExterne>
+              <LienExterne href={AUTEUR.rapport}>Rapport complet</LienExterne>
+            </div>
+          </div>
         </div>
       </aside>
 

@@ -30,6 +30,18 @@ export const PAGES: PageSite[] = [
 export const URL_GITHUB =
   "https://github.com/Ahmed-Badi3/observatoire-marches-maroc";
 
+// Adresse publique du site : sert aux aperçus de partage (LinkedIn, WhatsApp).
+export const URL_SITE = "https://observatoire-marches-maroc.vercel.app";
+
+// L'auteur, affiché sous le menu (Priorité 4 de docs/CORRECTIONS.md). Un seul endroit à modifier.
+// Le « rapport complet » est le README du dépôt : il décrit les 6 modules et les 18 résultats.
+export const AUTEUR = {
+  nom: "Ahmed Badi",
+  titre: "Ingénieur financier — recherche un poste de Data Analyst / Finance",
+  linkedin: "https://www.linkedin.com/in/ahmed-badi-01831a296",
+  rapport: `${URL_GITHUB}#readme`,
+};
+
 export const MENTION_LEGALE =
   "Projet personnel à but pédagogique. Données publiques (AMMC, Bourse de Casablanca, Bank Al-Maghrib, HCP). Ne constitue pas un conseil en investissement.";
 

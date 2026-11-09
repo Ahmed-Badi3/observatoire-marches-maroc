@@ -33,8 +33,8 @@ Même problème pour la pire baisse (−16,2 % en hebdo sur l'accueil, −19,0 %
 
 ### Priorité 4 — profil de l'auteur (recherche d'emploi)
 
-- [ ] Ajouter dans la colonne de gauche, sous « Code sur GitHub » : nom (Ahmed Badi), une ligne « Ingénieur financier — recherche un poste de Data Analyst / Finance », lien LinkedIn, lien CV, lien vers le rapport complet.
-- [ ] Ajouter les métadonnées de partage (titre, description, image Open Graph) pour un bel aperçu sur LinkedIn.
+- [x] Ajouter dans la colonne de gauche, sous « Code sur GitHub » : nom (Ahmed Badi), une ligne « Ingénieur financier — recherche un poste de Data Analyst / Finance », lien LinkedIn, lien CV, lien vers le rapport complet. *(Fait sans le lien CV, choix d'Ahmed : le CV s'envoie sur demande. « Rapport complet » = README du dépôt.)*
+- [x] Ajouter les métadonnées de partage (titre, description, image Open Graph) pour un bel aperçu sur LinkedIn.
 
 ### Priorité 5 — refonte des cartes de résultats (demande d'Ahmed)
 
