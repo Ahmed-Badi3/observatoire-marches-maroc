@@ -26,7 +26,11 @@ function creerConnexion() {
   return postgres(url, {
     ssl: surCePc ? false : "require",
     prepare: false,
-    max: 1, // une fonction serverless = une connexion
+    // En ligne : une fonction serverless = une connexion.
+    // En développement (`npm run dev`), Next prépare la même page plusieurs fois en parallèle ; avec un seul
+    // guichet, une préparation attendrait l'autre et Next la bloquerait (erreur « use cache … awaiting a
+    // promise created outside it », page à ~3 min). On ouvre donc plusieurs guichets, en local seulement.
+    max: process.env.NODE_ENV === "development" ? 10 : 1,
     idle_timeout: 20,
     connect_timeout: 10,
   });
