@@ -18,7 +18,8 @@ les noms ni les images.
 | Rôle | Couleur |
 |---|---|
 | Fond de page | `#EAF6FA` |
-| Fond de zone de contenu | `#DCEFF6` |
+| Fond de zone de contenu | `#F3F7FB` (presque blanc : les cartes ressortent ; changé le 09/11/2026) |
+| Barre latérale | dégradé bleu vif `#1B78C8` → `#1462AD` → `#0F4C8A`, texte blanc (variable `--menu-fond`) |
 | Cartes | `#FFFFFF` |
 | Texte principal | `#1F2A37` |
 | Texte secondaire | `#5B6675` |
@@ -37,8 +38,17 @@ différent : pour le site, c'est cet ordre qui compte.
 - Carte 1 : `#1B6F7E` → `#2A9DB0` (texte blanc)
 - Carte 2 : `#E8836B` → `#F2B84B` (texte `#1F2A37`)
 
-Deux cartes en dégradé maximum par page : le reste est blanc. L'accent attire l'œil
-parce qu'il est rare.
+Sur l'accueil, deux cartes vedettes en dégradé ; les cartes KPI, graphiques et tableaux restent blancs.
+
+**Cartes de résultat (Priorité 5 des corrections, 09/11/2026)** : pleines et colorées, une
+teinte par carte en alternance (composant `carte-constat.tsx`). Remplace l'ancienne règle « deux
+cartes colorées maximum par page ».
+- Teintes : bleu foncé `#1B6F7E` (texte blanc), sarcelle `#2A9DB0`, corail `#E8836B`,
+  ambre `#F2B84B` (texte `#1F2A37` sur ces trois : le blanc y serait trop pâle pour les petits textes).
+- De haut en bas : thème (icône + mot), constat en une phrase, 1 ou 2 mini-tuiles (ce que mesure
+  le chiffre au-dessus, mot d'interprétation en dessous), période, conclusion, « En savoir plus »
+  replié pour le texte long.
+- Pas de badge « Résultat N ».
 
 ## Typographie
 - Police : **Plus Jakarta Sans** (Google Fonts, gratuite, chargée avec `next/font`).
@@ -56,8 +66,9 @@ parce qu'il est rare.
 - **Barre latérale gauche** (240 px, repliable sur téléphone) :
   logo texte « Observatoire » + sous-titre « Marchés financiers marocains »,
   puis les 7 pages avec une icône chacune (lucide-react), la page active surlignée
-  par une barre d'accent à gauche et un fond `#EAF6FA`.
-  En bas : date de dernière mise à jour et lien GitHub.
+  par une barre blanche à gauche et un fond blanc transparent, sur le dégradé bleu vif.
+  En bas : date de dernière mise à jour, lien GitHub, puis le bloc auteur (nom, titre, LinkedIn,
+  rapport complet).
 - **Barre du haut** : titre de la page, fil d'Ariane, filtre de période
   (1 an / 3 ans / Tout) quand la page en a besoin.
 - **Contenu** : grille de 12 colonnes sur ordinateur, 1 colonne sur téléphone.

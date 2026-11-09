@@ -40,11 +40,11 @@ Même problème pour la pire baisse (−16,2 % en hebdo sur l'accueil, −19,0 %
 
 Problème : on ne comprend ce que désigne le grand chiffre qu'après avoir lu le petit texte ; les badges « Résultat 1, 2, 3… » ne disent rien et ne sont pas beaux.
 
-- [ ] Supprimer les badges « Résultat N ». Les remplacer par une petite icône + le thème en gris (ex. « Comportement des épargnants », « Risque », « Valorisation », « Taux », « IPO », « Diversification »).
-- [ ] Nouvelle structure de carte, de haut en bas : 1) thème ; 2) le constat en une phrase ; 3) le ou les chiffres, chacun avec son étiquette JUSTE AU-DESSUS (ce que le chiffre mesure, en mots simples) et un mot d'interprétation en dessous (« lien net », « aucun lien », « moins cher que la moyenne ») ; 4) une phrase de conclusion courte.
-- [ ] Quand un résultat repose sur une comparaison (passé / futur, MASI / MASI 20, nominal / réel, fonds / indice), afficher les deux chiffres côte à côte dans deux mini-tuiles, pas un chiffre en gros et l'autre caché dans le texte.
-- [ ] Appliquer à toutes les cartes (18). Premier modèle proposé, PAS retenu par Ahmed (à redéfinir à partir de sa vidéo d'inspiration) : carte « flux et MASI » avec deux tuiles « Lien achats ↔ MASI du mois passé : 0,43 (lien net) » et « Lien achats ↔ MASI du mois suivant : −0,07 (aucun lien) ».
-- [ ] Garder le thème bleu actuel (sarcelle #2A9DB0, corail #E8836B, ambre #F2B84B).
+- [x] Supprimer les badges « Résultat N ». Les remplacer par une petite icône + le thème en gris (ex. « Comportement des épargnants », « Risque », « Valorisation », « Taux », « IPO », « Diversification »).
+- [x] Nouvelle structure de carte, de haut en bas : 1) thème ; 2) le constat en une phrase ; 3) le ou les chiffres, chacun avec son étiquette JUSTE AU-DESSUS (ce que le chiffre mesure, en mots simples) et un mot d'interprétation en dessous (« lien net », « aucun lien », « moins cher que la moyenne ») ; 4) une phrase de conclusion courte.
+- [x] Quand un résultat repose sur une comparaison (passé / futur, MASI / MASI 20, nominal / réel, fonds / indice), afficher les deux chiffres côte à côte dans deux mini-tuiles, pas un chiffre en gros et l'autre caché dans le texte.
+- [x] Appliquer à toutes les cartes (18). Premier modèle proposé, PAS retenu par Ahmed (à redéfinir à partir de sa vidéo d'inspiration) : carte « flux et MASI » avec deux tuiles « Lien achats ↔ MASI du mois passé : 0,43 (lien net) » et « Lien achats ↔ MASI du mois suivant : −0,07 (aucun lien) ».
+- [x] Garder le thème bleu actuel (sarcelle #2A9DB0, corail #E8836B, ambre #F2B84B).
 
 ### Priorité 6 — corrélations : toujours dire « entre quoi et quoi »
 
@@ -166,7 +166,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 ### Onglet Sensibilité aux taux (Résultat 9)
 
-- [ ] Erreur dans la carte : « Depuis le changement de méthode de Bank Al-Maghrib : 4,1 » est inversé. Le tableau donne 4,60 depuis le 24/03/2023 et 4,14 sur toute la période. Corriger en : « Sur toute la période (202 semaines) : 4,1. »
+- [x] Erreur dans la carte : « Depuis le changement de méthode de Bank Al-Maghrib : 4,1 » est inversé. Le tableau donne 4,60 depuis le 24/03/2023 et 4,14 sur toute la période. Corriger en : « Sur toute la période (202 semaines) : 4,1. »
 - [ ] Expliquer le R² en mots sur la carte : « Les taux expliquent environ 38 % des variations hebdomadaires de ces fonds. »
 - [ ] Préciser le signe : « Sensibilité 4,6 = −4,6 % pour +1 point de taux. »
 - [ ] Préciser « taux à 10 ans (taux de marché des bons du Trésor, différent du taux directeur de BAM) ».
@@ -279,7 +279,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 - [ ] Reformuler la limite « Le MASI sert d'approximation… les dividendes n'y sont pas comptés » en disant le sens du biais : « Le MASI exclut les dividendes (≈ 3 %/an) que les fonds encaissent : la comparaison avantage les fonds. »
 - [ ] Ajouter une section « Définitions des indicateurs » : Sharpe = (rendement annualisé − rendement du monétaire) ÷ volatilité ; volatilité (écart-type hebdo × √52) ; pire baisse ; composition des portefeuilles (prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70, rééquilibrés chaque semaine).
 - [ ] Ajouter un petit lexique pour les recruteurs non spécialistes : OPCVM, OMLT, OCT, monétaire, point de base, PER, sensibilité, corrélation, R², séance, sursouscription.
-- [ ] La page dit qu'aucun chiffre n'est écrit à la main, « y compris dans les phrases » : l'inversion 4,6 / 4,1 de la carte Résultat 9 vient donc probablement du modèle de phrase (mauvais champ). Vérifier le code de cette carte.
+- [x] La page dit qu'aucun chiffre n'est écrit à la main, « y compris dans les phrases » : l'inversion 4,6 / 4,1 de la carte Résultat 9 vient donc probablement du modèle de phrase (mauvais champ). Vérifier le code de cette carte.
 
 ## Relecture terminée
 

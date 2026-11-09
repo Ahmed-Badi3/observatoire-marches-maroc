@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import { Building2, Tag, TrendingDown, Users } from "lucide-react";
 
-import { CarteResultat } from "@/components/observatoire/carte-resultat";
+import { CarteConstat } from "@/components/observatoire/carte-constat";
 import {
   CarteGraphique,
   ConclusionPage,
@@ -25,7 +26,16 @@ import {
   type Ligne,
 } from "@/lib/donnees-pages";
 import { placements, type Placement } from "@/lib/donnees";
-import { formatDate, formatMultiple, formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
+import {
+  LIBELLE_FREQUENCE,
+  formatDate,
+  formatDateCourte,
+  formatMultiple,
+  formatNombre,
+  formatPeriode,
+  formatPourcentage,
+} from "@/lib/format";
+import { interpreterCorrelation } from "@/lib/interpretation";
 import { enNombre, etiqueterAnnees, pivoter, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "OPCVM et marché actions" };
@@ -80,11 +90,26 @@ function ongletFlux(
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={1}
-          phrase="Les épargnants courent après la performance."
-          chiffre={formatNombre(t.corr_passe, { signe: true })}
-          legende={`Corrélation entre le flux net hebdomadaire vers les fonds Actions et la performance du MASI des 4 semaines précédentes. Avec les 4 semaines suivantes : ${formatNombre(t.corr_futur, { signe: true })}. Pondéré par les flux, l'argent est entré quand le MASI valait en moyenne ${formatNombre(t.masi_moyen_achat, { decimales: 0 })} et en est ressorti à ${formatNombre(t.masi_moyen_vente, { decimales: 0 })} : acheter cher, vendre moins cher.`}
+        <CarteConstat
+          teinte="fonce"
+          icone={Users}
+          theme="Comportement des épargnants"
+          constat="Les épargnants courent après la performance."
+          tuiles={[
+            {
+              etiquette: "Achats des fonds Actions ↔ MASI des 4 semaines précédentes",
+              valeur: formatNombre(t.corr_passe, { signe: true }),
+              interpretation: interpreterCorrelation(t.corr_passe),
+            },
+            {
+              etiquette: "Achats des fonds Actions ↔ MASI des 4 semaines suivantes",
+              valeur: formatNombre(t.corr_futur, { signe: true }),
+              interpretation: interpreterCorrelation(t.corr_futur),
+            },
+          ]}
+          precision={`Corrélations · ${LIBELLE_FREQUENCE.hebdo} · MASI hors dividendes`}
+          conclusion="Ils achètent après la hausse, sans l'anticiper."
+          details={`Corrélation entre le flux net hebdomadaire vers les fonds Actions (en % de leur actif net) et la performance du MASI. Pondéré par les flux, l'argent est entré quand le MASI valait en moyenne ${formatNombre(t.masi_moyen_achat, { decimales: 0 })} et en est ressorti à ${formatNombre(t.masi_moyen_vente, { decimales: 0 })} : acheter cher, vendre moins cher.`}
         />
       }
       graphiques={
@@ -147,12 +172,21 @@ function ongletVolatilite(
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={2}
-          phrase="Le risque a fortement augmenté."
-          chiffre={formatPourcentage(pire[0].drawdown_pct)}
+        <CarteConstat
+          teinte="corail"
+          icone={TrendingDown}
+          theme="Risque"
+          constat="Le risque a fortement augmenté."
+          tuiles={[
+            { etiquette: "Pire baisse du MASI depuis un plus haut", valeur: formatPourcentage(pire[0].drawdown_pct) },
+            {
+              etiquette: `Amplitude des variations du MASI en ${derniere.annee} (volatilité sur un an)`,
+              valeur: formatPourcentage(derniere.volatilite_annualisee_pct, { signe: false }),
+            },
+          ]}
           precision={formatPeriode(masiQuotidien?.debut, masiQuotidien?.fin, "quotidien", { horsDividendes: false })}
-          legende={`Pire baisse du MASI depuis un plus haut, atteinte le ${formatDate(pire[0].date)}. Volatilité annualisée en ${derniere.annee} : ${formatPourcentage(derniere.volatilite_annualisee_pct, { signe: false })}. Mesurées chaque séance, elles sont plus précises que les chiffres de l'accueil, relevés chaque vendredi.`}
+          conclusion="Les creux du MASI se sont approfondis."
+          details={`La pire baisse a été atteinte le ${formatDate(pire[0].date)}. Mesurées chaque séance, la baisse et la volatilité sont plus précises que les chiffres de l'accueil, relevés chaque vendredi.`}
         />
       }
       graphiques={
@@ -217,12 +251,18 @@ function ongletIndices(quotidien: Ligne[] | null, synthese: Ligne[] | null) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={3}
-          phrase="Les grandes valeurs font moins bien que le marché."
-          chiffre={formatPourcentage(masi20?.rendement_total_pct)}
+        <CarteConstat
+          teinte="sarcelle"
+          icone={Building2}
+          theme="Grandes valeurs"
+          constat="Les grandes valeurs font moins bien que le marché."
+          tuiles={[
+            { etiquette: "MASI 20 (les 20 plus grandes sociétés), rendement", valeur: formatPourcentage(masi20?.rendement_total_pct) },
+            { etiquette: "MASI (tout le marché), rendement", valeur: formatPourcentage(masi?.rendement_total_pct) },
+          ]}
           precision={`${formatPeriode(masi20?.debut, masi20?.fin, "quotidien", { horsDividendes: false })} · indices hors dividendes`}
-          legende={`Rendement du MASI 20 depuis ${formatDate(masi20?.debut)}, contre ${formatPourcentage(masi?.rendement_total_pct)} pour le MASI. Pire baisse : ${formatPourcentage(masi20?.pire_drawdown_pct)} contre ${formatPourcentage(masi?.pire_drawdown_pct)}.`}
+          conclusion="Les 20 plus grandes valeurs ont moins rapporté, et plus baissé."
+          details={`Pire baisse depuis un plus haut : ${formatPourcentage(masi20?.pire_drawdown_pct)} pour le MASI 20, contre ${formatPourcentage(masi?.pire_drawdown_pct)} pour le MASI.`}
         />
       }
       graphiques={
@@ -290,11 +330,20 @@ function ongletPer(valo: Ligne[] | null) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={4}
-          phrase="Le marché est devenu moins cher."
-          chiffre={formatMultiple(dernier?.per)}
-          legende={`PER prévu pour ${anneeCible} (Scope 40), publié le ${formatDate(dernier?.date_article)}. Il était de ${formatMultiple(premier?.per)} le ${formatDate(premier?.date_article)}. Moyenne historique sur 10 ans : ${formatMultiple(moyenneRecente?.per)}.`}
+        <CarteConstat
+          teinte="ambre"
+          icone={Tag}
+          theme="Valorisation"
+          constat="Le marché est devenu moins cher."
+          tuiles={[
+            {
+              etiquette: `PER ${anneeCible} prévu (Scope 40), publié le ${formatDateCourte(dernier?.date_article)}`,
+              valeur: formatMultiple(dernier?.per),
+            },
+            { etiquette: "Moyenne historique sur 10 ans", valeur: formatMultiple(moyenneRecente?.per) },
+          ]}
+          conclusion="On paie moins d'années de bénéfices qu'en moyenne."
+          details={`PER = prix d'une action divisé par le bénéfice par action attendu : combien d'années de bénéfices on paie. Le PER prévu pour ${anneeCible} était de ${formatMultiple(premier?.per)} le ${formatDate(premier?.date_article)}.`}
         />
       }
       graphiques={

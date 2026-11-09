@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import { Activity, ChartLine, Percent, Telescope, Users } from "lucide-react";
 
-import { CarteResultat } from "@/components/observatoire/carte-resultat";
+import { CarteConstat } from "@/components/observatoire/carte-constat";
 import {
   CarteGraphique,
   ConclusionPage,
@@ -31,6 +32,7 @@ import {
   formatPointsDeBase,
   formatPourcentage,
 } from "@/lib/format";
+import { interpreterCorrelation } from "@/lib/interpretation";
 import { etiqueterAnnees, numeriser, pivoter, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "Taux et obligations" };
@@ -38,6 +40,13 @@ export const metadata: Metadata = { title: "Taux et obligations" };
 // Libellés de catégories présents en base (docs/DATA.md).
 const MLT = "Obligations MLT";
 const CT = "Obligations CT";
+const TOUTE_LA_PERIODE = "Toute la période";
+
+// « Toute la période » → « toute la période » au milieu d'une phrase ; « BAM » garde ses majuscules.
+const minusculeInitiale = (t: unknown) => {
+  const texte = String(t ?? "—");
+  return texte.charAt(0).toLowerCase() + texte.slice(1);
+};
 
 /* ---------- Résultat 8 : fonds par année ---------- */
 function ongletAnnees(fonds: Ligne[] | null) {
@@ -67,11 +76,22 @@ function ongletAnnees(fonds: Ligne[] | null) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={8}
-          phrase="Les fonds obligataires longs suivent les taux, année après année."
-          chiffre={formatPourcentage(derniere?.rendement_pct)}
-          legende={`Rendement des fonds MLT en ${derniere?.annee ?? "—"} (année en cours), quand le taux à 10 ans a varié de ${formatPointsDeBase(derniere?.var_taux_10a_pb)}. Les années où les taux baissent sont les meilleures pour ces fonds, celles où ils montent les pires.`}
+        <CarteConstat
+          teinte="fonce"
+          icone={Percent}
+          theme="Taux"
+          constat="Les fonds obligataires longs suivent les taux, année après année."
+          tuiles={[
+            {
+              etiquette: `Rendement des fonds MLT en ${derniere?.annee ?? "—"} (année en cours)`,
+              valeur: formatPourcentage(derniere?.rendement_pct),
+            },
+            {
+              etiquette: "Variation du taux à 10 ans sur la même période",
+              valeur: formatPointsDeBase(derniere?.var_taux_10a_pb),
+            },
+          ]}
+          conclusion="Les années où les taux baissent sont les meilleures pour ces fonds, celles où ils montent les pires."
         />
       }
       graphiques={
@@ -111,9 +131,12 @@ function ongletSensibilite(sens: Ligne[] | null) {
       ["sensibilite"],
     ),
   }));
-  const toute = sens.find((s) => s.periode === periodes[0] && s.categorie === MLT);
-  const recente = sens.find((s) => s.periode === periodes[1] && s.categorie === MLT);
-  const ct = sens.find((s) => s.periode === periodes[0] && s.categorie === CT);
+  // Les périodes sont cherchées par leur intitulé en base (DATA.md : « Toute la période » = 4,1, R² 0,57).
+  // Avant, on prenait la 1re période dans l'ordre alphabétique, qui est « Depuis le 24/03/2023 » :
+  // la carte inversait donc 4,6 et 4,1 (CORRECTIONS.md, Résultat 9).
+  const toute = sens.find((s) => s.periode === TOUTE_LA_PERIODE && s.categorie === MLT);
+  const recente = sens.find((s) => s.periode !== TOUTE_LA_PERIODE && s.categorie === MLT);
+  const ct = sens.find((s) => s.periode === TOUTE_LA_PERIODE && s.categorie === CT);
 
   const colonnes: Colonne[] = [
     { cle: "periode", libelle: "Période" },
@@ -126,11 +149,25 @@ function ongletSensibilite(sens: Ligne[] | null) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={9}
-          phrase="Les fonds obligataires longs sont très sensibles aux taux."
-          chiffre={formatNombre(toute?.sensibilite_implicite, { decimales: 1 })}
-          legende={`Quand le taux à 10 ans monte d'un point, un fonds MLT perd environ ${formatPourcentage(toute?.sensibilite_implicite, { decimales: 1, signe: false })} (R² = ${formatNombre(toute?.r2)} sur ${formatNombre(toute?.nb_semaines, { decimales: 0 })} semaines). Depuis le changement de méthode de Bank Al-Maghrib : ${formatNombre(recente?.sensibilite_implicite, { decimales: 1 })}. Fonds CT : ${formatNombre(ct?.sensibilite_implicite, { decimales: 1 })}.`}
+        <CarteConstat
+          teinte="corail"
+          icone={Activity}
+          theme="Sensibilité aux taux"
+          constat="Les fonds obligataires longs sont très sensibles aux taux."
+          tuiles={[
+            {
+              etiquette: `Fonds MLT, ${minusculeInitiale(toute?.periode)} (${formatNombre(toute?.nb_semaines, { decimales: 0 })} semaines)`,
+              valeur: formatNombre(toute?.sensibilite_implicite, { decimales: 1 }),
+              interpretation: `R² = ${formatNombre(toute?.r2)}`,
+            },
+            {
+              etiquette: `Fonds MLT, ${minusculeInitiale(recente?.periode)} (${formatNombre(recente?.nb_semaines, { decimales: 0 })} semaines)`,
+              valeur: formatNombre(recente?.sensibilite_implicite, { decimales: 1 }),
+              interpretation: `R² = ${formatNombre(recente?.r2)}`,
+            },
+          ]}
+          conclusion={`Quand le taux à 10 ans monte d'un point, un fonds MLT perd environ ${formatPourcentage(toute?.sensibilite_implicite, { decimales: 1, signe: false })}.`}
+          details={`Sensibilité = perte approximative du fonds, en %, pour +1 point de taux à 10 ans. R² = part des variations hebdomadaires du fonds expliquée par les taux. Fonds CT, sur toute la période : ${formatNombre(ct?.sensibilite_implicite, { decimales: 1 })}.`}
         />
       }
       graphiques={
@@ -191,11 +228,23 @@ function ongletAnticipations(decisions: Ligne[] | null, resume: Ligne[] | null) 
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={10}
-          phrase="Le marché anticipait les hausses de Bank Al-Maghrib, pas les baisses."
-          chiffre={formatPointsDeBase(hausse?.ecart_max)}
-          legende={`À la veille des hausses, le taux à 13 semaines était déjà de ${formatPointsDeBase(hausse?.ecart_min, { signe: false })} à ${formatPointsDeBase(hausse?.ecart_max, { signe: false })} au-dessus du taux directeur. Avant les baisses, l'écart allait de ${formatPointsDeBase(baisse?.ecart_min)} à ${formatPointsDeBase(baisse?.ecart_max)}.`}
+        <CarteConstat
+          teinte="ambre"
+          icone={Telescope}
+          theme="Anticipations"
+          constat="Le marché anticipait les hausses de Bank Al-Maghrib, pas les baisses."
+          tuiles={[
+            {
+              etiquette: "Écart du taux à 13 semaines avec le directeur, la veille des hausses",
+              valeur: `${formatPointsDeBase(hausse?.ecart_min)} à ${formatPointsDeBase(hausse?.ecart_max)}`,
+            },
+            {
+              etiquette: "Même écart, la veille des baisses",
+              valeur: `${formatPointsDeBase(baisse?.ecart_min)} à ${formatPointsDeBase(baisse?.ecart_max)}`,
+            },
+          ]}
+          conclusion="Avant une hausse, le taux à 13 semaines était déjà au-dessus du taux directeur."
+          details="Le taux à 13 semaines est le taux de marché des bons du Trésor à 3 mois, la veille de chaque décision. Un écart positif veut dire que le marché prêtait déjà plus cher que le taux directeur."
         />
       }
       graphiques={
@@ -250,11 +299,25 @@ function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] |
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={11}
-          phrase="Les épargnants obligataires suivent moins la tendance que ceux des fonds actions."
-          chiffre={formatNombre(mlt?.corr_flux_rend_passe, { signe: true })}
-          legende={`Corrélation des flux (en dirhams) avec la performance passée, pour les fonds MLT. Pour les fonds Actions : ${formatNombre(kpi?.[0]?.corr_passe, { signe: true })}, mais mesurée sur les flux en % de l'actif net : les deux chiffres ne se comparent pas exactement.`}
+        <CarteConstat
+          teinte="sarcelle"
+          icone={Users}
+          theme="Comportement des épargnants"
+          constat="Les épargnants obligataires suivent moins la tendance que ceux des fonds actions."
+          tuiles={[
+            {
+              etiquette: "Flux des fonds MLT ↔ leur performance passée",
+              valeur: formatNombre(mlt?.corr_flux_rend_passe, { signe: true }),
+              interpretation: interpreterCorrelation(mlt?.corr_flux_rend_passe),
+            },
+            {
+              etiquette: "Achats des fonds Actions ↔ MASI des 4 semaines précédentes",
+              valeur: formatNombre(kpi?.[0]?.corr_passe, { signe: true }),
+              interpretation: interpreterCorrelation(kpi?.[0]?.corr_passe),
+            },
+          ]}
+          conclusion="Les épargnants des fonds de taux courent moins après la performance."
+          details="Les flux des fonds MLT sont mesurés en dirhams, ceux des fonds Actions en % de leur actif net : les deux chiffres ne se comparent pas exactement."
         />
       }
       graphiques={
@@ -328,11 +391,17 @@ function ongletCourbe(courbes: Ligne[] | null, serie: Ligne[] | null) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          etiquette="Courbe des taux"
-          phrase="Les taux de référence des bons du Trésor, selon la durée."
-          chiffre={formatPourcentage(dix?.taux_pct, { signe: false, decimales: 2 })}
-          legende={`Taux à 10 ans au ${formatDate(dateDuRang(0))}. À 13 semaines : ${formatPourcentage(treize?.taux_pct, { signe: false, decimales: 2 })}. Une courbe qui monte avec la durée est la situation normale : on est payé pour immobiliser son argent plus longtemps.`}
+        <CarteConstat
+          teinte="fonce"
+          icone={ChartLine}
+          theme="Courbe des taux"
+          constat="Les taux de référence des bons du Trésor, selon la durée."
+          tuiles={[
+            { etiquette: "Taux à 10 ans", valeur: formatPourcentage(dix?.taux_pct, { signe: false, decimales: 2 }) },
+            { etiquette: "Taux à 13 semaines", valeur: formatPourcentage(treize?.taux_pct, { signe: false, decimales: 2 }) },
+          ]}
+          precision={`Courbe du ${formatDate(dateDuRang(0))}`}
+          conclusion="Une courbe qui monte avec la durée est la situation normale : on est payé pour immobiliser son argent plus longtemps."
         />
       }
       graphiques={

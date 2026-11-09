@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { Briefcase, Layers, ListOrdered, Scale } from "lucide-react";
 
 import { CarteChaleur, type CelluleChaleur } from "@/components/observatoire/carte-chaleur";
-import { CarteResultat } from "@/components/observatoire/carte-resultat";
+import { CarteConstat } from "@/components/observatoire/carte-constat";
 import {
   CarteGraphique,
   ConclusionPage,
@@ -16,6 +17,7 @@ import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-
 import { placements, type Placement } from "@/lib/donnees";
 import { correlations, sharpeExtremes, syntheseAnnuel, type Ligne } from "@/lib/donnees-pages";
 import { formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
+import { interpreterCorrelation } from "@/lib/interpretation";
 import { enNombre, etiqueterAnnees, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "Synthèse quantitative" };
@@ -56,12 +58,20 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={15}
-          phrase="Plus de rendement, c'est autant plus de risque."
-          chiffre={`${formatNombre(e?.minimum)} – ${formatNombre(e?.maximum)}`}
+        <CarteConstat
+          teinte="fonce"
+          icone={Scale}
+          theme="Rendement et risque"
+          constat="Plus de rendement, c'est autant plus de risque."
+          tuiles={[
+            {
+              etiquette: "Rendement par unité de risque (Sharpe) de tous les placements, hors Monétaire",
+              valeur: `${formatNombre(e?.minimum)} – ${formatNombre(e?.maximum)}`,
+            },
+          ]}
           precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
-          legende="Fourchette du ratio de Sharpe (rendement par unité de risque) de tous les placements, hors Monétaire : aucun placement n'est nettement meilleur qu'un autre. Les trois portefeuilles types sont construits à partir des fonds."
+          conclusion="Aucun placement n'est nettement meilleur qu'un autre : on choisit son niveau de risque."
+          details="Les trois portefeuilles types sont construits à partir des fonds (voir « Méthode et sources »)."
         />
       }
       graphiques={
@@ -158,12 +168,18 @@ function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={16}
-          phrase="Le classement des placements change d'une année à l'autre."
-          chiffre={formatPourcentage(actions?.rendement_pct)}
+        <CarteConstat
+          teinte="corail"
+          icone={ListOrdered}
+          theme="Classement des placements"
+          constat="Le classement des placements change d'une année à l'autre."
+          tuiles={[
+            { etiquette: `Fonds Actions en ${derniere}`, valeur: formatPourcentage(actions?.rendement_pct) },
+            { etiquette: "Portefeuille prudent, même période", valeur: formatPourcentage(prudent?.rendement_pct) },
+          ]}
           precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
-          legende={`Fonds Actions en ${derniere}. Sur la même période : portefeuille prudent ${formatPourcentage(prudent?.rendement_pct)}, portefeuille dynamique ${formatPourcentage(dynamique?.rendement_pct)}. Choisissez un portefeuille à droite pour le comparer au MASI et aux fonds Actions.`}
+          conclusion="Choisissez un portefeuille au-dessus du graphique pour le comparer au MASI et aux fonds Actions."
+          details={`Portefeuille dynamique sur la même période : ${formatPourcentage(dynamique?.rendement_pct)}.`}
         />
       }
       graphiques={
@@ -209,12 +225,26 @@ function ongletCorrelations(paires: Ligne[] | null, masi: Placement | undefined)
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={17}
-          phrase="La diversification fonctionne."
-          chiffre={formatNombre(corr(MASI, "OMLT"))}
-          precision={formatPeriode(masi?.debut, masi?.fin, "hebdo", { horsDividendes: false })}
-          legende={`Corrélation hebdomadaire du MASI avec les fonds obligataires MLT (OMLT). Avec les fonds CT (OCT) : ${formatNombre(corr(MASI, "OCT"))} ; avec les fonds Actions : ${formatNombre(corr(MASI, FONDS_ACTIONS))}. Plus la corrélation est proche de 0, plus deux placements bougent indépendamment : c'est ce qui amortit les chutes.`}
+        <CarteConstat
+          teinte="sarcelle"
+          icone={Layers}
+          theme="Diversification"
+          constat="La diversification fonctionne."
+          tuiles={[
+            {
+              etiquette: "MASI ↔ fonds obligataires MLT (OMLT)",
+              valeur: formatNombre(corr(MASI, "OMLT")),
+              interpretation: interpreterCorrelation(corr(MASI, "OMLT")),
+            },
+            {
+              etiquette: "MASI ↔ fonds Actions",
+              valeur: formatNombre(corr(MASI, FONDS_ACTIONS)),
+              interpretation: interpreterCorrelation(corr(MASI, FONDS_ACTIONS)),
+            },
+          ]}
+          precision={`Corrélations des rendements · ${formatPeriode(masi?.debut, masi?.fin, "hebdo", { horsDividendes: false })}`}
+          conclusion="Les fonds de taux bougent bien moins avec le MASI que les fonds Actions : c'est ce qui amortit les chutes."
+          details={`Avec les fonds obligataires CT (OCT) : ${formatNombre(corr(MASI, "OCT"))}. Plus la corrélation est proche de 0, plus deux placements bougent indépendamment.`}
         />
       }
       graphiques={
@@ -251,12 +281,18 @@ function ongletFondsActions(lignes: Placement[]) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={18}
-          phrase="Les fonds Actions ne battent pas l'indice."
-          chiffre={formatPourcentage(actions?.rdt_cumule_pct)}
+        <CarteConstat
+          teinte="ambre"
+          icone={Briefcase}
+          theme="Gestion de fonds"
+          constat="Les fonds Actions ne battent pas l'indice."
+          tuiles={[
+            { etiquette: "Fonds Actions, rendement cumulé", valeur: formatPourcentage(actions?.rdt_cumule_pct) },
+            { etiquette: "MASI, rendement cumulé", valeur: formatPourcentage(masi?.rdt_cumule_pct) },
+          ]}
           precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
-          legende={`Rendement cumulé des fonds Actions, contre ${formatPourcentage(masi?.rdt_cumule_pct)} pour le MASI. Volatilité : ${formatPourcentage(actions?.volatilite_pct, { signe: false })} contre ${formatPourcentage(masi?.volatilite_pct, { signe: false })}. Le MASI ne compte pas les dividendes : l'écart reflète les frais et les choix de gestion.`}
+          conclusion="Les fonds rapportent un peu moins que l'indice qu'ils cherchent à suivre."
+          details={`Volatilité : ${formatPourcentage(actions?.volatilite_pct, { signe: false })} pour les fonds Actions, contre ${formatPourcentage(masi?.volatilite_pct, { signe: false })} pour le MASI. Le MASI ne compte pas les dividendes : l'écart reflète les frais et les choix de gestion.`}
         />
       }
       graphiques={

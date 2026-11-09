@@ -10,13 +10,14 @@ import { formatDate } from "@/lib/format";
 import { AUTEUR, MENTION_LEGALE, PAGES, URL_GITHUB, pageCourante } from "@/lib/pages";
 
 // Un lien externe de la colonne de gauche : texte + petite flèche, ouvert dans un nouvel onglet.
+// Dans la colonne bleue, le lien est blanc.
 function LienExterne({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 font-medium text-accent-fonce hover:underline"
+      className="inline-flex items-center gap-1 font-semibold text-white hover:underline"
     >
       {children} <ExternalLink className="size-3" aria-hidden="true" />
     </a>
@@ -58,19 +59,20 @@ export function AppShell({
         id="menu-lateral"
         className={cn(
           // overflow-y-auto : sur un écran bas, la colonne défile au lieu de couper le bloc auteur.
-          "fixed inset-y-0 left-0 z-40 flex w-60 flex-col overflow-y-auto bg-carte shadow-carte transition-transform duration-200",
-          "lg:sticky lg:top-0 lg:h-screen lg:shrink-0 lg:translate-x-0 lg:shadow-none lg:border-r lg:border-separateur",
+          "fixed inset-y-0 left-0 z-40 flex w-60 flex-col overflow-y-auto text-white shadow-carte transition-transform duration-200",
+          "lg:sticky lg:top-0 lg:h-screen lg:shrink-0 lg:translate-x-0 lg:shadow-none",
           menuOuvert ? "translate-x-0" : "max-lg:invisible max-lg:-translate-x-full",
         )}
+        style={{ background: "var(--menu-fond)" }}
       >
         <div className="flex items-start justify-between p-6 pb-4">
           <div>
-            <p className="text-xl font-semibold text-accent-fonce">Observatoire</p>
-            <p className="text-xs text-texte-secondaire">Marchés financiers marocains</p>
+            <p className="text-xl font-semibold">Observatoire</p>
+            <p className="text-xs text-white/90">Marchés financiers marocains</p>
           </div>
           <button
             type="button"
-            className="rounded-lg p-1 text-texte-secondaire hover:bg-page lg:hidden"
+            className="rounded-lg p-1 text-white hover:bg-white/15 lg:hidden"
             onClick={() => setMenuOuvert(false)}
             aria-label="Fermer le menu"
           >
@@ -90,12 +92,12 @@ export function AppShell({
                 className={cn(
                   "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors duration-150",
                   active
-                    ? "bg-page font-semibold text-accent-fonce"
-                    : "text-texte-secondaire hover:bg-page/60 hover:text-texte",
+                    ? "bg-white/20 font-semibold text-white"
+                    : "text-white/90 hover:bg-white/10 hover:text-white",
                 )}
               >
                 {active && (
-                  <span className="absolute inset-y-1.5 left-0 w-1 rounded-full bg-accent-principal" />
+                  <span className="absolute inset-y-1.5 left-0 w-1 rounded-full bg-white" />
                 )}
                 <Icone className="size-[18px] shrink-0" />
                 {titre}
@@ -104,15 +106,15 @@ export function AppShell({
           })}
         </nav>
 
-        <div className="space-y-2 border-t border-separateur p-6 text-xs text-texte-secondaire">
+        <div className="space-y-2 border-t border-white/20 p-6 text-xs text-white/90">
           <p>
             Données AMMC jusqu&apos;au {formatDate(dateAmmc)}
           </p>
           <LienExterne href={URL_GITHUB}>Code sur GitHub</LienExterne>
 
           {/* L'auteur : un recruteur doit pouvoir me joindre en un clic. */}
-          <div className="mt-4 space-y-1.5 border-t border-separateur pt-4">
-            <p className="text-sm font-semibold text-texte">{AUTEUR.nom}</p>
+          <div className="mt-4 space-y-1.5 border-t border-white/20 pt-4">
+            <p className="text-sm font-semibold text-white">{AUTEUR.nom}</p>
             <p className="leading-snug">{AUTEUR.titre}</p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1">
               <LienExterne href={AUTEUR.linkedin}>LinkedIn</LienExterne>

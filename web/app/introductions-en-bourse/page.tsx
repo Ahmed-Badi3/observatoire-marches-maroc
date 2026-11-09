@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import { CalendarClock, Rocket, ShoppingCart } from "lucide-react";
 
-import { CarteResultat } from "@/components/observatoire/carte-resultat";
+import { CarteConstat } from "@/components/observatoire/carte-constat";
 import {
   CarteGraphique,
   ConclusionPage,
@@ -41,11 +42,23 @@ function ongletPerformance(lignes: Ligne[], resume: Ligne) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={12}
-          phrase="Les IPO récentes battent le MASI, pour ceux qui les ont souscrites."
-          chiffre={`${formatNombre(resume.nb_battent, { decimales: 0 })} sur ${formatNombre(resume.nb, { decimales: 0 })}`}
-          legende={`IPO qui font mieux que le MASI depuis leur introduction, de ${formatPoints(resume.ecart_min)} à ${formatPoints(resume.ecart_max)}. Une IPO est une première vente d'actions au public.`}
+        <CarteConstat
+          teinte="fonce"
+          icone={Rocket}
+          theme="Introductions en bourse"
+          constat="Les IPO récentes battent le MASI, pour ceux qui les ont souscrites."
+          tuiles={[
+            {
+              etiquette: "IPO qui font mieux que le MASI depuis leur introduction",
+              valeur: `${formatNombre(resume.nb_battent, { decimales: 0 })} sur ${formatNombre(resume.nb, { decimales: 0 })}`,
+            },
+            {
+              etiquette: "Avance sur le MASI, de la plus petite à la plus grande",
+              valeur: `${formatPoints(resume.ecart_min)} à ${formatPoints(resume.ecart_max)}`,
+            },
+          ]}
+          conclusion="Souscrire au prix d'introduction a été payant."
+          details="Une IPO est une première vente d'actions au public. L'écart compare le rendement de l'action depuis son prix d'introduction à celui du MASI sur la même période, en points de pourcentage."
         />
       }
       graphiques={
@@ -84,11 +97,19 @@ function ongletPremierJour(lignes: Ligne[], resume: Ligne) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={13}
-          phrase="Le premier jour est limité, la vraie hausse vient après."
-          chiffre={formatPourcentage(resume.j5_max)}
-          legende={`Meilleur gain en 5 séances. Le premier jour, les titres ne montent que de ${formatPourcentage(resume.j1_min)} à ${formatPourcentage(resume.j1_max)} : la Bourse limite la variation quotidienne.`}
+        <CarteConstat
+          teinte="corail"
+          icone={CalendarClock}
+          theme="Premiers jours de cotation"
+          constat="Le premier jour est limité, la vraie hausse vient après."
+          tuiles={[
+            {
+              etiquette: "Hausse le premier jour",
+              valeur: `${formatPourcentage(resume.j1_min)} à ${formatPourcentage(resume.j1_max)}`,
+            },
+            { etiquette: "Meilleur gain en 5 séances", valeur: formatPourcentage(resume.j5_max) },
+          ]}
+          conclusion="La Bourse limite la variation quotidienne : la hausse s'étale sur plusieurs séances."
         />
       }
       graphiques={
@@ -123,11 +144,20 @@ function ongletAchat(lignes: Ligne[], resume: Ligne) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={14}
-          phrase="Racheter une IPO en bourse après le premier mois fait perdre."
-          chiffre={formatPourcentage(resume.j20_min)}
-          legende={`Pire cas : ${resume.j20_pire}, acheté au cours de la 20e séance et gardé jusqu'au ${formatDate(dateFin)}. Seules ${formatNombre(resume.nb_gagnent_j20, { decimales: 0 })} IPO sur ${formatNombre(resume.nb, { decimales: 0 })} gagnent avec cet achat tardif.`}
+        <CarteConstat
+          teinte="sarcelle"
+          icone={ShoppingCart}
+          theme="Achat après l'introduction"
+          constat="Racheter une IPO en bourse après le premier mois fait perdre."
+          tuiles={[
+            {
+              etiquette: "IPO gagnantes si achetées à la 20e séance",
+              valeur: `${formatNombre(resume.nb_gagnent_j20, { decimales: 0 })} sur ${formatNombre(resume.nb, { decimales: 0 })}`,
+            },
+            { etiquette: `Pire cas : ${resume.j20_pire}`, valeur: formatPourcentage(resume.j20_min) },
+          ]}
+          conclusion="Acheter après le premier mois, c'est acheter après la hausse."
+          details={`Achat au cours de la 20e séance, gardé jusqu'au ${formatDate(dateFin)}.`}
         />
       }
       graphiques={

@@ -14,7 +14,7 @@
 :root {
   /* Fonds et textes */
   --page: #eaf6fa;
-  --zone: #dceff6;
+  --zone: #f3f7fb; /* fond de la zone de contenu : presque blanc, les cartes ressortent */
   --carte: #ffffff;
   --texte: #1f2a37;
   --texte-secondaire: #5b6675;
@@ -39,6 +39,10 @@
   --serie-6: #7a8ca3;
   --serie-7: #9ed3de;
   --serie-8: #c9d3da;
+
+  /* Colonne de gauche : bleu vif en dégradé (demande d'Ahmed, inspirée de sa maquette).
+     Assez soutenu pour que le texte blanc reste lisible (contraste ≥ 4,5:1 sur les petits textes). */
+  --menu-fond: linear-gradient(165deg, #1b78c8 0%, #1462ad 45%, #0f4c8a 100%);
 
   /* Dégradés des cartes vedettes */
   --degrade-1: linear-gradient(135deg, #1b6f7e, #2a9db0);

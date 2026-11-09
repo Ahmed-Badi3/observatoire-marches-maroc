@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import { Factory, Landmark, ShoppingBasket } from "lucide-react";
 
-import { CarteResultat } from "@/components/observatoire/carte-resultat";
+import { CarteConstat } from "@/components/observatoire/carte-constat";
 import {
   CarteGraphique,
   ConclusionPage,
@@ -60,16 +61,21 @@ function ongletPib(lignesMacro: Ligne[] | null, lignesPic: Ligne[] | null) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={5}
-          phrase="La bourse bouge beaucoup plus que l'économie."
-          chiffre={formatPourcentage(p?.perf_masi_annuelle_pct)}
+        <CarteConstat
+          teinte="fonce"
+          icone={Factory}
+          theme="Économie"
+          constat="La bourse bouge beaucoup plus que l'économie."
+          tuiles={[
+            { etiquette: `MASI sur un an, au ${p?.periode ?? "—"}`, valeur: formatPourcentage(p?.perf_masi_annuelle_pct) },
+            {
+              etiquette: `Croissance du PIB sur un an, au ${p?.periode ?? "—"}`,
+              valeur: formatPourcentage(p?.croissance_pib_pct, { signe: false }),
+            },
+          ]}
           precision={`${LIBELLE_FREQUENCE.trimestriel}, variation sur un an · MASI hors dividendes`}
-          legende={
-            p
-              ? `Au trimestre ${p.periode}, le MASI gagnait ${formatPourcentage(p.perf_masi_annuelle_pct)} sur un an, pour une croissance du PIB de ${formatPourcentage(p.croissance_pib_pct, { signe: false })} : c'est le trimestre où l'écart était le plus grand. Le recul récent du MASI ne vient pas d'un ralentissement économique mais de la valorisation.`
-              : undefined
-          }
+          conclusion="C'est le trimestre où l'écart entre la Bourse et l'économie a été le plus grand."
+          details="Le recul récent du MASI ne vient pas d'un ralentissement économique mais de la valorisation."
         />
       }
       graphiques={
@@ -119,12 +125,18 @@ function ongletReel(reel: Ligne[] | null, infl: Ligne[] | null, pic: Ligne[] | n
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={6}
-          phrase="L'inflation a peu pesé sur le rendement des actions."
-          chiffre={formatPourcentage(dernier.reel_pct)}
+        <CarteConstat
+          teinte="corail"
+          icone={ShoppingBasket}
+          theme="Inflation et pouvoir d'achat"
+          constat="L'inflation a peu pesé sur le rendement des actions."
+          tuiles={[
+            { etiquette: "MASI en dirhams courants (nominal)", valeur: formatPourcentage(dernier.nominal_pct) },
+            { etiquette: "MASI en pouvoir d'achat (réel, après inflation)", valeur: formatPourcentage(dernier.reel_pct) },
+          ]}
           precision={formatPeriode(premier.date, dernier.date, "mensuel")}
-          legende={`Rendement réel du MASI (corrigé de l'inflation) de ${formatMoisAnnee(premier.date)} à ${formatMoisAnnee(dernier.date)}, contre ${formatPourcentage(dernier.nominal_pct)} en nominal. Le calcul s'arrête au dernier mois d'inflation publié par le HCP : ce chiffre ne se compare donc pas directement au rendement de l'accueil, relevé chaque vendredi.${
+          conclusion="En pouvoir d'achat, le MASI gagne presque autant."
+          details={`Le calcul s'arrête au dernier mois d'inflation publié par le HCP : ces chiffres ne se comparent donc pas directement au rendement de l'accueil, relevé chaque vendredi.${
             p
               ? ` L'inflation a atteint ${formatPourcentage(p.inflation_annuelle_pct)} en ${formatMoisAnnee(p.date)}, puis elle est retombée : le vrai risque de la période a été la volatilité.`
               : ""
@@ -206,12 +218,26 @@ function ongletBam(moyennes: Ligne[] | null, decisions: Ligne[] | null) {
   return (
     <MiseEnPageResultat
       carte={
-        <CarteResultat
-          numero={7}
-          phrase="Les baisses du taux directeur ont été suivies d'une hausse du MASI."
-          chiffre={formatPoints(baisse?.rendement_anormal_20_moyen_pct)}
+        <CarteConstat
+          teinte="sarcelle"
+          icone={Landmark}
+          theme="Banque centrale"
+          constat="Les baisses du taux directeur ont été suivies d'une hausse du MASI."
+          tuiles={[
+            {
+              etiquette: "MASI après une baisse du taux, par rapport à d'habitude",
+              valeur: formatPoints(baisse?.rendement_anormal_20_moyen_pct),
+              interpretation: baisse ? `${baisse.nb_decisions} décisions` : null,
+            },
+            {
+              etiquette: "MASI après un maintien du taux, par rapport à d'habitude",
+              valeur: formatPoints(maintien?.rendement_anormal_20_moyen_pct),
+              interpretation: maintien ? `${maintien.nb_decisions} décisions` : null,
+            },
+          ]}
           precision={`${LIBELLE_FREQUENCE.quotidien}, 20 séances après chaque annonce · MASI hors dividendes`}
-          legende={`Sur 20 séances après l'annonce, le MASI fait en moyenne ${formatPoints(baisse?.rendement_anormal_20_moyen_pct, { signe: false })} de mieux qu'en temps normal après une baisse (${baisse?.nb_decisions ?? "—"} décisions), contre ${formatPoints(maintien?.rendement_anormal_20_moyen_pct, { signe: false })} après un maintien (${maintien?.nb_decisions ?? "—"} décisions). Très peu de baisses : c'est une corrélation, pas une preuve de cause.`}
+          conclusion="Très peu de baisses : c'est une corrélation, pas une preuve de cause."
+          details="Chaque chiffre est l'écart moyen entre la performance du MASI sur les 20 séances qui suivent l'annonce et sa performance habituelle, en points de pourcentage."
         />
       }
       graphiques={
