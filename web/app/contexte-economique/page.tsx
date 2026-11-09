@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Factory, Landmark, ShoppingBasket } from "lucide-react";
+import { Factory, Landmark, ShoppingBasket, Thermometer } from "lucide-react";
 
+import { BandeauKpi, type Kpi } from "@/components/observatoire/bandeau-kpi";
 import { CarteConstat } from "@/components/observatoire/carte-constat";
 import {
   CarteGraphique,
@@ -25,6 +26,7 @@ import {
 } from "@/lib/donnees-pages";
 import {
   LIBELLE_FREQUENCE,
+  formatDateCourte,
   formatMoisAnnee,
   formatPeriode,
   formatPoints,
@@ -280,8 +282,47 @@ export default async function PageContexteEconomique() {
   const moyennes = await moyennesBam();
   const decisions = await decisionsBam();
 
+  // Bandeau de KPI : les derniers chiffres de la page, et en pastille le chiffre de comparaison lu en base.
+  const reelDernier = reel?.[reel.length - 1];
+  const inflDerniere = infl?.[infl.length - 1];
+  const pibDernier = macro?.filter((m) => m.croissance_pib_pct !== null).at(-1);
+  const decisionDerniere = decisions?.[decisions.length - 1];
+  const kpis: Kpi[] = [
+    {
+      icone: ShoppingBasket,
+      valeur: formatPourcentage(reelDernier?.reel_pct),
+      libelle: `MASI en pouvoir d'achat (réel), jusqu'à ${formatMoisAnnee(reelDernier?.date)}`,
+      pastille: reelDernier ? `Nominal : ${formatPourcentage(reelDernier.nominal_pct)}` : null,
+      valeurPastille: reelDernier?.nominal_pct,
+    },
+    {
+      icone: Thermometer,
+      valeur: formatPourcentage(inflDerniere?.inflation_annuelle_pct),
+      libelle: `Inflation sur un an, ${formatMoisAnnee(inflDerniere?.date)}`,
+      pastille: picInfl?.[0]
+        ? `Pic : ${formatPourcentage(picInfl[0].inflation_annuelle_pct)} (${formatMoisAnnee(picInfl[0].date)})`
+        : null,
+    },
+    {
+      icone: Factory,
+      valeur: formatPourcentage(pibDernier?.croissance_pib_pct),
+      libelle: `Croissance du PIB sur un an, ${pibDernier ? formatTrimestre(pibDernier.annee, pibDernier.trimestre, false) : "—"}`,
+      pastille: pibDernier ? `MASI sur un an : ${formatPourcentage(pibDernier.perf_masi_annuelle_pct)}` : null,
+      valeurPastille: pibDernier?.perf_masi_annuelle_pct,
+    },
+    {
+      icone: Landmark,
+      valeur: formatPourcentage(decisionDerniere?.taux_directeur_pct, { signe: false, decimales: 2 }),
+      libelle: "Taux directeur de Bank Al-Maghrib",
+      pastille: decisionDerniere
+        ? `${MAJUSCULE(decisionDerniere.type_decision)} le ${formatDateCourte(decisionDerniere.date_annonce)}`
+        : null,
+    },
+  ];
+
   return (
     <>
+      <BandeauKpi titre="Chiffres clés de la page" kpis={kpis} />
       <ConclusionPage>
         La bourse réagit bien plus vite que l&apos;économie, l&apos;inflation a peu rogné le rendement des actions,
         et les baisses du taux directeur ont plutôt été de bonnes nouvelles pour le MASI.

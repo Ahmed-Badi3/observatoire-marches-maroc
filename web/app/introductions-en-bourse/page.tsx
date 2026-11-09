@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { CalendarClock, Rocket, ShoppingCart } from "lucide-react";
+import { CalendarClock, Rocket, ShoppingCart, Trophy } from "lucide-react";
 
+import { BandeauKpi, type Kpi } from "@/components/observatoire/bandeau-kpi";
 import { CarteConstat } from "@/components/observatoire/carte-constat";
 import {
   CarteGraphique,
@@ -13,7 +14,7 @@ import { GraphiqueBarres } from "@/components/observatoire/graphique-barres";
 import { Onglets } from "@/components/observatoire/onglets";
 import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-triable";
 import { ipo, ipoResume, type Ligne } from "@/lib/donnees-pages";
-import { formatDate, formatNombre, formatPoints, formatPourcentage } from "@/lib/format";
+import { formatDate, formatDateCourte, formatNombre, formatPoints, formatPourcentage } from "@/lib/format";
 import { numeriser, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "Introductions en bourse" };
@@ -190,8 +191,39 @@ export default async function PageIntroductionsEnBourse() {
   }
   const resume = resumes[0];
 
+  // Bandeau de KPI : chiffres déjà calculés en base (analytics.ipo_performance, résumé en SQL).
+  const derniere = lignes[lignes.length - 1]; // lignes triées par date de 1re cotation
+  const kpis: Kpi[] = [
+    {
+      icone: Rocket,
+      valeur: formatNombre(resume.nb, { decimales: 0 }),
+      libelle: "Introductions en bourse étudiées",
+      pastille: derniere ? `Dernière : ${derniere.societe}, ${formatDateCourte(derniere.date_premiere_cotation)}` : null,
+    },
+    {
+      icone: Trophy,
+      valeur: `${formatNombre(resume.nb_battent, { decimales: 0 })} sur ${formatNombre(resume.nb, { decimales: 0 })}`,
+      libelle: "IPO qui battent le MASI depuis leur introduction",
+      pastille: `Jusqu'à ${formatPoints(resume.ecart_max)}`,
+      valeurPastille: resume.ecart_max,
+    },
+    {
+      icone: CalendarClock,
+      valeur: formatPourcentage(resume.j5_max),
+      libelle: "Meilleur gain en 5 séances",
+      pastille: `1er jour : ${formatPourcentage(resume.j1_min)} à ${formatPourcentage(resume.j1_max)}`,
+    },
+    {
+      icone: ShoppingCart,
+      valeur: formatPourcentage(resume.j20_min),
+      libelle: `Pire achat à la 20e séance : ${resume.j20_pire}`,
+      pastille: `${formatNombre(resume.nb_gagnent_j20, { decimales: 0 })} sur ${formatNombre(resume.nb, { decimales: 0 })} gagnantes`,
+    },
+  ];
+
   return (
     <>
+      <BandeauKpi titre="Chiffres clés de la page" kpis={kpis} />
       <ConclusionPage>
         Les nouvelles cotations ont surtout profité à ceux qui ont souscrit à l&apos;IPO : acheter le titre en
         bourse un mois plus tard a presque toujours fait perdre de l&apos;argent.

@@ -1,0 +1,27 @@
+version: 2
+
+seeds:
+  - name: compositions_portefeuilles
+    description: >
+      Composition des 3 portefeuilles types (poids en %, rééquilibrés chaque semaine).
+      Lue par synthese_rendements_hebdo pour calculer leurs rendements, et par le site pour la
+      barre empilée de la page Synthèse (Priorité 8, lot C). Les noms de placement sont ceux de la
+      colonne actif de synthese_rendements_hebdo.
+    config:
+      column_types:
+        portefeuille: text
+        placement: text
+        poids_pct: numeric
+    columns:
+      - name: portefeuille
+        tests:
+          - not_null
+      - name: placement
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Monétaire', 'OMLT', 'Fonds Actions']
+      - name: poids_pct
+        tests:
+          - not_null

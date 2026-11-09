@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Activity, ChartLine, Percent, Telescope, Users } from "lucide-react";
+import { Activity, ArrowLeftRight, ChartLine, Landmark, Percent, Telescope, Users } from "lucide-react";
 
+import { BandeauKpi, type Kpi } from "@/components/observatoire/bandeau-kpi";
 import { CarteConstat } from "@/components/observatoire/carte-constat";
 import {
   CarteGraphique,
@@ -27,6 +28,7 @@ import {
 } from "@/lib/donnees-pages";
 import {
   formatDate,
+  formatMilliards,
   formatDateCourte,
   formatNombre,
   formatPointsDeBase,
@@ -453,8 +455,46 @@ export default async function PageTauxObligations() {
   const courbes = await courbesTaux();
   const serie = await tauxDansLeTemps();
 
+  // Bandeau de KPI : les derniers chiffres de la page, et en pastille le chiffre de comparaison lu en base.
+  const dixAns = (rang: number) => courbes?.find((c) => Number(c.rang) === rang && c.maturite === "10 ans");
+  const [dixActuel, dixIlYaUnAn] = [dixAns(0), dixAns(1)];
+  const [mltPrec, mltDernier] = (fonds ? etiqueterAnnees(fonds.filter((f) => f.categorie === MLT)) : []).slice(-2);
+  const [fluxPrec, fluxDernier] = (flux ? etiqueterAnnees(flux.filter((f) => f.categorie === MLT)) : []).slice(-2);
+  const sensMlt = sens?.find((s) => s.periode === TOUTE_LA_PERIODE && s.categorie === MLT);
+  const kpis: Kpi[] = [
+    {
+      icone: Landmark,
+      valeur: formatPourcentage(dixActuel?.taux_pct, { signe: false, decimales: 2 }),
+      libelle: `Taux à 10 ans des bons du Trésor, ${formatDateCourte(dixActuel?.date_courbe)}`,
+      pastille: dixIlYaUnAn
+        ? `${formatDateCourte(dixIlYaUnAn.date_courbe)} : ${formatPourcentage(dixIlYaUnAn.taux_pct, { signe: false, decimales: 2 })}`
+        : null,
+    },
+    {
+      icone: Percent,
+      valeur: formatPourcentage(mltDernier?.rendement_pct),
+      libelle: `Rendement des fonds obligataires MLT, ${mltDernier?.annee ?? "—"}`,
+      pastille: mltPrec ? `${mltPrec.annee_brute} : ${formatPourcentage(mltPrec.rendement_pct)}` : null,
+      valeurPastille: mltPrec?.rendement_pct,
+    },
+    {
+      icone: ArrowLeftRight,
+      valeur: formatMilliards(fluxDernier?.flux_net_md),
+      libelle: `Flux net vers les fonds MLT, ${fluxDernier?.annee ?? "—"}`,
+      pastille: fluxPrec ? `${fluxPrec.annee_brute} : ${formatMilliards(fluxPrec.flux_net_md)}` : null,
+      valeurPastille: fluxPrec?.flux_net_md,
+    },
+    {
+      icone: Activity,
+      valeur: formatNombre(sensMlt?.sensibilite_implicite, { decimales: 1 }),
+      libelle: "Sensibilité des fonds MLT : perte en % pour +1 point de taux",
+      pastille: sensMlt ? `R² = ${formatNombre(sensMlt.r2)}` : null,
+    },
+  ];
+
   return (
     <>
+      <BandeauKpi titre="Chiffres clés de la page" kpis={kpis} />
       <ConclusionPage>
         Les fonds obligataires longs gagnent quand les taux baissent et perdent quand ils montent, et le marché
         des taux devance souvent les décisions de Bank Al-Maghrib.

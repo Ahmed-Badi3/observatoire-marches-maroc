@@ -69,12 +69,12 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 - [ ] Fond de page clair et chaud (blanc cassé), titres de page à gauche en grand. *(Non retenu le 09/11/2026 : Ahmed garde la colonne bleu vif et le contenu blanc bleuté.)*
 - [ ] Navigation par pilules en haut de chaque page (onglets arrondis, l'actif rempli en bleu foncé). *(Lot A, non retenu le 09/11/2026.)*
-- [ ] Bandeau de KPI en haut de page : icône ronde + grand chiffre + petite légende dessous + pastille colorée de variation (ex. « +22 % vs 2024 »).
+- [x] Bandeau de KPI en haut de page : icône ronde + grand chiffre + petite légende dessous + pastille colorée de variation (ex. « +22 % vs 2024 »).
 - [x] Cartes de résultats PLEINES et colorées (bleu foncé, sarcelle, corail, ambre) avec texte blanc : étiquette courte en haut (ce que mesure le chiffre, « Achats ↔ MASI du mois passé »), titre en une ligne, grand chiffre en bas à gauche, pastille d'interprétation en bas à droite (« lien net »). Coins très arrondis (≈ 16 px). Grille de 2 à 3 cartes.
 - [x] Clic sur une carte : elle s'agrandit en panneau détaillé animé (comme la carte jaune de la vidéo) avec l'explication complète, la méthode et les limites. Le texte long quitte donc la carte.
 - [x] Graphiques : boutons segmentés en pilule (1 an / 3 ans / Tout), infobulle au survol, ligne de référence en pointillé (ex. moyenne PER 20,3x).
 - [x] Jauge en demi-cercle pour les résultats en proportion (ex. « 5 IPO sur 6 battent le MASI », « 58 % du rendement du MASI »).
-- [ ] Barre empilée horizontale pour les répartitions (ex. composition des portefeuilles prudent / équilibré / dynamique).
+- [x] Barre empilée horizontale pour les répartitions (ex. composition des portefeuilles prudent / équilibré / dynamique).
 - [x] Animations légères : apparition des cartes, chiffres qui défilent jusqu'à leur valeur, transition entre onglets. *(Sans la transition entre onglets, prévue au lot A non retenu.)*
 
 ## Page Accueil

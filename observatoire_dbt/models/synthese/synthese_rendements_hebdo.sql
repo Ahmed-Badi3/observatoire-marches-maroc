@@ -1,9 +1,9 @@
 -- Rendements hebdomadaires de chaque placement et des 3 portefeuilles types.
 -- Période commune : semaines AMMC (vendredis) couvertes par l'historique du MASI.
--- Portefeuilles : poids fixes, rééquilibrés chaque semaine.
---   prudent    = 50 % Monétaire, 40 % OMLT, 10 % fonds Actions
---   équilibré  = 20 % Monétaire, 40 % OMLT, 40 % fonds Actions
---   dynamique  = 10 % Monétaire, 20 % OMLT, 70 % fonds Actions
+-- Portefeuilles : poids fixes, rééquilibrés chaque semaine, lus dans le seed compositions_portefeuilles
+-- (prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70 en Monétaire / OMLT / fonds Actions).
+-- Rendement d'un portefeuille = somme des (poids × rendement de la semaine) de ses placements ;
+-- une semaine où un placement manque n'a pas de rendement de portefeuille (comme avant).
 
 with ammc as (
     select date, categorie, indice::numeric as indice
@@ -65,22 +65,24 @@ actifs as (
     where r is not null
 ),
 
-pivot as (
-    select
-        date,
-        max(case when actif = 'Monétaire'     then r end) as mon,
-        max(case when actif = 'OMLT'          then r end) as omlt,
-        max(case when actif = 'Fonds Actions' then r end) as act
-    from actifs
-    group by date
+compositions as (
+    select portefeuille, placement, poids_pct / 100.0 as poids
+    from {{ ref('compositions_portefeuilles') }}
+),
+
+nb_placements as (
+    select portefeuille, count(*) as n
+    from compositions
+    group by portefeuille
 ),
 
 portefeuilles as (
-    select date, 'Portefeuille prudent'   as actif, 0.5 * mon + 0.4 * omlt + 0.1 * act as r from pivot
-    union all
-    select date, 'Portefeuille équilibré' as actif, 0.2 * mon + 0.4 * omlt + 0.4 * act as r from pivot
-    union all
-    select date, 'Portefeuille dynamique' as actif, 0.1 * mon + 0.2 * omlt + 0.7 * act as r from pivot
+    select a.date, c.portefeuille as actif, sum(c.poids * a.r) as r
+    from actifs a
+    join compositions c on c.placement = a.actif
+    join nb_placements n on n.portefeuille = c.portefeuille
+    group by a.date, c.portefeuille, n.n
+    having count(*) = n.n          -- tous les placements du portefeuille ont un rendement cette semaine
 )
 
 select date, actif, r as rendement_hebdo from actifs

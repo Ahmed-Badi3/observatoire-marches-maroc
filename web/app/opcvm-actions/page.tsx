@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Building2, Tag, TrendingDown, Users } from "lucide-react";
+import { Activity, Building2, Tag, TrendingDown, Users, Wallet } from "lucide-react";
 
+import { BandeauKpi, type Kpi } from "@/components/observatoire/bandeau-kpi";
 import { CarteConstat } from "@/components/observatoire/carte-constat";
 import {
   CarteGraphique,
@@ -30,6 +31,7 @@ import {
   LIBELLE_FREQUENCE,
   formatDate,
   formatDateCourte,
+  formatMilliards,
   formatMultiple,
   formatNombre,
   formatPeriode,
@@ -289,22 +291,26 @@ function ongletIndices(quotidien: Ligne[] | null, synthese: Ligne[] | null) {
 }
 
 /* ---------- Résultat 4 : PER ---------- */
-function ongletPer(valo: Ligne[] | null) {
-  if (!valo || valo.length === 0) return <Indisponible />;
+// Choix des lignes de valorisation à afficher (rangement, pas de calcul) : le PER prévu pour l'année de la
+// dernière étude (Scope 40), et la moyenne historique de la MÊME source et du même périmètre (BMCE Capital
+// Global Research) : on ne mélange plus Scope 40 et marché total (CORRECTIONS.md, Résultat 4).
+// La moyenne CFG (marché total) reste dans le tableau. Sert à la carte, au graphique et au bandeau de KPI.
+function selectionPer(valo: Ligne[]) {
   const derniereDate = String(valo[valo.length - 1].date_article);
   const anneeCible = Number(derniereDate.slice(0, 4));
   const scope = valo.filter(
     (l) => l.perimetre === "Scope 40" && Number(l.annee) === anneeCible && l.per !== null,
   );
-  const premier = scope[0];
   const dernier = scope[scope.length - 1];
-  // Moyenne historique de la MÊME source et du même périmètre que le PER Scope 40 (BMCE Capital Global
-  // Research) : on ne mélange plus Scope 40 et marché total sur le graphique (CORRECTIONS.md, Résultat 4).
-  // La moyenne CFG (marché total) reste dans le tableau ci-dessous.
   const moyenne = valo.filter(
     (l) => String(l.perimetre).startsWith("moyenne historique") && l.source === dernier?.source && l.per !== null,
   );
-  const moyenneRecente = moyenne[moyenne.length - 1];
+  return { anneeCible, scope, premier: scope[0], dernier, moyenneRecente: moyenne[moyenne.length - 1] };
+}
+
+function ongletPer(valo: Ligne[] | null) {
+  if (!valo || valo.length === 0) return <Indisponible />;
+  const { anneeCible, scope, premier, dernier, moyenneRecente } = selectionPer(valo);
   const libelleScope = `PER ${anneeCible} prévu (Scope 40)`;
   const { donnees } = pivoter(
     scope.map((l) => ({ date: l.date_article, serie: libelleScope, per: l.per })),
@@ -403,8 +409,43 @@ export default async function PageOpcvmActions() {
   const valo = await valorisation();
   const masiHebdo = (await placements())?.find((l) => l.actif === "MASI");
 
+  // Bandeau de KPI : les derniers chiffres de la page, et en pastille le chiffre de comparaison lu en base.
+  const fluxActions = flux ? etiqueterAnnees(flux).filter((l) => l.categorie === "Actions") : [];
+  const [fluxPrec, fluxDernier] = fluxActions.slice(-2);
+  const volAnnees = annuel ? etiqueterAnnees(annuel) : [];
+  const [volPrec, volDerniere] = volAnnees.slice(-2);
+  const per = valo && valo.length > 0 ? selectionPer(valo) : null;
+  const kpis: Kpi[] = [
+    {
+      icone: Wallet,
+      valeur: formatMilliards(fluxDernier?.flux_net_md),
+      libelle: `Flux net vers les fonds Actions, ${fluxDernier?.annee ?? "—"}`,
+      pastille: fluxPrec ? `${fluxPrec.annee_brute} : ${formatMilliards(fluxPrec.flux_net_md)}` : null,
+      valeurPastille: fluxPrec?.flux_net_md,
+    },
+    {
+      icone: TrendingDown,
+      valeur: formatPourcentage(pire?.[0]?.drawdown_pct),
+      libelle: "Pire baisse du MASI depuis un plus haut (chaque séance)",
+      pastille: pire?.[0] ? `le ${formatDateCourte(pire[0].date)}` : null,
+    },
+    {
+      icone: Activity,
+      valeur: formatPourcentage(volDerniere?.volatilite_annualisee_pct, { signe: false }),
+      libelle: `Volatilité du MASI, ${volDerniere?.annee ?? "—"}`,
+      pastille: volPrec ? `${volPrec.annee_brute} : ${formatPourcentage(volPrec.volatilite_annualisee_pct, { signe: false })}` : null,
+    },
+    {
+      icone: Tag,
+      valeur: formatMultiple(per?.dernier?.per),
+      libelle: `PER ${per?.anneeCible ?? "—"} prévu (Scope 40)`,
+      pastille: per?.moyenneRecente ? `Moyenne 10 ans : ${formatMultiple(per.moyenneRecente.per)}` : null,
+    },
+  ];
+
   return (
     <>
+      <BandeauKpi titre="Chiffres clés de la page" kpis={kpis} />
       <ConclusionPage>
         Les épargnants ont investi dans les fonds Actions après la hausse du marché, juste avant que le risque
         augmente. Le marché est pourtant devenu moins cher.

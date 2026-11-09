@@ -1,0 +1,10 @@
+portefeuille,placement,poids_pct
+Portefeuille prudent,Monétaire,50
+Portefeuille prudent,OMLT,40
+Portefeuille prudent,Fonds Actions,10
+Portefeuille équilibré,Monétaire,20
+Portefeuille équilibré,OMLT,40
+Portefeuille équilibré,Fonds Actions,40
+Portefeuille dynamique,Monétaire,10
+Portefeuille dynamique,OMLT,20
+Portefeuille dynamique,Fonds Actions,70

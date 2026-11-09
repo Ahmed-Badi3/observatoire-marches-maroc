@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Briefcase, Layers, ListOrdered, Scale } from "lucide-react";
+import { Briefcase, ChartPie, Gauge, Layers, ListOrdered, Scale, TrendingUp } from "lucide-react";
 
 import { CarteChaleur, type CelluleChaleur } from "@/components/observatoire/carte-chaleur";
+import { BandeauKpi, type Kpi } from "@/components/observatoire/bandeau-kpi";
 import { CarteConstat } from "@/components/observatoire/carte-constat";
 import {
   CarteGraphique,
@@ -15,7 +16,8 @@ import { NuageRendementRisque } from "@/components/observatoire/nuage-rendement-
 import { Onglets } from "@/components/observatoire/onglets";
 import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-triable";
 import { placements, type Placement } from "@/lib/donnees";
-import { correlations, sharpeExtremes, syntheseAnnuel, type Ligne } from "@/lib/donnees-pages";
+import { compositions, correlations, sharpeExtremes, syntheseAnnuel, type Ligne } from "@/lib/donnees-pages";
+import { BarreEmpilee } from "@/components/observatoire/barre-empilee";
 import { formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
 import { interpreterCorrelation } from "@/lib/interpretation";
 import { enNombre, etiqueterAnnees, type Jeu } from "@/lib/graphiques";
@@ -121,7 +123,14 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
 }
 
 /* ---------- Résultat 16 : année par année, avec choix du portefeuille ---------- */
-function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined) {
+// Couleurs des placements dans la barre empilée (texte foncé sur les teintes claires, pour la lisibilité).
+const COULEURS_PLACEMENTS: Record<string, { couleur: string; texte: string }> = {
+  Monétaire: { couleur: "var(--serie-3)", texte: "white" },
+  OMLT: { couleur: "var(--serie-1)", texte: "var(--texte)" },
+  [FONDS_ACTIONS]: { couleur: "var(--serie-2)", texte: "var(--texte)" },
+};
+
+function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined, compo: Ligne[] | null) {
   if (!annuel || annuel.length === 0) return <Indisponible />;
   // « 2026 » devient « 2026 (janv.–oct.) » quand la base déclare l'année partielle.
   const etiquetes = etiqueterAnnees(annuel);
@@ -198,12 +207,33 @@ function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined) {
         </CarteGraphique>
       }
       tableau={
-        <div>
-          <TitreTableau>Rendement par année</TitreTableau>
-          <TableauTriable colonnes={colonnes} lignes={lignes} legende="Rendement annuel de chaque placement et portefeuille" />
-          <p className="mt-2 text-xs text-texte-secondaire">
-            {formatPeriode(masi?.debut, masi?.fin, "hebdo")}.
-          </p>
+        <div className="space-y-6">
+          {compo && compo.length > 0 && (
+            <CarteGraphique
+              titre="De quoi sont faits les portefeuilles types"
+              note="Poids de chaque placement, rééquilibrés chaque semaine. Monétaire = fonds monétaires, OMLT = fonds obligataires moyen et long terme. Source : base de l'Observatoire (table des compositions)."
+            >
+              <BarreEmpilee
+                description="Composition des portefeuilles prudent, équilibré et dynamique"
+                legende={Object.entries(COULEURS_PLACEMENTS).map(([cle, c]) => ({ cle, couleur: c.couleur }))}
+                barres={PORTEFEUILLES.filter((p) => compo.some((c) => c.portefeuille === p)).map((p) => ({
+                  libelle: p,
+                  segments: Object.keys(COULEURS_PLACEMENTS).map((placement) => ({
+                    cle: placement,
+                    valeur: compo.find((c) => c.portefeuille === p && c.placement === placement)?.poids_pct ?? null,
+                    ...COULEURS_PLACEMENTS[placement],
+                  })),
+                }))}
+              />
+            </CarteGraphique>
+          )}
+          <div>
+            <TitreTableau>Rendement par année</TitreTableau>
+            <TableauTriable colonnes={colonnes} lignes={lignes} legende="Rendement annuel de chaque placement et portefeuille" />
+            <p className="mt-2 text-xs text-texte-secondaire">
+              {formatPeriode(masi?.debut, masi?.fin, "hebdo")}.
+            </p>
+          </div>
         </div>
       }
     />
@@ -318,10 +348,49 @@ export default async function PageSynthese() {
   const lignes = await placements();
   const extremes = await sharpeExtremes();
   const annuel = await syntheseAnnuel();
+  const compo = await compositions();
   const paires = await correlations();
+
+  // Bandeau de KPI : chiffres de la synthèse, et en pastille le chiffre de comparaison lu en base.
+  const masi = lignes?.find((l) => l.actif === MASI);
+  const actions = lignes?.find((l) => l.actif === FONDS_ACTIONS);
+  const equilibre = lignes?.find((l) => l.actif === PORTEFEUILLES[1]);
+  const sharpe = extremes?.[0];
+  const masiOmlt = paires?.find(
+    (p) => (p.actif_1 === MASI && p.actif_2 === "OMLT") || (p.actif_1 === "OMLT" && p.actif_2 === MASI),
+  )?.correlation;
+  const kpis: Kpi[] = [
+    {
+      icone: TrendingUp,
+      valeur: formatPourcentage(masi?.rdt_cumule_pct),
+      libelle: "MASI, rendement cumulé (chaque vendredi, hors dividendes)",
+      pastille: actions ? `Fonds Actions : ${formatPourcentage(actions.rdt_cumule_pct)}` : null,
+      valeurPastille: actions?.rdt_cumule_pct,
+    },
+    {
+      icone: ChartPie,
+      valeur: formatPourcentage(equilibre?.rdt_cumule_pct),
+      libelle: "Portefeuille équilibré, rendement cumulé",
+      pastille: equilibre
+        ? `${formatPourcentage(equilibre.part_rdt_masi_pct, { decimales: 0, signe: false })} du rendement du MASI`
+        : null,
+    },
+    {
+      icone: Gauge,
+      valeur: `${formatNombre(sharpe?.minimum)} – ${formatNombre(sharpe?.maximum)}`,
+      libelle: "Rendement par unité de risque (Sharpe), tous placements hors Monétaire",
+    },
+    {
+      icone: Layers,
+      valeur: formatNombre(masiOmlt),
+      libelle: "Corrélation MASI ↔ fonds OMLT (rendements hebdo)",
+      pastille: interpreterCorrelation(masiOmlt),
+    },
+  ];
 
   return (
     <>
+      <BandeauKpi titre="Chiffres clés de la page" kpis={kpis} />
       <ConclusionPage>
         Aucun placement n&apos;est nettement meilleur par unité de risque : choisir son niveau de risque et diversifier
         compte plus que chercher le « meilleur » produit.
@@ -333,7 +402,7 @@ export default async function PageSynthese() {
             libelle: "Rendement et risque",
             contenu: lignes ? ongletRendementRisque(lignes, extremes) : <Indisponible />,
           },
-          { id: "annees", libelle: "Année par année", contenu: ongletAnnees(annuel, lignes?.find((l) => l.actif === MASI)) },
+          { id: "annees", libelle: "Année par année", contenu: ongletAnnees(annuel, lignes?.find((l) => l.actif === MASI), compo) },
           { id: "correlations", libelle: "Corrélations", contenu: ongletCorrelations(paires, lignes?.find((l) => l.actif === MASI)) },
           {
             id: "fonds-actions",

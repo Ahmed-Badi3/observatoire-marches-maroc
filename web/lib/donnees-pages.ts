@@ -345,6 +345,15 @@ async function lireSharpeExtremes() {
 }
 export const sharpeExtremes = () => sur("extrêmes du Sharpe", lireSharpeExtremes);
 
+async function lireCompositions() {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
+  return plat(await sql()`
+    SELECT portefeuille, placement, poids_pct
+    FROM analytics.compositions_portefeuilles ORDER BY portefeuille, placement`);
+}
+export const compositions = () => sur("compositions des portefeuilles", lireCompositions);
+
 /* ---------- Méthode et sources ---------- */
 
 async function lireFraicheur() {

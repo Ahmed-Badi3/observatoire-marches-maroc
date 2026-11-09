@@ -168,6 +168,7 @@ Période commune : vendredis AMMC couverts par l'historique du MASI. Valeurs de 
 |---|---|
 | `analytics.synthese_classes_actifs` (1 ligne par placement ou portefeuille) | `actif`, `nb_semaines`, `debut`, `fin`, `rdt_cumule_pct`, `rdt_annualise_pct`, `volatilite_pct`, `pire_baisse_pct`, `pire_semaine_pct`, `semaines_negatives_pct`, `ratio_rendement_risque` (Sharpe), `part_rdt_masi_pct`, `part_risque_masi_pct` (rendement annualisé et volatilité en % de ceux du MASI, tâche A8) |
 | `analytics.synthese_annuel` | `actif`, `annee`, `nb_semaines` (1re et dernière année partielles), `rendement_pct`, `premiere_date`, `derniere_date`, `annee_partielle` (Priorité 2 des corrections : étiquette « 2026 (janv.–oct.) ») |
+| `analytics.compositions_portefeuilles` (seed dbt, Priorité 8 des corrections) | `portefeuille`, `placement` (Monétaire, OMLT, Fonds Actions), `poids_pct` : prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70. Lu par `synthese_rendements_hebdo` (les poids n'y sont plus écrits en dur) et par la barre empilée du site. Test : chaque portefeuille fait 100 %. |
 | `analytics.synthese_correlations` (chaque paire une fois, `actif_1 < actif_2` par ordre alphabétique, hors portefeuilles) | `actif_1`, `actif_2`, `nb_semaines`, `correlation` (de −1 à 1, pas un %) |
 | `analytics.synthese_rendements_hebdo` | `date`, `actif`, `rendement_hebdo` (**fraction**, 0,01 = 1 %) |
 
