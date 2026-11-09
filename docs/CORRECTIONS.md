@@ -29,7 +29,7 @@ Même problème pour la pire baisse (−16,2 % en hebdo sur l'accueil, −19,0 %
 
 ### Priorité 3 — courbes lissées
 
-- [ ] Remplacer les courbes arrondies (spline / monotone) par des segments droits avec les points visibles là où il y a peu de points ou des données mensuelles : PER, inflation.
+- [x] Remplacer les courbes arrondies (spline / monotone) par des segments droits avec les points visibles là où il y a peu de points ou des données mensuelles : PER, inflation.
 
 ### Priorité 4 — profil de l'auteur (recherche d'emploi)
 
@@ -126,7 +126,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 ### Onglet PER (Résultat 4)
 
 - [ ] La ligne grise « moyenne historique sur 10 ans » relie deux valeurs de sources et de périmètres différents (18,0x CFG marché total ; 20,3x BMCE Scope 40) : la remplacer par une ligne horizontale plate à 20,3x (BMCE, Scope 40, même périmètre que la ligne bleue). Garder 18,0x dans le tableau seulement.
-- [ ] Ligne bleue : segments droits avec les points visibles (seulement 3 points).
+- [x] Ligne bleue : segments droits avec les points visibles (seulement 3 points).
 - [ ] Ne pas mélanger Scope 40 et marché total sur un même graphique.
 - [ ] Message final de la carte : « Le PER 2026 prévu (Scope 40) est passé de 19,4x à 18,0x, sous sa moyenne de 10 ans de 20,3x. » Ajouter : « Moins cher ne veut pas dire bonne affaire : si les bénéfices baissent, le PER remontera. »
 
@@ -143,7 +143,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 - [ ] Nuance importante sur la carte : la période étudiée commence en novembre 2023, après le pic d'inflation (+10,1 % en février 2023). Écrire : « Sur la période étudiée, qui commence après le pic d'inflation, celle-ci a peu pesé. »
 - [x] Le +50,5 % nominal est un 3e chiffre différent du MASI : voir Priorité 1.
-- [ ] Graphique de l'inflation : segments droits au lieu de la courbe lissée (les données sont mensuelles).
+- [x] Graphique de l'inflation : segments droits au lieu de la courbe lissée (les données sont mensuelles).
 - [ ] Phrase sous le graphique de l'inflation : « Fin 2025 et mi-2026, les prix ont même légèrement baissé (déflation). »
 
 ### Onglet Décisions de la banque centrale (Résultat 7)

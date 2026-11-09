@@ -140,6 +140,7 @@ function ongletReel(reel: Ligne[] | null, infl: Ligne[] | null, pic: Ligne[] | n
             <GraphiqueLignes
               jeux={jeux}
               description="MASI en valeur nominale et réelle, base 100"
+              points
               labelChoix="Valeur"
               decimalesInfo={1}
             />
@@ -162,6 +163,7 @@ function ongletReel(reel: Ligne[] | null, infl: Ligne[] | null, pic: Ligne[] | n
                 ligneZero
                 decimalesInfo={1}
                 description="Inflation annuelle au Maroc, mois par mois"
+                points
               />
             </CarteGraphique>
           )}

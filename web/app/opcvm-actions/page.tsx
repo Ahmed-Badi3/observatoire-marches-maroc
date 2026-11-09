@@ -319,6 +319,7 @@ function ongletPer(valo: Ligne[] | null) {
             decimalesAxe={1}
             decimalesInfo={1}
             description="PER prévu du Scope 40 et moyenne historique sur 10 ans, selon la date de publication"
+            points
           />
         </CarteGraphique>
       }

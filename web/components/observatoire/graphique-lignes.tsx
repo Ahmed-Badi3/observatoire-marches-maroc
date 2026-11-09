@@ -38,6 +38,9 @@ function coupure(derniere: string, annees: number): string {
 // Graphique en lignes (courbes dans le temps ou le long d'un axe de textes).
 // - `jeux` : un ou plusieurs choix (ex. Nominal / Réel). S'il y en a plusieurs, un sélecteur apparaît.
 // - `typeX: "date"` : la clé `date` (AAAA-MM-JJ) alimente l'axe et le filtre de période 1 an / 3 ans / Tout.
+// - Les points sont reliés par des segments droits : une courbe arrondie inventerait des virages entre
+//   deux données (image : un fil souple tendu entre des clous). `points` affiche chaque donnée,
+//   pour les séries mensuelles ou à peu de points (PER, inflation, courbe des taux).
 export function GraphiqueLignes({
   jeux,
   format = "nombre",
@@ -45,6 +48,7 @@ export function GraphiqueLignes({
   cleX = "date",
   filtrePeriode = true,
   escalier = false,
+  points = false,
   ligneZero = false,
   decimalesAxe = 0,
   decimalesInfo,
@@ -59,6 +63,7 @@ export function GraphiqueLignes({
   cleX?: string;
   filtrePeriode?: boolean;
   escalier?: boolean; // marches d'escalier (ex. taux directeur)
+  points?: boolean; // un point visible sur chaque donnée
   ligneZero?: boolean;
   decimalesAxe?: number;
   decimalesInfo?: number;
@@ -152,12 +157,12 @@ export function GraphiqueLignes({
             {jeu.series.map((s, i) => (
               <Line
                 key={s.cle}
-                type={escalier ? "stepAfter" : "monotone"}
+                type={escalier ? "stepAfter" : "linear"}
                 dataKey={s.cle}
                 name={s.libelle}
                 stroke={couleurSerie(s, i)}
                 strokeWidth={2}
-                dot={donnees.length <= 12 ? { r: 3 } : false}
+                dot={points || donnees.length <= 12 ? { r: donnees.length > 40 ? 2 : 3 } : false}
                 activeDot={{ r: 5 }}
                 connectNulls
                 hide={masquees.has(s.cle)}

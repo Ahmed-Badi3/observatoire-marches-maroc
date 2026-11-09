@@ -350,6 +350,7 @@ function ongletCourbe(courbes: Ligne[] | null, serie: Ligne[] | null) {
               decimalesInfo={2}
               filtrePeriode={false}
               description="Courbe des taux à la date la plus récente, un an et deux ans plus tôt"
+              points
             />
           </CarteGraphique>
           {jeuTemps && (
