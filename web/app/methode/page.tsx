@@ -59,6 +59,12 @@ const QUALITE = [
     solution: "Interpolation linéaire à des maturités fixes dans dbt.",
   },
   {
+    probleme:
+      "Quelques indices publiés par l'AMMC contredisent ses propres variations de la même semaine (fonds monétaires et obligataires court terme)",
+    solution:
+      "Indices recalculés dans dbt à partir des variations publiées, semaine par semaine, avec la justification de chaque correction (table corrections_indices_ammc). Sans cela, le monétaire paraissait plus risqué que les fonds CT.",
+  },
+  {
     probleme: "Plusieurs chiffres légitimes pour une même mesure du MASI (chaque séance, chaque vendredi, fin de mois)",
     solution: "Sous chaque chiffre du MASI, le site indique sa fréquence et sa période (voir « Pourquoi le MASI a plusieurs chiffres »).",
   },

@@ -81,22 +81,22 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 ### Cartes du haut et « Le MASI en quatre chiffres »
 
-- [ ] Carte Volatilité : ajouter une petite courbe (volatilité glissante sur 3 mois), ou retirer les courbes des trois autres cartes pour que les quatre cartes soient homogènes.
-- [ ] Carte Sharpe : ajouter en gris « Taux sans risque : fonds monétaires, 2,8 %/an ».
-- [ ] Carte Pire baisse (−16,2 %) : ajouter « mesurée sur les vendredis ; en données quotidiennes : −19,0 % (03/03/2026) ».
-- [ ] Ajouter les 3 règles de la conclusion sur l'accueil : choisir son niveau de risque ; ne pas acheter après la hausse ; surveiller les taux.
+- [x] Carte Volatilité : ajouter une petite courbe (volatilité glissante sur 3 mois), ou retirer les courbes des trois autres cartes pour que les quatre cartes soient homogènes. *(Fait : courbes retirées des 4 cartes, choix d'Ahmed.)*
+- [x] Carte Sharpe : ajouter en gris « Taux sans risque : fonds monétaires, 2,8 %/an ».
+- [x] Carte Pire baisse (−16,2 %) : ajouter « mesurée sur les vendredis ; en données quotidiennes : −19,0 % (03/03/2026) ».
+- [x] Ajouter les 3 règles de la conclusion sur l'accueil : choisir son niveau de risque ; ne pas acheter après la hausse ; surveiller les taux.
 
 ### Graphique « Plus de rendement s'est payé par plus de risque »
 
-- [ ] Ajouter une phrase sous le titre : « Les placements sont presque alignés : aucun n'a offert plus de rendement sans plus de risque. »
-- [ ] Ajouter une légende des couleurs : ● Portefeuilles types · ● Fonds / indices.
-- [ ] Le Monétaire (1,2 % de volatilité) apparaît à droite de l'OCT (0,8 %) à cause d'une semaine anormale à −1,22 %. Vérifier cette semaine dans le fichier AMMC source et corriger si c'est une erreur de publication ou de saisie.
+- [x] Ajouter une phrase sous le titre : « Les placements sont presque alignés : aucun n'a offert plus de rendement sans plus de risque. »
+- [x] Ajouter une légende des couleurs : ● Portefeuilles types · ● Fonds / indices.
+- [x] Le Monétaire (1,2 % de volatilité) apparaît à droite de l'OCT (0,8 %) à cause d'une semaine anormale à −1,22 %. Vérifier cette semaine dans le fichier AMMC source et corriger si c'est une erreur de publication ou de saisie. *(Fait le 09/11/2026 : erreurs de publication AMMC confirmées dans les fichiers d'origine — Monétaire 11/04 et 16/05/2025, OCT 16/05/2025 — et corrigées dans dbt. Volatilité Monétaire 0,2 %, OCT 0,4 % ; Sharpe OCT 1,25 : phrase clé reformulée « hors fonds obligataires court terme ».)*
 
 ### Tableau « Tous les placements côte à côte »
 
-- [ ] Note sous le tableau : « Sharpe : taux sans risque = monétaire (2,8 %/an), d'où le « — » pour le monétaire. Portefeuilles : prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70 (Monétaire / OMLT / fonds Actions). »
-- [ ] Nuancer « rendement par unité de risque presque identique » : « écarts de Sharpe (0,54 à 0,66) trop faibles pour départager les placements sur moins de 3 ans ».
-- [ ] Nuancer la comparaison MASI / fonds Actions : le MASI est un indice (hors dividendes, sans frais) ; on ne peut pas l'acheter directement.
+- [x] Note sous le tableau : « Sharpe : taux sans risque = monétaire (2,8 %/an), d'où le « — » pour le monétaire. Portefeuilles : prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70 (Monétaire / OMLT / fonds Actions). »
+- [x] Nuancer « rendement par unité de risque presque identique » : « écarts de Sharpe (0,54 à 0,66) trop faibles pour départager les placements sur moins de 3 ans ».
+- [x] Nuancer la comparaison MASI / fonds Actions : le MASI est un indice (hors dividendes, sans frais) ; on ne peut pas l'acheter directement.
 
 ## Page OPCVM et marché actions
 
@@ -170,7 +170,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 - [ ] Expliquer le R² en mots sur la carte : « Les taux expliquent environ 38 % des variations hebdomadaires de ces fonds. »
 - [ ] Préciser le signe : « Sensibilité 4,6 = −4,6 % pour +1 point de taux. »
 - [ ] Préciser « taux à 10 ans (taux de marché des bons du Trésor, différent du taux directeur de BAM) ».
-- [ ] Signaler que la sensibilité du monétaire (0,29) n'est pas fiable (R² = 0,01).
+- [ ] Signaler que la sensibilité du monétaire (0,29) n'est pas fiable (R² = 0,01). *(Obsolète depuis la correction AMMC du 09/11/2026 : R² ≈ 0,3. À revoir avec la page Taux.)*
 
 ### Onglet Anticipations (Résultat 10)
 
@@ -245,7 +245,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 - [ ] Ajouter la légende des couleurs du nuage (portefeuilles types / fonds et indices), comme sur l'accueil.
 - [ ] Préciser la base des colonnes « % du rendement du MASI » et « % du risque du MASI » : calculées sur le rendement annualisé et la volatilité (équilibré : 7,4 ÷ 12,8 = 58 % ; 7,5 ÷ 15,1 = 50 %).
 - [ ] Mettre en avant les OCT : 26 % du rendement du MASI pour seulement 5 % de son risque.
-- [ ] Corriger le titre de la carte « Plus de rendement, c'est autant plus de risque » → « Plus de rendement, c'est plus de risque », et ajouter : « écarts de Sharpe trop faibles pour départager les placements sur moins de 3 ans ».
+- [x] Corriger le titre de la carte « Plus de rendement, c'est autant plus de risque » → « Plus de rendement, c'est plus de risque », et ajouter : « écarts de Sharpe trop faibles pour départager les placements sur moins de 3 ans ».
 
 ### Onglet Année par année (Résultat 16)
 
@@ -257,7 +257,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 ### Onglet Corrélations (Résultat 17)
 
-- [ ] À VÉRIFIER EN PRIORITÉ : le Monétaire a une corrélation de 0,40 à 0,53 avec tous les placements, MASI compris. C'est anormal pour un placement presque sans risque. Hypothèse : la semaine anormale à −1,22 % (voir Accueil) tombe une semaine où tout baisse et tire toutes les corrélations. Recalculer la matrice sans cette semaine (ou après correction de la donnée AMMC) et comparer.
+- [x] À VÉRIFIER EN PRIORITÉ : le Monétaire a une corrélation de 0,40 à 0,53 avec tous les placements, MASI compris. C'est anormal pour un placement presque sans risque. Hypothèse : la semaine anormale à −1,22 % (voir Accueil) tombe une semaine où tout baisse et tire toutes les corrélations. Recalculer la matrice sans cette semaine (ou après correction de la donnée AMMC) et comparer. *(Vérifié : après correction des 3 semaines AMMC, 0,25 à 0,35.)*
 - [ ] Afficher seulement la moitié de la matrice (triangle) : chaque chiffre apparaît aujourd'hui deux fois.
 - [ ] Renforcer l'échelle de couleurs : 0,38 et 0,53 ont presque la même teinte ; utiliser une échelle plus contrastée entre 0 et 1.
 - [ ] Ajouter le constat sur les Diversifiés : corrélation 0,98 avec les fonds Actions, ils se comportent comme une « petite dose » d'actions, pas comme un mélange indépendant.

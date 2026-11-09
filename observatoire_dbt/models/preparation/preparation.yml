@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: ammc_indices_corriges
+    description: >
+      Indices de performance AMMC (staging.ammc_indices), avec les semaines listées dans le seed
+      corrections_indices_ammc recalculées à partir des variations publiées par l'AMMC.
+      indice_publie garde la valeur d'origine ; corrige = vrai pour une semaine recalculée.
+    columns:
+      - name: indice
+        tests:
+          - not_null
+      - name: corrige
+        tests:
+          - not_null

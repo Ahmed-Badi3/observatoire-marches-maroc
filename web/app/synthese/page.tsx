@@ -64,16 +64,20 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
           teinte="fonce"
           icone={Scale}
           theme="Rendement et risque"
-          constat="Plus de rendement, c'est autant plus de risque."
+          constat="Plus de rendement, c'est plus de risque."
           tuiles={[
             {
-              etiquette: "Rendement par unité de risque (Sharpe) de tous les placements, hors Monétaire",
+              etiquette: "Rendement par unité de risque (Sharpe) des autres placements",
               valeur: `${formatNombre(e?.minimum)} – ${formatNombre(e?.maximum)}`,
+            },
+            {
+              etiquette: "Fonds obligataires court terme (OCT)",
+              valeur: formatNombre(lignes.find((l) => l.actif === "OCT")?.ratio_rendement_risque),
             },
           ]}
           precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
-          conclusion="Aucun placement n'est nettement meilleur qu'un autre : on choisit son niveau de risque."
-          details="Les trois portefeuilles types sont construits à partir des fonds (voir « Méthode et sources »)."
+          conclusion="Hors fonds de taux courts, aucun placement n'est nettement meilleur : on choisit son niveau de risque."
+          details="Les écarts de Sharpe entre les autres placements sont trop faibles pour les départager sur une période aussi courte. Les fonds CT ont un ratio élevé surtout parce que leur risque est très faible : le moindre surplus de rendement sur le monétaire, divisé par une volatilité minuscule, donne un grand nombre. Les trois portefeuilles types sont construits à partir des fonds (voir « Méthode et sources »)."
         />
       }
       graphiques={
@@ -378,7 +382,8 @@ export default async function PageSynthese() {
     {
       icone: Gauge,
       valeur: `${formatNombre(sharpe?.minimum)} – ${formatNombre(sharpe?.maximum)}`,
-      libelle: "Rendement par unité de risque (Sharpe), tous placements hors Monétaire",
+      libelle: "Rendement par unité de risque (Sharpe), hors fonds de taux courts",
+      pastille: `Fonds CT : ${formatNombre(lignes?.find((l) => l.actif === "OCT")?.ratio_rendement_risque)}`,
     },
     {
       icone: Layers,
@@ -392,8 +397,8 @@ export default async function PageSynthese() {
     <>
       <BandeauKpi titre="Chiffres clés de la page" kpis={kpis} />
       <ConclusionPage>
-        Aucun placement n&apos;est nettement meilleur par unité de risque : choisir son niveau de risque et diversifier
-        compte plus que chercher le « meilleur » produit.
+        Hors fonds de taux courts, aucun placement n&apos;est nettement meilleur par unité de risque : choisir son
+        niveau de risque et diversifier compte plus que chercher le « meilleur » produit.
       </ConclusionPage>
       <Onglets
         onglets={[

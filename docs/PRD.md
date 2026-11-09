@@ -6,8 +6,8 @@ et 2026, ce qui l'a fait bouger, et où un investisseur aurait eu intérêt à p
 son argent — dans un dashboard interactif et moderne.
 
 ## Phrase clé (affichée en haut de l'accueil)
-Sur 2023–2026, les actions ont rapporté le plus (+42 % pour le MASI), mais tous les
-placements ont un rendement par unité de risque presque identique : il fallait
+Sur 2023–2026, les actions ont rapporté le plus (+42 % pour le MASI), mais hors fonds
+obligataires court terme, tous les placements ont un rendement par unité de risque presque identique : il fallait
 choisir son niveau de risque, diversifier avec des fonds de taux, et ne pas acheter
 après la hausse.
 

@@ -7,7 +7,7 @@
 
 with ammc as (
     select date, categorie, indice::numeric as indice
-    from {{ source('staging_synthese', 'ammc_indices') }}
+    from {{ ref('ammc_indices_corriges') }}
 ),
 
 masi_jour as (

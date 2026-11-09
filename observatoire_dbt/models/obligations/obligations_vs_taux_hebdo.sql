@@ -2,7 +2,7 @@
 -- rendement hebdomadaire du fonds + niveau et variation des taux BAM
 with indices as (
     select date, categorie, indice
-    from {{ source('staging', 'ammc_indices') }}
+    from {{ ref('ammc_indices_corriges') }}
     where categorie in ('Monétaire', 'Obligations CT', 'Obligations MLT')
 ),
 

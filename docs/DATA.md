@@ -169,6 +169,7 @@ Période commune : vendredis AMMC couverts par l'historique du MASI. Valeurs de 
 | `analytics.synthese_classes_actifs` (1 ligne par placement ou portefeuille) | `actif`, `nb_semaines`, `debut`, `fin`, `rdt_cumule_pct`, `rdt_annualise_pct`, `volatilite_pct`, `pire_baisse_pct`, `pire_semaine_pct`, `semaines_negatives_pct`, `ratio_rendement_risque` (Sharpe), `part_rdt_masi_pct`, `part_risque_masi_pct` (rendement annualisé et volatilité en % de ceux du MASI, tâche A8) |
 | `analytics.synthese_annuel` | `actif`, `annee`, `nb_semaines` (1re et dernière année partielles), `rendement_pct`, `premiere_date`, `derniere_date`, `annee_partielle` (Priorité 2 des corrections : étiquette « 2026 (janv.–oct.) ») |
 | `analytics.compositions_portefeuilles` (seed dbt, Priorité 8 des corrections) | `portefeuille`, `placement` (Monétaire, OMLT, Fonds Actions), `poids_pct` : prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70. Lu par `synthese_rendements_hebdo` (les poids n'y sont plus écrits en dur) et par la barre empilée du site. Test : chaque portefeuille fait 100 %. |
+| `analytics.corrections_indices_ammc` (seed dbt) et `analytics.ammc_indices_corriges` (modèle) | 3 semaines où l'indice publié par l'AMMC contredit ses propres variations (Monétaire 11/04/2025 et 16/05/2025, Obligations CT 16/05/2025 ; vérifié dans les fichiers Excel d'origine). Le modèle recalcule l'indice à partir de la variation publiée (`indice`, `indice_publie`, `corrige`) et remplace `staging.ammc_indices` dans `synthese_rendements_hebdo` et `obligations_vs_taux_hebdo`. `dw.fact_opcvm_hebdo` (Power BI) n'est pas corrigé. |
 | `analytics.synthese_correlations` (chaque paire une fois, `actif_1 < actif_2` par ordre alphabétique, hors portefeuilles) | `actif_1`, `actif_2`, `nb_semaines`, `correlation` (de −1 à 1, pas un %) |
 | `analytics.synthese_rendements_hebdo` | `date`, `actif`, `rendement_hebdo` (**fraction**, 0,01 = 1 %) |
 
@@ -300,8 +301,8 @@ la base (tâche B7) : sur cette copie, une valeur différente = une erreur à ex
 | Page | Valeur attendue |
 |---|---|
 | Accueil / Synthèse | MASI : +42,3 % cumulé, +12,7 % annualisé, volatilité 15,2 %, pire baisse −16,2 %, Sharpe 0,66 |
-| Synthèse | Portefeuille équilibré : +23,5 % cumulé, volatilité 7,5 %, Sharpe 0,62 |
-| Synthèse | Corrélation du MASI avec les fonds obligataires MLT : 0,38 ; avec les fonds CT : 0,21 |
+| Synthèse | Portefeuille équilibré : +23,5 % cumulé, volatilité 7,4 %, Sharpe 0,63 (après correction des 3 semaines AMMC, 09/11/2026 ; avant : 7,5 % et 0,62) |
+| Synthèse | Corrélation du MASI avec les fonds obligataires MLT : 0,38 ; avec les fonds CT : 0,33 (avant correction AMMC : 0,21) |
 | OPCVM | Corrélation flux / MASI des 4 semaines précédentes : +0,43 ; suivantes : −0,08 |
 | OPCVM | Flux net vers les fonds actions 2025 : +10,6 Md MAD |
 | Marché actions | Volatilité annualisée du MASI : 8,5 % (2024), 19,7 % (2026) ; pire drawdown −19,0 % (03/03/2026) |

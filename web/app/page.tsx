@@ -5,8 +5,9 @@ import { CarteModule } from "@/components/observatoire/carte-module";
 import { CarteVedette } from "@/components/observatoire/carte-vedette";
 import { NuageRendementRisque } from "@/components/observatoire/nuage-rendement-risque";
 import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-triable";
-import { courbesMasi, placements, type Placement } from "@/lib/donnees";
-import { formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
+import { placements, type Placement } from "@/lib/donnees";
+import { compositions, pireDrawdown, sharpeExtremes } from "@/lib/donnees-pages";
+import { formatDateCourte, formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
 
 const colonnesPlacements: Colonne[] = [
   { cle: "actif", libelle: "Placement" },
@@ -44,8 +45,12 @@ function annee(date: string | undefined): string {
 export default async function PageAccueil() {
   // L'une après l'autre : la connexion à la base est unique (max: 1 dans lib/db.ts).
   const lignes = await placements();
-  const courbes = await courbesMasi();
+  const pireQuotidien = (await pireDrawdown())?.[0];
+  const sharpe = (await sharpeExtremes())?.[0];
+  const compo = await compositions();
   const masi = trouver(lignes, MASI);
+  const monetaire = trouver(lignes, "Monétaire");
+  const oct = trouver(lignes, "OCT");
   const equilibre = trouver(lignes, EQUILIBRE);
   const actions = trouver(lignes, FONDS_ACTIONS);
 
@@ -53,6 +58,17 @@ export default async function PageAccueil() {
   // Tous les chiffres de cette page viennent de la synthèse : MASI relevé chaque vendredi AMMC.
   const precisionMasi = formatPeriode(masi?.debut, masi?.fin, "hebdo");
   const precisionRisque = formatPeriode(masi?.debut, masi?.fin, "hebdo", { horsDividendes: false });
+  const tauxSansRisque = `${formatPourcentage(monetaire?.rdt_annualise_pct, { signe: false })} par an`;
+  // « prudent 50/40/10 » : poids lus dans analytics.compositions_portefeuilles (Monétaire / OMLT / fonds Actions).
+  const PLACEMENTS = ["Monétaire", "OMLT", FONDS_ACTIONS];
+  const descriptionPortefeuilles = ["Portefeuille prudent", EQUILIBRE, "Portefeuille dynamique"]
+    .map((p) => {
+      const poids = PLACEMENTS.map((pl) =>
+        formatNombre(compo?.find((c) => c.portefeuille === p && c.placement === pl)?.poids_pct, { decimales: 0 }),
+      );
+      return `${p.replace("Portefeuille ", "")} ${poids.join("/")}`;
+    })
+    .join(", ");
 
   return (
     <div className="space-y-8">
@@ -64,10 +80,24 @@ export default async function PageAccueil() {
         <p className="mt-3 max-w-3xl text-base leading-relaxed text-texte">
           Sur {periode}, les actions ont rapporté le plus (
           <strong className="font-semibold">{formatPourcentage(masi?.rdt_cumule_pct)}</strong> pour le
-          MASI), mais tous les placements ont un rendement par unité de risque presque identique : il
-          fallait choisir son niveau de risque, diversifier avec des fonds de taux, et ne pas acheter
-          après la hausse.
+          MASI), mais, hors fonds obligataires court terme, tous les placements ont un rendement par
+          unité de risque presque identique : il fallait choisir son niveau de risque, diversifier avec
+          des fonds de taux, et ne pas acheter après la hausse.
         </p>
+        <ol className="mt-4 grid gap-2 sm:grid-cols-3">
+          {[
+            ["Choisir son niveau de risque", "plus de rendement s'est toujours payé par plus de risque"],
+            ["Ne pas acheter après la hausse", "les épargnants l'ont fait, en fonds Actions comme en IPO"],
+            ["Surveiller les taux", "leur remontée a fait perdre les fonds obligataires longs"],
+          ].map(([regle, pourquoi], i) => (
+            <li key={regle} className="rounded-[12px] bg-page p-3 text-sm">
+              <span className="font-semibold text-accent-fonce">
+                {i + 1}. {regle}
+              </span>
+              <span className="block text-xs text-texte-secondaire">{pourquoi}</span>
+            </li>
+          ))}
+        </ol>
         <p className="mt-3 text-xs text-texte-secondaire">
           {masi
             ? `Période analysée : ${precisionMasi.charAt(0).toLowerCase()}${precisionMasi.slice(1)}. Les autres pages regardent parfois le MASI chaque séance ou chaque fin de mois : voir « Méthode et sources ».`
@@ -114,7 +144,6 @@ export default async function PageAccueil() {
           <CarteKpi
             libelle="Rendement annualisé"
             valeur={formatPourcentage(masi?.rdt_annualise_pct)}
-            serie={courbes?.masi}
             precision={precisionMasi}
           />
           <CarteKpi
@@ -125,13 +154,12 @@ export default async function PageAccueil() {
           <CarteKpi
             libelle="Pire baisse"
             valeur={formatPourcentage(masi?.pire_baisse_pct)}
-            serie={courbes?.baisse}
-            precision={precisionRisque}
+            precision={`${precisionRisque}. Mesurée chaque séance : ${formatPourcentage(pireQuotidien?.drawdown_pct)} (${formatDateCourte(pireQuotidien?.date)})`}
           />
           <CarteKpi
             libelle="Rendement par unité de risque (Sharpe)"
             valeur={formatNombre(masi?.ratio_rendement_risque)}
-            precision={precisionMasi}
+            precision={`Taux sans risque : fonds monétaires, ${tauxSansRisque} · ${precisionMasi}`}
           />
         </div>
         <p className="text-xs text-texte-secondaire">
@@ -146,6 +174,9 @@ export default async function PageAccueil() {
         <h2 className="text-base font-semibold">
           Plus de rendement s&apos;est payé par plus de risque
         </h2>
+        <p className="text-sm text-texte-secondaire">
+          Les placements sont presque alignés : aucun n&apos;a offert plus de rendement sans prendre plus de risque.
+        </p>
         <div className="rounded-carte bg-carte p-4 shadow-carte sm:p-6">
           <NuageRendementRisque
             points={(lignes ?? []).map((l) => ({
@@ -178,6 +209,24 @@ export default async function PageAccueil() {
             Données indisponibles.
           </p>
         )}
+        <div className="space-y-1.5 text-xs leading-relaxed text-texte-secondaire">
+          <p>
+            Sharpe = (rendement annualisé − celui des fonds monétaires, {tauxSansRisque}) ÷ volatilité. Les
+            fonds monétaires servent de taux sans risque, d&apos;où le « — ». Hors fonds obligataires court terme,
+            les écarts de Sharpe ({formatNombre(sharpe?.minimum)} à {formatNombre(sharpe?.maximum)}) sont trop
+            faibles pour départager les placements sur une période aussi courte ({precisionRisque.charAt(0).toLowerCase()}
+            {precisionRisque.slice(1)}). Les fonds CT ({formatNombre(oct?.ratio_rendement_risque)}) se distinguent
+            surtout par un risque très faible.
+          </p>
+          <p>
+            Portefeuilles types, rééquilibrés chaque semaine (Monétaire / OMLT / fonds Actions, en %) :{" "}
+            {descriptionPortefeuilles}.
+          </p>
+          <p>
+            Le MASI est un indice (hors dividendes, sans frais) : on ne peut pas l&apos;acheter directement. Les fonds
+            Actions, eux, encaissent les dividendes mais paient des frais.
+          </p>
+        </div>
       </section>
 
       {/* 6. Les 6 modules */}

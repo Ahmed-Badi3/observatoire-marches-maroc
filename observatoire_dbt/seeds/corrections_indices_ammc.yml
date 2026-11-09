@@ -1,0 +1,23 @@
+version: 2
+
+seeds:
+  - name: corrections_indices_ammc
+    description: >
+      Semaines où l'indice de performance publié par l'AMMC est incohérent avec les variations qu'elle
+      publie elle-même (vérifié dans les fichiers Excel d'origine, data/raw/ammc). Le modèle
+      ammc_indices_corriges recalcule l'indice de ces semaines ; les données brutes et staging ne changent pas.
+      methode = variation_publiee : indice de la semaine précédente × (1 + variation hebdomadaire publiée ce jour-là).
+      methode = variation_semaine_suivante : indice de la semaine suivante ÷ (1 + variation publiée la semaine suivante).
+    config:
+      column_types:
+        date: date
+        categorie: text
+        methode: text
+        justification: text
+    columns:
+      - name: methode
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['variation_publiee', 'variation_semaine_suivante']

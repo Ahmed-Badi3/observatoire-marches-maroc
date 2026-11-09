@@ -17,11 +17,9 @@ Il présente ces résultats en 7 pages (accueil, OPCVM et marché actions, conte
 |---|---|---|
 | ![Flux des OPCVM](docs/images/site_opcvm.png) | ![Courbe des taux](docs/images/site_taux.png) | ![Corrélations](docs/images/site_synthese.png) |
 
-Le site s'affiche aussi sur téléphone : ![Accueil sur téléphone](docs/images/site_accueil_telephone.png)
-
 ## En une phrase
 
-Sur 2023–2026, les actions ont rapporté le plus (+42 % pour le MASI) mais tous les placements ont un rendement par unité de risque presque identique : il fallait choisir son niveau de risque, diversifier avec des fonds de taux, et surtout ne pas acheter après la hausse, ce que les épargnants marocains font pourtant, en OPCVM comme en IPO.
+Sur 2023–2026, les actions ont rapporté le plus (+42 % pour le MASI) mais, hors fonds obligataires court terme, tous les placements ont un rendement par unité de risque presque identique : il fallait choisir son niveau de risque, diversifier avec des fonds de taux, et surtout ne pas acheter après la hausse, ce que les épargnants marocains font pourtant, en OPCVM comme en IPO.
 
 ---
 
@@ -114,17 +112,20 @@ Novembre 2023 → octobre 2026 (153 semaines), avec 3 portefeuilles types constr
 |---|---|---|---|---|---|
 | MASI | +42,3 % | +12,7 % | 15,2 % | −16,2 % | 0,66 |
 | Fonds Actions | +39,6 % | +12,0 % | 16,2 % | −19,0 % | 0,57 |
-| Portefeuille dynamique | +31,7 % | +9,8 % | 11,8 % | −13,8 % | 0,59 |
-| Portefeuille équilibré | +23,5 % | +7,4 % | 7,5 % | −8,4 % | 0,62 |
+| Portefeuille dynamique | +31,7 % | +9,8 % | 11,8 % | −13,8 % | 0,60 |
+| Portefeuille équilibré | +23,5 % | +7,4 % | 7,4 % | −8,4 % | 0,63 |
 | Fonds obligataires MLT | +14,3 % | +4,7 % | 3,3 % | −2,5 % | 0,57 |
-| Portefeuille prudent | +13,9 % | +4,5 % | 3,0 % | −2,2 % | 0,58 |
-| Monétaire | +8,4 % | +2,8 % | 1,2 % | −1,2 % | — |
+| Portefeuille prudent | +13,9 % | +4,5 % | 2,7 % | −2,2 % | 0,65 |
+| Fonds obligataires CT | +9,9 % | +3,3 % | 0,4 % | −0,1 % | 1,25 |
+| Monétaire | +8,4 % | +2,8 % | 0,2 % | −0,04 % | — |
 
-Tous les ratios de Sharpe sont entre 0,57 et 0,66 : aucun placement n'est « meilleur ». Le portefeuille équilibré garde 58 % du rendement du MASI avec la moitié de son risque.
+Hors fonds obligataires court terme, tous les ratios de Sharpe sont entre 0,57 et 0,66 : aucun placement n'est « meilleur ». Les fonds CT font 1,25 : leur risque est si faible (0,4 % par an) que le moindre surplus de rendement sur le monétaire donne un ratio élevé. Le portefeuille équilibré garde 58 % du rendement du MASI avec la moitié de son risque.
+
+Trois semaines où l'AMMC a publié un indice incohérent avec ses propres variations (Monétaire le 11/04/2025 et le 16/05/2025, fonds CT le 16/05/2025) sont corrigées dans dbt (seed `corrections_indices_ammc`) ; sans cette correction, le monétaire paraissait plus risqué que les fonds CT.
 
 **16. 2026 inverse le classement.** Après +22,6 % (2024) et +24,5 % (2025) pour les fonds actions, 2026 ne laisse gagner que les fonds CT (+2,1 %) et monétaires (+2,0 %) ; le portefeuille prudent limite la perte à −0,5 %, le dynamique perd −6,2 %.
 
-**17. La diversification fonctionne.** Corrélation hebdomadaire du MASI : 0,92 avec les fonds actions, mais seulement **0,38** avec les fonds obligataires MLT et **0,21** avec les fonds CT.
+**17. La diversification fonctionne.** Corrélation hebdomadaire du MASI : 0,92 avec les fonds actions, mais seulement **0,38** avec les fonds obligataires MLT et **0,33** avec les fonds CT.
 
 **18. Les fonds actions ne battent pas l'indice.** +39,6 % contre +42,3 % pour le MASI, avec plus de volatilité, alors que le MASI ne compte pas les dividendes : l'écart correspond aux frais et aux choix de gestion.
 

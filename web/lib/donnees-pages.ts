@@ -338,10 +338,12 @@ export const correlations = () => sur("corrélations", lireCorrelations);
 async function lireSharpeExtremes() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
-  // Le Sharpe du Monétaire est stocké à 0,00 (non significatif, DATA.md) : on l'écarte.
+  // Fourchette « hors fonds de taux courts » : le Monétaire sert de taux sans risque (Sharpe 0 par
+  // construction) et l'OCT, au risque très faible, a un ratio à part (CORRECTIONS.md, correction AMMC) ;
+  // son Sharpe est lu à part dans synthese_classes_actifs.
   return plat(await sql()`
     SELECT min(ratio_rendement_risque) AS minimum, max(ratio_rendement_risque) AS maximum
-    FROM analytics.synthese_classes_actifs WHERE actif <> 'Monétaire'`);
+    FROM analytics.synthese_classes_actifs WHERE actif NOT IN ('Monétaire', 'OCT')`);
 }
 export const sharpeExtremes = () => sur("extrêmes du Sharpe", lireSharpeExtremes);
 

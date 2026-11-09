@@ -44,7 +44,7 @@ const COTES: Record<string, Cote> = {
   "Portefeuille prudent": "haut",
   OMLT: "droite",
   OCT: "haut",
-  Monétaire: "droite",
+  Monétaire: "bas", // tout près de l'OCT depuis la correction des indices AMMC
   "Fonds Actions": "bas",
 };
 
@@ -93,48 +93,63 @@ export function NuageRendementRisque({ points }: { points: PointNuage[] }) {
   }
 
   return (
-    <div className="h-[380px] w-full" role="img" aria-label="Nuage de points : rendement annualisé selon la volatilité de chaque placement">
-      <ResponsiveContainer width="100%" height="100%">
-        <ScatterChart margin={{ top: 16, right: 56, bottom: 24, left: 8 }}>
-          <CartesianGrid vertical={false} stroke="var(--separateur)" />
-          <XAxis
-            type="number"
-            dataKey="x"
-            name="Volatilité"
-            tickFormatter={(v: number) => formatNombre(v, { decimales: 0 })}
-            tick={{ fontSize: 12, fill: "var(--texte-secondaire)" }}
-            axisLine={false}
-            tickLine={false}
-            label={{ value: "Risque : volatilité annualisée (%)", position: "insideBottom", offset: -12, fontSize: 12, fill: "var(--texte-secondaire)" }}
-          />
-          <YAxis
-            type="number"
-            dataKey="y"
-            name="Rendement"
-            width={44}
-            tickFormatter={(v: number) => formatNombre(v, { decimales: 0 })}
-            tick={{ fontSize: 12, fill: "var(--texte-secondaire)" }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <Tooltip content={<InfoBulle />} cursor={{ strokeDasharray: "3 3" }} />
-          <Scatter
-            data={donnees}
-            shape={(props: { cx?: number; cy?: number; payload?: Donnee }) => (
-              <circle
-                cx={props.cx}
-                cy={props.cy}
-                r={7}
-                fill={couleurDe(props.payload?.actif ?? "")}
-                stroke="#fff"
-                strokeWidth={2}
-              />
-            )}
-          >
-            <LabelList dataKey="actif" content={EtiquettePoint} />
-          </Scatter>
-        </ScatterChart>
-      </ResponsiveContainer>
+    <div>
+      <div className="h-[380px] w-full" role="img" aria-label="Nuage de points : rendement annualisé selon la volatilité de chaque placement">
+        <ResponsiveContainer width="100%" height="100%">
+          <ScatterChart margin={{ top: 16, right: 56, bottom: 24, left: 8 }}>
+            <CartesianGrid vertical={false} stroke="var(--separateur)" />
+            <XAxis
+              type="number"
+              dataKey="x"
+              name="Volatilité"
+              tickFormatter={(v: number) => formatNombre(v, { decimales: 0 })}
+              tick={{ fontSize: 12, fill: "var(--texte-secondaire)" }}
+              axisLine={false}
+              tickLine={false}
+              label={{ value: "Risque : volatilité annualisée (%)", position: "insideBottom", offset: -12, fontSize: 12, fill: "var(--texte-secondaire)" }}
+            />
+            <YAxis
+              type="number"
+              dataKey="y"
+              name="Rendement"
+              width={44}
+              tickFormatter={(v: number) => formatNombre(v, { decimales: 0 })}
+              tick={{ fontSize: 12, fill: "var(--texte-secondaire)" }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip content={<InfoBulle />} cursor={{ strokeDasharray: "3 3" }} />
+            <Scatter
+              data={donnees}
+              shape={(props: { cx?: number; cy?: number; payload?: Donnee }) => (
+                <circle
+                  cx={props.cx}
+                  cy={props.cy}
+                  r={7}
+                  fill={couleurDe(props.payload?.actif ?? "")}
+                  stroke="#fff"
+                  strokeWidth={2}
+                />
+              )}
+            >
+              <LabelList dataKey="actif" content={EtiquettePoint} />
+            </Scatter>
+          </ScatterChart>
+        </ResponsiveContainer>
+      </div>
+      {/* Légende des couleurs (CORRECTIONS.md, Accueil et Synthèse) */}
+      <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-texte-secondaire">
+        {[
+          { libelle: "MASI (indice)", couleur: COULEURS.masi },
+          { libelle: "Portefeuilles types", couleur: COULEURS.portefeuille },
+          { libelle: "Fonds", couleur: COULEURS.autre },
+        ].map((l) => (
+          <span key={l.libelle} className="inline-flex items-center gap-1.5">
+            <span className="size-2.5 rounded-full" style={{ background: l.couleur }} aria-hidden="true" />
+            {l.libelle}
+          </span>
+        ))}
+      </p>
     </div>
   );
 }

@@ -59,36 +59,6 @@ export async function placements(): Promise<Placement[] | null> {
   }
 }
 
-// Deux petites courbes pour les cartes KPI : le MASI et sa « pire baisse » en cours de route,
-// une valeur par semaine AMMC, sur la même période que la synthèse. On lit, on ne calcule rien.
-export type CourbesMasi = { masi: number[]; baisse: number[] };
-
-async function lireCourbesMasi(): Promise<CourbesMasi> {
-  "use cache";
-  cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
-
-  const lignes = await sql()<{ masi: string; drawdown_pct: string }[]>`
-    SELECT h.masi, d.drawdown_pct
-    FROM dw.fact_masi_hebdo h
-    JOIN dw.v_masi_drawdown d ON d.date = h.date_seance
-    WHERE h.date >= (SELECT debut FROM analytics.synthese_classes_actifs WHERE actif = 'MASI')
-    ORDER BY h.date
-  `;
-  return {
-    masi: lignes.map((l) => Number(l.masi)),
-    baisse: lignes.map((l) => Number(l.drawdown_pct)),
-  };
-}
-
-export async function courbesMasi(): Promise<CourbesMasi | null> {
-  try {
-    return await lireCourbesMasi();
-  } catch (erreur) {
-    console.error("Lecture des courbes du MASI impossible :", erreur);
-    return null;
-  }
-}
-
 // Version sûre : si la base est inaccessible, le site s'affiche quand même (avec « — »).
 // Une erreur n'est pas mise en cache : la fois suivante, on réessaie.
 export async function derniereSemaineAmmc(): Promise<string | null> {
