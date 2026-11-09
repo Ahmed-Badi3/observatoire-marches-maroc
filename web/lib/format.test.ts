@@ -10,6 +10,7 @@ import {
   formatNombre,
   formatPoints,
   formatPointsDeBase,
+  formatPeriode,
   formatPourcentage,
 } from "./format";
 
@@ -90,6 +91,29 @@ describe("dates", () => {
   });
   it("date invalide", () => {
     expect(formatDate("pas une date")).toBe("—");
+  });
+});
+
+describe("période et fréquence du MASI", () => {
+  it("hebdomadaire : dates courtes et mention des dividendes", () => {
+    expect(formatPeriode("2023-11-17", "2026-10-23", "hebdo")).toBe(
+      "Chaque vendredi (jour des valeurs AMMC), du 17/11/2023 au 23/10/2026 · MASI hors dividendes",
+    );
+  });
+  it("quotidien, sans la mention des dividendes", () => {
+    expect(formatPeriode("2023-11-01", "2026-10-30", "quotidien", { horsDividendes: false })).toBe(
+      "Chaque séance, du 01/11/2023 au 30/10/2026",
+    );
+  });
+  it("mensuel : mois en toutes lettres", () => {
+    expect(formatPeriode("2023-11-30", "2026-09-30", "mensuel")).toBe(
+      "Fin de mois, de novembre 2023 à septembre 2026 · MASI hors dividendes",
+    );
+  });
+  it("date manquante", () => {
+    expect(formatPeriode(null, "2026-10-30", "quotidien", { horsDividendes: false })).toBe(
+      "Chaque séance, du — au 30/10/2026",
+    );
   });
 });
 

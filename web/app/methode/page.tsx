@@ -3,13 +3,16 @@ import { ArrowDown, ArrowRight, ExternalLink } from "lucide-react";
 
 import { CarteGraphique, Indisponible } from "@/components/observatoire/carte-graphique";
 import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-triable";
-import { fraicheur } from "@/lib/donnees-pages";
+import { placements } from "@/lib/donnees";
+import { fraicheur, indicesSynthese, rendementReel, type Ligne } from "@/lib/donnees-pages";
+import { LIBELLE_FREQUENCE, formatPeriode, formatPourcentage, type Frequence, type Valeur } from "@/lib/format";
 import { URL_GITHUB } from "@/lib/pages";
 
 export const metadata: Metadata = { title: "Méthode et sources" };
 
 // Page de texte : l'architecture, la qualité des données, les limites, les sources.
-// Aucun chiffre n'est écrit ici : les seules dates affichées viennent de la base (tableau de fraîcheur).
+// Aucun chiffre n'est écrit ici : les dates et les rendements affichés viennent de la base
+// (tableau de fraîcheur, tableau « Pourquoi le MASI a plusieurs chiffres »).
 
 const ETAPES = [
   { titre: "Sources publiques", texte: "AMMC, Bourse de Casablanca, Bank Al-Maghrib, HCP, presse financière." },
@@ -55,8 +58,8 @@ const QUALITE = [
     solution: "Interpolation linéaire à des maturités fixes dans dbt.",
   },
   {
-    probleme: "Deux chiffres légitimes pour une même mesure (données quotidiennes ou hebdomadaires)",
-    solution: "Chaque page indique sur quelle fréquence le chiffre est calculé.",
+    probleme: "Plusieurs chiffres légitimes pour une même mesure du MASI (chaque séance, chaque vendredi, fin de mois)",
+    solution: "Sous chaque chiffre du MASI, le site indique sa fréquence et sa période (voir « Pourquoi le MASI a plusieurs chiffres »).",
   },
 ];
 
@@ -80,13 +83,72 @@ const SOURCES = [
   { nom: "Boursenews", url: "https://boursenews.ma", detail: "études BMCE Capital Global Research et CFG Bank (PER, dividendes)" },
 ];
 
+// Les quatre façons de regarder le MASI sur le site. Le texte explique POURQUOI ; la période et le
+// rendement sont lus dans la base (null = pas de rendement total pour cette mesure).
+type MesureMasi = {
+  frequence: Frequence;
+  pages: string;
+  raison: string;
+  debut: Valeur;
+  fin: Valeur;
+  rendement: Valeur;
+};
+
+function mesuresMasi(
+  hebdo: { debut: string; fin: string; rdt_cumule_pct: string | null } | undefined,
+  quotidien: Ligne | undefined,
+  mensuel: Ligne[] | null,
+): MesureMasi[] {
+  const premierMois = mensuel?.[0];
+  const dernierMois = mensuel?.[mensuel.length - 1];
+  return [
+    {
+      frequence: "hebdo",
+      pages: "Accueil, Synthèse, onglet Flux",
+      raison: "L'AMMC ne publie la valeur des fonds qu'une fois par semaine : pour comparer le MASI aux fonds, on les regarde le même jour.",
+      debut: hebdo?.debut,
+      fin: hebdo?.fin,
+      rendement: hebdo?.rdt_cumule_pct,
+    },
+    {
+      frequence: "quotidien",
+      pages: "OPCVM et marché actions (volatilité, baisses, MASI 20), décisions de Bank Al-Maghrib",
+      raison: "Regarder chaque séance voit le vrai fond d'une chute, qu'un relevé du vendredi peut manquer : la pire baisse y est plus forte.",
+      debut: quotidien?.debut,
+      fin: quotidien?.fin,
+      rendement: quotidien?.rendement_total_pct,
+    },
+    {
+      frequence: "mensuel",
+      pages: "Contexte économique (nominal et réel)",
+      raison: "L'inflation du HCP est mensuelle : le calcul s'arrête au dernier mois d'inflation publié.",
+      debut: premierMois?.date,
+      fin: dernierMois?.date,
+      rendement: dernierMois?.nominal_pct,
+    },
+    {
+      frequence: "trimestriel",
+      pages: "Contexte économique (MASI et PIB)",
+      raison: "Le PIB est trimestriel : on compare la variation du MASI sur un an à celle du PIB, trimestre par trimestre.",
+      debut: null,
+      fin: null,
+      rendement: null,
+    },
+  ];
+}
+
 const colonnesFraicheur: Colonne[] = [
   { cle: "source", libelle: "Source" },
   { cle: "jusqu_au", libelle: "Données jusqu'au", type: "date" },
 ];
 
 export default async function PageMethode() {
+  // L'une après l'autre : la connexion à la base est unique (lib/db.ts).
   const dates = await fraicheur();
+  const masiHebdo = (await placements())?.find((l) => l.actif === "MASI");
+  const masiQuotidien = (await indicesSynthese())?.find((l) => l.indice === "MASI");
+  const masiMensuel = await rendementReel();
+  const mesures = mesuresMasi(masiHebdo, masiQuotidien, masiMensuel);
 
   return (
     <div className="space-y-8">
@@ -128,6 +190,46 @@ export default async function PageMethode() {
           seulement les schémas de résultats, avec un compte en lecture seule : même en cas d&apos;erreur, il ne peut
           rien modifier. Aucun chiffre n&apos;est écrit à la main dans les pages, y compris dans les phrases.
         </p>
+      </CarteGraphique>
+
+      <CarteGraphique titre="Pourquoi le MASI a plusieurs chiffres">
+        <p className="max-w-3xl text-sm leading-relaxed text-texte-secondaire">
+          Un même indice donne des rendements différents selon le jour où l&apos;on commence, le jour où l&apos;on
+          s&apos;arrête et la fréquence à laquelle on le regarde. Le site utilise quatre mesures, chacune choisie
+          pour être comparée à autre chose (les fonds, l&apos;inflation, le PIB). Aucune n&apos;est fausse : sous
+          chaque chiffre du MASI, le site indique celle qu&apos;il utilise. Dans tous les cas, le MASI est{" "}
+          <strong className="font-semibold text-texte">hors dividendes</strong> : il ne compte que la variation des
+          cours, alors que les fonds Actions encaissent les dividendes.
+        </p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[640px] border-collapse text-sm">
+            <caption className="sr-only">Les quatre mesures du MASI utilisées sur le site</caption>
+            <thead>
+              <tr className="text-left text-texte-secondaire">
+                <th scope="col" className="border-b border-separateur py-2 pr-4 font-semibold">Fréquence et période</th>
+                <th scope="col" className="border-b border-separateur py-2 pr-4 font-semibold">Rendement du MASI</th>
+                <th scope="col" className="border-b border-separateur py-2 pr-4 font-semibold">Pages</th>
+                <th scope="col" className="border-b border-separateur py-2 font-semibold">Pourquoi cette mesure</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mesures.map((m) => (
+                <tr key={m.frequence} className="align-top even:bg-page/50">
+                  <td className="py-2.5 pr-4">
+                    {m.debut
+                      ? formatPeriode(m.debut, m.fin, m.frequence, { horsDividendes: false })
+                      : `${LIBELLE_FREQUENCE[m.frequence]}, variation sur un an`}
+                  </td>
+                  <td className="py-2.5 pr-4 font-semibold tabular-nums">
+                    {m.rendement === null ? "—" : formatPourcentage(m.rendement)}
+                  </td>
+                  <td className="py-2.5 pr-4 text-texte-secondaire">{m.pages}</td>
+                  <td className="py-2.5 text-texte-secondaire">{m.raison}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </CarteGraphique>
 
       <CarteGraphique titre="Qualité des données : les pièges résolus">

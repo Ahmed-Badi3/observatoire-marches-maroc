@@ -22,7 +22,13 @@ import {
   rendementReel,
   type Ligne,
 } from "@/lib/donnees-pages";
-import { formatMoisAnnee, formatPoints, formatPourcentage } from "@/lib/format";
+import {
+  LIBELLE_FREQUENCE,
+  formatMoisAnnee,
+  formatPeriode,
+  formatPoints,
+  formatPourcentage,
+} from "@/lib/format";
 import { numeriser, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "Contexte économique" };
@@ -54,6 +60,7 @@ function ongletPib(macro: Ligne[] | null, pic: Ligne[] | null) {
           numero={5}
           phrase="La bourse bouge beaucoup plus que l'économie."
           chiffre={formatPourcentage(p?.perf_masi_annuelle_pct)}
+          precision={`${LIBELLE_FREQUENCE.trimestriel}, variation sur un an · MASI hors dividendes`}
           legende={
             p
               ? `Au trimestre ${p.periode}, le MASI gagnait ${formatPourcentage(p.perf_masi_annuelle_pct)} sur un an, pour une croissance du PIB de ${formatPourcentage(p.croissance_pib_pct, { signe: false })} : c'est le trimestre où l'écart était le plus grand. Le recul récent du MASI ne vient pas d'un ralentissement économique mais de la valorisation.`
@@ -64,7 +71,7 @@ function ongletPib(macro: Ligne[] | null, pic: Ligne[] | null) {
       graphiques={
         <CarteGraphique
           titre="Le MASI varie bien plus fort que la croissance de l'économie"
-          note="Variation sur un an, trimestre par trimestre. Le PIB est publié avec retard : les derniers trimestres n'ont pas encore de barre. Sources : Bourse de Casablanca, HCP."
+          note="Variation sur un an, trimestre par trimestre (MASI : dernière séance du trimestre, hors dividendes). Le PIB est publié avec retard : les derniers trimestres n'ont pas encore de barre. Sources : Bourse de Casablanca, HCP."
         >
           <GraphiqueBarres
             jeux={[jeu]}
@@ -112,7 +119,8 @@ function ongletReel(reel: Ligne[] | null, infl: Ligne[] | null, pic: Ligne[] | n
           numero={6}
           phrase="L'inflation a peu pesé sur le rendement des actions."
           chiffre={formatPourcentage(dernier.reel_pct)}
-          legende={`Rendement réel du MASI (corrigé de l'inflation) de ${formatMoisAnnee(premier.date)} à ${formatMoisAnnee(dernier.date)}, contre ${formatPourcentage(dernier.nominal_pct)} en nominal.${
+          precision={formatPeriode(premier.date, dernier.date, "mensuel")}
+          legende={`Rendement réel du MASI (corrigé de l'inflation) de ${formatMoisAnnee(premier.date)} à ${formatMoisAnnee(dernier.date)}, contre ${formatPourcentage(dernier.nominal_pct)} en nominal. Le calcul s'arrête au dernier mois d'inflation publié par le HCP : ce chiffre ne se compare donc pas directement au rendement de l'accueil, relevé chaque vendredi.${
             p
               ? ` L'inflation a atteint ${formatPourcentage(p.inflation_annuelle_pct)} en ${formatMoisAnnee(p.date)}, puis elle est retombée : le vrai risque de la période a été la volatilité.`
               : ""
@@ -123,7 +131,7 @@ function ongletReel(reel: Ligne[] | null, infl: Ligne[] | null, pic: Ligne[] | n
         <>
           <CarteGraphique
             titre="Corrigé de l'inflation, le MASI gagne presque autant"
-            note="Base 100 en fin de mois. Nominal = sans tenir compte des prix ; réel = en pouvoir d'achat. Sources : Bourse de Casablanca, HCP."
+            note="Base 100 en fin de mois. Nominal = sans tenir compte des prix ; réel = en pouvoir d'achat. MASI hors dividendes. Sources : Bourse de Casablanca, HCP."
           >
             <GraphiqueLignes
               jeux={jeux}
@@ -196,6 +204,7 @@ function ongletBam(moyennes: Ligne[] | null, decisions: Ligne[] | null) {
           numero={7}
           phrase="Les baisses du taux directeur ont été suivies d'une hausse du MASI."
           chiffre={formatPoints(baisse?.rendement_anormal_20_moyen_pct)}
+          precision={`${LIBELLE_FREQUENCE.quotidien}, 20 séances après chaque annonce · MASI hors dividendes`}
           legende={`Sur 20 séances après l'annonce, le MASI fait en moyenne ${formatPoints(baisse?.rendement_anormal_20_moyen_pct, { signe: false })} de mieux qu'en temps normal après une baisse (${baisse?.nb_decisions ?? "—"} décisions), contre ${formatPoints(maintien?.rendement_anormal_20_moyen_pct, { signe: false })} après un maintien (${maintien?.nb_decisions ?? "—"} décisions). Très peu de baisses : c'est une corrélation, pas une preuve de cause.`}
         />
       }

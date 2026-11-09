@@ -124,3 +124,31 @@ export function formatDateCourte(v: Valeur): string {
     timeZone: "UTC",
   });
 }
+
+// Période et fréquence d'un chiffre du MASI (Priorité 1 de docs/CORRECTIONS.md).
+// Image : l'étiquette d'un bocal de confiture, qui dit de quand à quand il a été rempli et comment.
+// Le même MASI donne des chiffres différents selon qu'on le regarde chaque séance, chaque vendredi
+// (jour des valeurs AMMC des fonds) ou chaque fin de mois (rythme de l'inflation du HCP).
+// Les dates viennent de la base ; la fonction ne fait que les écrire.
+export type Frequence = "quotidien" | "hebdo" | "mensuel" | "trimestriel";
+
+export const LIBELLE_FREQUENCE: Record<Frequence, string> = {
+  quotidien: "Chaque séance",
+  hebdo: "Chaque vendredi (jour des valeurs AMMC)",
+  mensuel: "Fin de mois",
+  trimestriel: "Fin de trimestre",
+};
+
+export function formatPeriode(
+  debut: Valeur,
+  fin: Valeur,
+  frequence: Frequence,
+  { horsDividendes = true }: { horsDividendes?: boolean } = {},
+): string {
+  const dates =
+    frequence === "mensuel" || frequence === "trimestriel"
+      ? `de ${formatMoisAnnee(debut)} à ${formatMoisAnnee(fin)}`
+      : `du ${formatDateCourte(debut)} au ${formatDateCourte(fin)}`;
+  const texte = `${LIBELLE_FREQUENCE[frequence]}, ${dates}`;
+  return horsDividendes ? `${texte} · MASI hors dividendes` : texte;
+}

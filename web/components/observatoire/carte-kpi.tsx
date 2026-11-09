@@ -30,16 +30,19 @@ function MiniCourbe({ serie }: { serie: number[] }) {
 
 // Carte KPI : libellé, grand chiffre, pastille de variation, mini-courbe.
 // `valeur` et `variation.texte` arrivent DÉJÀ formatés (lib/format.ts) : la carte n'invente rien.
+// `precision` : période et fréquence du chiffre, en petit gris (lib/format.ts, formatPeriode).
 export function CarteKpi({
   libelle,
   valeur,
   variation,
   serie,
+  precision,
 }: {
   libelle: string;
   valeur: string;
   variation?: { texte: string; ton: Ton };
   serie?: number[];
+  precision?: string;
 }) {
   return (
     <div className="flex flex-col gap-2 rounded-carte bg-carte p-6 shadow-carte">
@@ -51,6 +54,7 @@ export function CarteKpi({
         </div>
       )}
       {serie && <MiniCourbe serie={serie} />}
+      {precision && <p className="mt-auto text-xs text-texte-secondaire">{precision}</p>}
     </div>
   );
 }

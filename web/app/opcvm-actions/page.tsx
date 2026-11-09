@@ -24,7 +24,8 @@ import {
   valorisation,
   type Ligne,
 } from "@/lib/donnees-pages";
-import { formatDate, formatMultiple, formatNombre, formatPourcentage } from "@/lib/format";
+import { placements, type Placement } from "@/lib/donnees";
+import { formatDate, formatMultiple, formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
 import { enNombre, pivoter, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "OPCVM et marché actions" };
@@ -39,9 +40,13 @@ function ongletFlux(
   flux: Ligne[] | null,
   masiAn: Ligne[] | null,
   timing: Ligne[] | null,
+  masiHebdo: Placement | undefined,
 ) {
   if (!flux || !timing || timing.length === 0) return <Indisponible />;
   const t = timing[0];
+  // Le MASI de ce tableau est relevé chaque vendredi AMMC, comme les flux (analytics.synthese_annuel).
+  // Ses dates de début et de fin sont celles de la synthèse : même série hebdomadaire.
+  const precisionMasi = formatPeriode(masiHebdo?.debut, masiHebdo?.fin, "hebdo");
 
   // Un jeu par catégorie d'OPCVM ; « Actions » en premier.
   const categories = [...new Set(flux.map((l) => String(l.categorie)))].sort((a, b) =>
@@ -65,7 +70,7 @@ function ongletFlux(
     }));
   const colonnes: Colonne[] = [
     { cle: "annee", libelle: "Année" },
-    { cle: "masi", libelle: "MASI", type: "pourcentage", colore: true },
+    { cle: "masi", libelle: "MASI (chaque vendredi, hors dividendes)", type: "pourcentage", colore: true },
     { cle: "flux", libelle: "Flux net vers les fonds Actions", type: "milliards", colore: true },
   ];
 
@@ -103,6 +108,9 @@ function ongletFlux(
             lignes={lignesTableau}
             legende="Rendement annuel du MASI et flux net vers les fonds Actions"
           />
+          <p className="mt-2 text-xs text-texte-secondaire">
+            MASI : {precisionMasi}. La première et la dernière année sont partielles.
+          </p>
         </div>
       }
     />
@@ -114,9 +122,12 @@ function ongletVolatilite(
   annuel: Ligne[] | null,
   dd: Ligne[] | null,
   pire: Ligne[] | null,
+  synthese: Ligne[] | null,
 ) {
   if (!annuel || !dd || !pire || pire.length === 0 || annuel.length === 0) return <Indisponible />;
   const derniere = annuel[annuel.length - 1];
+  // Données quotidiennes : début et fin lus dans dw.v_indices_synthese (mêmes séances que dw.v_masi_drawdown).
+  const masiQuotidien = synthese?.find((l) => l.indice === "MASI");
   const volatilite: Jeu = {
     id: "vol",
     libelle: "Volatilité",
@@ -136,7 +147,8 @@ function ongletVolatilite(
           numero={2}
           phrase="Le risque a fortement augmenté."
           chiffre={formatPourcentage(pire[0].drawdown_pct)}
-          legende={`Pire baisse du MASI depuis un plus haut, atteinte le ${formatDate(pire[0].date)}. Volatilité annualisée en ${derniere.annee} : ${formatPourcentage(derniere.volatilite_annualisee_pct, { signe: false })}.`}
+          precision={formatPeriode(masiQuotidien?.debut, masiQuotidien?.fin, "quotidien", { horsDividendes: false })}
+          legende={`Pire baisse du MASI depuis un plus haut, atteinte le ${formatDate(pire[0].date)}. Volatilité annualisée en ${derniere.annee} : ${formatPourcentage(derniere.volatilite_annualisee_pct, { signe: false })}. Mesurées chaque séance, elles sont plus précises que les chiffres de l'accueil, relevés chaque vendredi.`}
         />
       }
       graphiques={
@@ -205,6 +217,7 @@ function ongletIndices(quotidien: Ligne[] | null, synthese: Ligne[] | null) {
           numero={3}
           phrase="Les grandes valeurs font moins bien que le marché."
           chiffre={formatPourcentage(masi20?.rendement_total_pct)}
+          precision={`${formatPeriode(masi20?.debut, masi20?.fin, "quotidien", { horsDividendes: false })} · indices hors dividendes`}
           legende={`Rendement du MASI 20 depuis ${formatDate(masi20?.debut)}, contre ${formatPourcentage(masi?.rendement_total_pct)} pour le MASI. Pire baisse : ${formatPourcentage(masi20?.pire_drawdown_pct)} contre ${formatPourcentage(masi?.pire_drawdown_pct)}.`}
         />
       }
@@ -332,6 +345,7 @@ export default async function PageOpcvmActions() {
   const quotidien = await indices();
   const synthese = await indicesSynthese();
   const valo = await valorisation();
+  const masiHebdo = (await placements())?.find((l) => l.actif === "MASI");
 
   return (
     <>
@@ -341,8 +355,8 @@ export default async function PageOpcvmActions() {
       </ConclusionPage>
       <Onglets
         onglets={[
-          { id: "flux", libelle: "Flux et MASI", contenu: ongletFlux(flux, masiAn, timing) },
-          { id: "volatilite", libelle: "Volatilité et baisses", contenu: ongletVolatilite(annuel, dd, pire) },
+          { id: "flux", libelle: "Flux et MASI", contenu: ongletFlux(flux, masiAn, timing, masiHebdo) },
+          { id: "volatilite", libelle: "Volatilité et baisses", contenu: ongletVolatilite(annuel, dd, pire, synthese) },
           { id: "indices", libelle: "MASI et MASI 20", contenu: ongletIndices(quotidien, synthese) },
           { id: "per", libelle: "PER", contenu: ongletPer(valo) },
         ]}

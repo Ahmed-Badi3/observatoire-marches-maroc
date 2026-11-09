@@ -6,7 +6,7 @@ import { CarteVedette } from "@/components/observatoire/carte-vedette";
 import { NuageRendementRisque } from "@/components/observatoire/nuage-rendement-risque";
 import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-triable";
 import { courbesMasi, placements, type Placement } from "@/lib/donnees";
-import { formatDate, formatNombre, formatPourcentage } from "@/lib/format";
+import { formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
 
 const colonnesPlacements: Colonne[] = [
   { cle: "actif", libelle: "Placement" },
@@ -50,6 +50,9 @@ export default async function PageAccueil() {
   const actions = trouver(lignes, FONDS_ACTIONS);
 
   const periode = `${annee(masi?.debut)}–${annee(masi?.fin)}`;
+  // Tous les chiffres de cette page viennent de la synthèse : MASI relevé chaque vendredi AMMC.
+  const precisionMasi = formatPeriode(masi?.debut, masi?.fin, "hebdo");
+  const precisionRisque = formatPeriode(masi?.debut, masi?.fin, "hebdo", { horsDividendes: false });
 
   return (
     <div className="space-y-8">
@@ -67,7 +70,7 @@ export default async function PageAccueil() {
         </p>
         <p className="mt-3 text-xs text-texte-secondaire">
           {masi
-            ? `Période analysée : du ${formatDate(masi.debut)} au ${formatDate(masi.fin)} (vendredis AMMC).`
+            ? `Période analysée : ${precisionMasi.charAt(0).toLowerCase()}${precisionMasi.slice(1)}. Les autres pages regardent parfois le MASI chaque séance ou chaque fin de mois : voir « Méthode et sources ».`
             : "Les données sont momentanément indisponibles."}
         </p>
       </section>
@@ -78,6 +81,7 @@ export default async function PageAccueil() {
           variante={1}
           libelle={`MASI, rendement cumulé sur ${periode}`}
           valeur={formatPourcentage(masi?.rdt_cumule_pct)}
+          precision={precisionMasi}
           pastilles={[
             { libelle: FONDS_ACTIONS, valeur: formatPourcentage(actions?.rdt_cumule_pct) },
             { libelle: EQUILIBRE, valeur: formatPourcentage(equilibre?.rdt_cumule_pct) },
@@ -110,23 +114,29 @@ export default async function PageAccueil() {
             libelle="Rendement annualisé"
             valeur={formatPourcentage(masi?.rdt_annualise_pct)}
             serie={courbes?.masi}
+            precision={precisionMasi}
           />
           <CarteKpi
             libelle="Volatilité"
             valeur={formatPourcentage(masi?.volatilite_pct, { signe: false })}
+            precision={precisionRisque}
           />
           <CarteKpi
             libelle="Pire baisse"
             valeur={formatPourcentage(masi?.pire_baisse_pct)}
             serie={courbes?.baisse}
+            precision={precisionRisque}
           />
           <CarteKpi
             libelle="Rendement par unité de risque (Sharpe)"
             valeur={formatNombre(masi?.ratio_rendement_risque)}
+            precision={precisionMasi}
           />
         </div>
         <p className="text-xs text-texte-secondaire">
-          Données hebdomadaires (vendredis AMMC). Source : AMMC, Bourse de Casablanca.
+          Le MASI ne compte pas les dividendes ; les fonds, eux, les encaissent. Mesurés chaque séance,
+          la volatilité et la pire baisse sont un peu différentes (page « OPCVM et marché actions »).
+          Source : AMMC, Bourse de Casablanca.
         </p>
       </section>
 

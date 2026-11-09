@@ -19,9 +19,9 @@ Le site affiche quatre rendements différents pour le MASI selon la page :
 
 Même problème pour la pire baisse (−16,2 % en hebdo sur l'accueil, −19,0 % en quotidien sur la page actions) et la volatilité (15,1 % contre 14,9 %).
 
-- [ ] Choisir : une période commune à tout le site, OU écrire la période exacte et la fréquence sous chaque chiffre du MASI.
-- [ ] Ajouter dans « Méthode et sources » un paragraphe qui explique les différentes périodes et fréquences.
-- [ ] Préciser partout « MASI hors dividendes » (les fonds Actions, eux, encaissent les dividendes).
+- [x] Choisir : une période commune à tout le site, OU écrire la période exacte et la fréquence sous chaque chiffre du MASI.
+- [x] Ajouter dans « Méthode et sources » un paragraphe qui explique les différentes périodes et fréquences.
+- [x] Préciser partout « MASI hors dividendes » (les fonds Actions, eux, encaissent les dividendes).
 
 ### Priorité 2 — années et trimestres partiels
 
@@ -142,7 +142,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 ### Onglet Nominal et réel (Résultat 6)
 
 - [ ] Nuance importante sur la carte : la période étudiée commence en novembre 2023, après le pic d'inflation (+10,1 % en février 2023). Écrire : « Sur la période étudiée, qui commence après le pic d'inflation, celle-ci a peu pesé. »
-- [ ] Le +50,5 % nominal est un 3e chiffre différent du MASI : voir Priorité 1.
+- [x] Le +50,5 % nominal est un 3e chiffre différent du MASI : voir Priorité 1.
 - [ ] Graphique de l'inflation : segments droits au lieu de la courbe lissée (les données sont mensuelles).
 - [ ] Phrase sous le graphique de l'inflation : « Fin 2025 et mi-2026, les prix ont même légèrement baissé (déflation). »
 
@@ -252,7 +252,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 - [ ] La carte ne démontre pas son titre : « Le classement change d'une année à l'autre » avec en gros −8,7 % (fonds Actions 2026). Mettre plutôt en gros le changement de classement, ex. « Fonds Actions : 1er en 2024 (+22,6 %), dernier en 2026 (−8,7 %) ».
 - [ ] Ajouter au tableau Monétaire, OCT, OMLT et Diversifiés : sans eux, on ne voit pas le « classement » (en 2026, OCT ≈ +2,1 % et Monétaire ≈ +2,0 % passent en tête). Option : afficher le rang (1er…9e) dans chaque case.
 - [ ] Étiqueter « 2023 (≈ 6 semaines, depuis le 17/11) » et « 2026 (jan.–oct.) » dans le graphique et le tableau.
-- [ ] MASI 2026 = −7,7 % ici, −8,0 % et −12,2 % ailleurs : voir Priorité 1.
+- [x] MASI 2026 = −7,7 % ici, −8,0 % et −12,2 % ailleurs : voir Priorité 1.
 - [ ] Ajouter une phrase sous le graphique : « Le prudent a perdu presque rien en 2026 (−0,5 %) mais n'a gagné qu'un tiers des actions en 2024–2025. »
 
 ### Onglet Corrélations (Résultat 17)
@@ -273,7 +273,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 ## Page Méthode et sources
 
 - [ ] BUG : le tableau « Fraîcheur des données » est vide (une seule ligne « — »). Vérifier la requête ou la vue qui l'alimente (droits de lecture du compte du site, nom de vue, schéma analytics). Attendu : une ligne par source (AMMC, MASI, courbe BAM, HCP, IPO, PER) avec sa dernière date.
-- [ ] Le tableau qualité affirme « Chaque page indique sur quelle fréquence le chiffre est calculé » : ce n'est pas encore le cas (voir Priorité 1). Soit le réaliser, soit corriger la phrase.
+- [x] Le tableau qualité affirme « Chaque page indique sur quelle fréquence le chiffre est calculé » : ce n'est pas encore le cas (voir Priorité 1). Soit le réaliser, soit corriger la phrase.
 - [ ] Ajouter une phrase à la ligne « changement de méthode en mars 2023 » : « Avant le 21/03/2023, BAM publiait le taux de la dernière transaction de chaque bon, parfois vieux de plusieurs semaines ; depuis, une courbe de référence calculée chaque jour. Les résultats sont donc donnés sur les deux périodes. »
 - [ ] Ajouter au tableau qualité, une fois vérifiés : la semaine anormale du monétaire (−1,22 %) et les pics du taux 13 semaines mi-2025.
 - [ ] Reformuler la limite « Le MASI sert d'approximation… les dividendes n'y sont pas comptés » en disant le sens du biais : « Le MASI exclut les dividendes (≈ 3 %/an) que les fonds encaissent : la comparaison avantage les fonds. »

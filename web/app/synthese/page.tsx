@@ -15,7 +15,7 @@ import { Onglets } from "@/components/observatoire/onglets";
 import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-triable";
 import { placements, type Placement } from "@/lib/donnees";
 import { correlations, sharpeExtremes, syntheseAnnuel, type Ligne } from "@/lib/donnees-pages";
-import { formatNombre, formatPourcentage } from "@/lib/format";
+import { formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
 import { enNombre, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "Synthèse quantitative" };
@@ -41,6 +41,7 @@ const colonnesPlacements: Colonne[] = [
 /* ---------- Résultat 15 : rendement / risque ---------- */
 function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
   const e = extremes?.[0];
+  const masi = lignes.find((l) => l.actif === MASI);
   // Le Sharpe du Monétaire est stocké à 0,00 (non significatif) : on affiche « — » (docs/DATA.md).
   const lignesTableau = lignes.map((l) => ({
     ...l,
@@ -59,6 +60,7 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
           numero={15}
           phrase="Plus de rendement, c'est autant plus de risque."
           chiffre={`${formatNombre(e?.minimum)} – ${formatNombre(e?.maximum)}`}
+          precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
           legende="Fourchette du ratio de Sharpe (rendement par unité de risque) de tous les placements, hors Monétaire : aucun placement n'est nettement meilleur qu'un autre. Les trois portefeuilles types sont construits à partir des fonds."
         />
       }
@@ -66,7 +68,7 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
         <>
           <CarteGraphique
             titre="Le rendement augmente avec le risque : on choisit son niveau de risque"
-            note="Rendement et volatilité annualisés, sur les vendredis AMMC de la période. Source : AMMC, Bourse de Casablanca."
+            note="Rendement et volatilité annualisés, sur les vendredis AMMC de la période. MASI hors dividendes. Source : AMMC, Bourse de Casablanca."
           >
             <NuageRendementRisque
               points={lignes.map((l) => ({
@@ -109,7 +111,7 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
 }
 
 /* ---------- Résultat 16 : année par année, avec choix du portefeuille ---------- */
-function ongletAnnees(annuel: Ligne[] | null) {
+function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined) {
   if (!annuel || annuel.length === 0) return <Indisponible />;
   const annees = [...new Set(annuel.map((l) => String(l.annee)))].sort();
   const valeur = (actif: string, annee: string) =>
@@ -158,6 +160,7 @@ function ongletAnnees(annuel: Ligne[] | null) {
           numero={16}
           phrase="Le classement des placements change d'une année à l'autre."
           chiffre={formatPourcentage(actions?.rendement_pct)}
+          precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
           legende={`Fonds Actions en ${derniere} (année en cours). Sur la même période : portefeuille prudent ${formatPourcentage(prudent?.rendement_pct)}, portefeuille dynamique ${formatPourcentage(dynamique?.rendement_pct)}. Choisissez un portefeuille à droite pour le comparer au MASI et aux fonds Actions.`}
         />
       }
@@ -180,6 +183,9 @@ function ongletAnnees(annuel: Ligne[] | null) {
         <div>
           <TitreTableau>Rendement par année</TitreTableau>
           <TableauTriable colonnes={colonnes} lignes={lignes} legende="Rendement annuel de chaque placement et portefeuille" />
+          <p className="mt-2 text-xs text-texte-secondaire">
+            {formatPeriode(masi?.debut, masi?.fin, "hebdo")}. La première et la dernière année sont partielles.
+          </p>
         </div>
       }
     />
@@ -187,7 +193,7 @@ function ongletAnnees(annuel: Ligne[] | null) {
 }
 
 /* ---------- Résultat 17 : corrélations ---------- */
-function ongletCorrelations(paires: Ligne[] | null) {
+function ongletCorrelations(paires: Ligne[] | null, masi: Placement | undefined) {
   if (!paires || paires.length === 0) return <Indisponible />;
   const presents = ORDRE_ACTIFS.filter((a) => paires.some((p) => p.actif_1 === a || p.actif_2 === a));
   const corr = (a: string, b: string): number | null => {
@@ -205,6 +211,7 @@ function ongletCorrelations(paires: Ligne[] | null) {
           numero={17}
           phrase="La diversification fonctionne."
           chiffre={formatNombre(corr(MASI, "OMLT"))}
+          precision={formatPeriode(masi?.debut, masi?.fin, "hebdo", { horsDividendes: false })}
           legende={`Corrélation hebdomadaire du MASI avec les fonds obligataires MLT (OMLT). Avec les fonds CT (OCT) : ${formatNombre(corr(MASI, "OCT"))} ; avec les fonds Actions : ${formatNombre(corr(MASI, FONDS_ACTIONS))}. Plus la corrélation est proche de 0, plus deux placements bougent indépendamment : c'est ce qui amortit les chutes.`}
         />
       }
@@ -246,13 +253,14 @@ function ongletFondsActions(lignes: Placement[]) {
           numero={18}
           phrase="Les fonds Actions ne battent pas l'indice."
           chiffre={formatPourcentage(actions?.rdt_cumule_pct)}
+          precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
           legende={`Rendement cumulé des fonds Actions, contre ${formatPourcentage(masi?.rdt_cumule_pct)} pour le MASI. Volatilité : ${formatPourcentage(actions?.volatilite_pct, { signe: false })} contre ${formatPourcentage(masi?.volatilite_pct, { signe: false })}. Le MASI ne compte pas les dividendes : l'écart reflète les frais et les choix de gestion.`}
         />
       }
       graphiques={
         <CarteGraphique
           titre="Les fonds Actions rapportent un peu moins que l'indice qu'ils cherchent à suivre"
-          note="Sur la même période. Sources : AMMC, Bourse de Casablanca."
+          note="Sur la même période, chaque vendredi AMMC. Le MASI est hors dividendes ; les fonds, eux, les encaissent. Sources : AMMC, Bourse de Casablanca."
         >
           <GraphiqueBarres
             jeux={[jeu]}
@@ -287,8 +295,8 @@ export default async function PageSynthese() {
             libelle: "Rendement et risque",
             contenu: lignes ? ongletRendementRisque(lignes, extremes) : <Indisponible />,
           },
-          { id: "annees", libelle: "Année par année", contenu: ongletAnnees(annuel) },
-          { id: "correlations", libelle: "Corrélations", contenu: ongletCorrelations(paires) },
+          { id: "annees", libelle: "Année par année", contenu: ongletAnnees(annuel, lignes?.find((l) => l.actif === MASI)) },
+          { id: "correlations", libelle: "Corrélations", contenu: ongletCorrelations(paires, lignes?.find((l) => l.actif === MASI)) },
           {
             id: "fonds-actions",
             libelle: "Fonds Actions et MASI",

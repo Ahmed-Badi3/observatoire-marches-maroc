@@ -6,12 +6,14 @@ export function CarteResultat({
   phrase,
   chiffre,
   legende,
+  precision,
 }: {
   numero?: number; // 1 à 18 ; sans numéro, on passe une `etiquette` (ex. « Courbe des taux »)
   etiquette?: string;
   phrase: string;
   chiffre: string;
   legende?: string;
+  precision?: string; // période et fréquence du chiffre (lib/format.ts, formatPeriode)
 }) {
   return (
     <div className="flex flex-col gap-3 rounded-carte bg-carte p-6 shadow-carte">
@@ -20,6 +22,7 @@ export function CarteResultat({
       </span>
       <p className="text-base font-semibold text-texte">{phrase}</p>
       <p className="text-[32px] font-semibold leading-tight text-accent-fonce">{chiffre}</p>
+      {precision && <p className="-mt-2 text-xs font-medium text-texte-secondaire">{precision}</p>}
       {legende && <p className="text-xs text-texte-secondaire">{legende}</p>}
     </div>
   );

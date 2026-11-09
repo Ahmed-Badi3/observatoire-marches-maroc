@@ -12,12 +12,14 @@ export function CarteVedette({
   valeur,
   pastilles,
   href,
+  precision,
 }: {
   variante: 1 | 2;
   libelle: string;
   valeur: string;
   pastilles?: { libelle: string; valeur: string }[];
   href?: string;
+  precision?: string; // période et fréquence du chiffre (lib/format.ts, formatPeriode)
 }) {
   const clair = variante === 1;
   return (
@@ -30,6 +32,7 @@ export function CarteVedette({
     >
       <p className="text-sm font-medium opacity-90">{libelle}</p>
       <p className="text-[32px] font-semibold leading-tight">{valeur}</p>
+      {precision && <p className="-mt-3 text-xs opacity-90">{precision}</p>}
       {pastilles && pastilles.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {pastilles.map((p) => (
