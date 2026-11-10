@@ -102,33 +102,33 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 ### Phrase d'introduction
 
-- [ ] « Le marché est pourtant devenu moins cher » : ajouter le chiffre entre parenthèses « (PER passé de 19,7x à 18,0x) ».
+- [x] « Le marché est pourtant devenu moins cher » : ajouter le chiffre entre parenthèses « (PER passé de 19,7x à 18,0x) ». *(Fait avec le premier et le dernier PER Scope 40 de l'année, comme la carte (19,4x → 18,0x), lus en base.)*
 
 ### Onglet Flux et MASI (Résultat 1)
 
-- [ ] Le titre du graphique dit « après la hausse » mais le MASI n'apparaît pas : afficher la performance annuelle du MASI au-dessus de chaque barre (ex. « MASI +22 % » en 2024, « +28 % » en 2025), ou une ligne.
-- [ ] Le titre ne colle plus quand on change d'onglet de catégorie (Diversifiés, etc.) : titre neutre « Flux net annuel par catégorie de fonds », ou titre qui change avec l'onglet.
-- [ ] Ajouter une nuance sous la carte : « Corrélation ≠ causalité ; le décalage dans le temps rend l'explication ‘les épargnants suivent la hausse’ très plausible. »
-- [ ] Nouveau résultat à ajouter (après vérification semaine par semaine) : « En 2026, l'argent n'a pas quitté la Bourse : il est passé des fonds Actions (−0,6 Md) vers les fonds Diversifiés (≈ +9,5 Md), moins risqués. » Vérifier que les sorties Actions et les entrées Diversifiés tombent aux mêmes dates. Mentionner que les Diversifiés sont très utilisés par les institutionnels.
+- [x] Le titre du graphique dit « après la hausse » mais le MASI n'apparaît pas : afficher la performance annuelle du MASI au-dessus de chaque barre (ex. « MASI +22 % » en 2024, « +28 % » en 2025), ou une ligne.
+- [x] Le titre ne colle plus quand on change d'onglet de catégorie (Diversifiés, etc.) : titre neutre « Flux net annuel par catégorie de fonds », ou titre qui change avec l'onglet.
+- [x] Ajouter une nuance sous la carte : « Corrélation ≠ causalité ; le décalage dans le temps rend l'explication ‘les épargnants suivent la hausse’ très plausible. »
+- [ ] Nouveau résultat à ajouter (après vérification semaine par semaine) : « En 2026, l'argent n'a pas quitté la Bourse : il est passé des fonds Actions (−0,6 Md) vers les fonds Diversifiés (≈ +9,5 Md), moins risqués. » Vérifier que les sorties Actions et les entrées Diversifiés tombent aux mêmes dates. Mentionner que les Diversifiés sont très utilisés par les institutionnels. *(Vérifié le 10/11/2026, NON confirmé : en 2026, les flux hebdomadaires Actions et Diversifiés vont plutôt dans le même sens (corrélation +0,37) ; 19 semaines sur 27 de sorties Actions seulement avec entrées Diversifiés. Les totaux (−0,6 / +9,6 Md) ne prouvent pas que c'est le même argent : résultat non ajouté.)*
 
 ### Onglet Volatilité et baisses (Résultat 2)
 
-- [ ] Carte : mettre en gros la volatilité 2026 (19,7 %), avec en dessous « contre 8,5 % en 2024 · pire baisse −19,0 % le 3 mars 2026 », pour coller au graphique en barres voisin.
-- [ ] Vérifier que la carte « pire baisse » est calculée automatiquement : fin octobre 2026, le MASI est à ≈ −18 %, tout près du record de −19 %.
-- [ ] Phrase sous le graphique des baisses : « Depuis l'été 2025, le MASI n'a plus retrouvé son plus haut. »
+- [x] Carte : mettre en gros la volatilité 2026 (19,7 %), avec en dessous « contre 8,5 % en 2024 · pire baisse −19,0 % le 3 mars 2026 », pour coller au graphique en barres voisin.
+- [x] Vérifier que la carte « pire baisse » est calculée automatiquement : fin octobre 2026, le MASI est à ≈ −18 %, tout près du record de −19 %. *(Oui : lue à chaque mise à jour dans dw.v_masi_drawdown ; la carte affiche aussi l'écart actuel avec le plus haut.)*
+- [x] Phrase sous le graphique des baisses : « Depuis l'été 2025, le MASI n'a plus retrouvé son plus haut. »
 
 ### Onglet MASI et MASI 20 (Résultat 3)
 
-- [ ] Nuancer le titre : « Depuis l'été 2025, les grandes valeurs décrochent du reste du marché » (avant, les deux indices évoluaient ensemble).
-- [ ] Ajouter « à expliquer par l'analyse des principales capitalisations » tant que la cause n'est pas étudiée (ne pas inventer de raison).
-- [ ] Mettre en avant : l'écart actuel du MASI 20 (−27,8 %) égale sa pire baisse → il est à son point le plus bas au 30/10/2026.
+- [x] Nuancer le titre : « Depuis l'été 2025, les grandes valeurs décrochent du reste du marché » (avant, les deux indices évoluaient ensemble).
+- [x] Ajouter « à expliquer par l'analyse des principales capitalisations » tant que la cause n'est pas étudiée (ne pas inventer de raison).
+- [x] Mettre en avant : l'écart actuel du MASI 20 (−27,8 %) égale sa pire baisse → il est à son point le plus bas au 30/10/2026.
 
 ### Onglet PER (Résultat 4)
 
 - [x] La ligne grise « moyenne historique sur 10 ans » relie deux valeurs de sources et de périmètres différents (18,0x CFG marché total ; 20,3x BMCE Scope 40) : la remplacer par une ligne horizontale plate à 20,3x (BMCE, Scope 40, même périmètre que la ligne bleue). Garder 18,0x dans le tableau seulement.
 - [x] Ligne bleue : segments droits avec les points visibles (seulement 3 points).
 - [x] Ne pas mélanger Scope 40 et marché total sur un même graphique.
-- [ ] Message final de la carte : « Le PER 2026 prévu (Scope 40) est passé de 19,4x à 18,0x, sous sa moyenne de 10 ans de 20,3x. » Ajouter : « Moins cher ne veut pas dire bonne affaire : si les bénéfices baissent, le PER remontera. »
+- [x] Message final de la carte : « Le PER 2026 prévu (Scope 40) est passé de 19,4x à 18,0x, sous sa moyenne de 10 ans de 20,3x. » Ajouter : « Moins cher ne veut pas dire bonne affaire : si les bénéfices baissent, le PER remontera. »
 
 ## Page Contexte économique
 

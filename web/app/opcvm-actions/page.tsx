@@ -66,6 +66,13 @@ function ongletFlux(
   const categories = [...new Set(flux.map((l) => String(l.categorie)))].sort((a, b) =>
     a === "Actions" ? -1 : b === "Actions" ? 1 : a.localeCompare(b, "fr"),
   );
+  // Au-dessus des barres des fonds Actions : le rendement du MASI de la même année (analytics.synthese_annuel),
+  // pour voir d'un coup d'œil que l'argent arrive APRÈS la hausse.
+  const masiParAnnee: Record<string, string> = {};
+  for (const l of fluxEtiquetes) {
+    const m = masiAn?.find((x) => String(x.annee) === l.annee_brute);
+    if (m) masiParAnnee[l.annee] = `MASI ${formatPourcentage(m.rendement_pct, { decimales: 0 })}`;
+  }
   const jeux: Jeu[] = categories.map((c) => ({
     id: c,
     libelle: c,
@@ -73,6 +80,7 @@ function ongletFlux(
     donnees: fluxEtiquetes
       .filter((l) => l.categorie === c)
       .map((l) => ({ annee: l.annee, flux: enNombre(l.flux_net_md) })),
+    etiquettesHaut: c === "Actions" ? masiParAnnee : undefined,
   }));
 
   // Le rapprochement flux / MASI se fait sur l'année d'origine (annee_brute), pas sur l'étiquette.
@@ -111,13 +119,13 @@ function ongletFlux(
           ]}
           precision={`Corrélations · ${LIBELLE_FREQUENCE.hebdo} · MASI hors dividendes`}
           conclusion="Ils achètent après la hausse, sans l'anticiper."
-          details={`Corrélation entre le flux net hebdomadaire vers les fonds Actions (en % de leur actif net) et la performance du MASI. Pondéré par les flux, l'argent est entré quand le MASI valait en moyenne ${formatNombre(t.masi_moyen_achat, { decimales: 0 })} et en est ressorti à ${formatNombre(t.masi_moyen_vente, { decimales: 0 })} : acheter cher, vendre moins cher.`}
+          details={`Corrélation n'est pas causalité ; mais le décalage dans le temps (les achats suivent la hausse, ils ne la précèdent pas) rend l'explication « les épargnants suivent la hausse » très plausible. Corrélation entre le flux net hebdomadaire vers les fonds Actions (en % de leur actif net) et la performance du MASI. Pondéré par les flux, l'argent est entré quand le MASI valait en moyenne ${formatNombre(t.masi_moyen_achat, { decimales: 0 })} et en est ressorti à ${formatNombre(t.masi_moyen_vente, { decimales: 0 })} : acheter cher, vendre moins cher.`}
         />
       }
       graphiques={
         <CarteGraphique
-          titre="L'argent est arrivé en masse après la hausse, et reparti quand le marché baissait"
-          note="Flux net = souscriptions − rachats, en milliards de dirhams (Md MAD). Entre parenthèses, les mois couverts quand l'année est incomplète. Source : AMMC."
+          titre="Flux net annuel par catégorie de fonds"
+          note="Flux net = souscriptions − rachats, en milliards de dirhams (Md MAD). Pour les fonds Actions, le rendement du MASI de la même année est écrit au-dessus de chaque barre (chaque vendredi, hors dividendes) : l'argent est arrivé en masse après la hausse. Entre parenthèses, les mois couverts quand l'année est incomplète. Source : AMMC."
         >
           <GraphiqueBarres
             jeux={jeux}
@@ -157,6 +165,16 @@ function ongletVolatilite(
 ) {
   if (!annuel || !dd || !pire || pire.length === 0 || annuel.length === 0) return <Indisponible />;
   const derniere = annuel[annuel.length - 1];
+  // Année complète la plus calme (volatilité la plus basse), pour comparer à la dernière année.
+  const plusCalme = annuel
+    .filter((l) => String(l.annee_partielle) === "false")
+    .reduce<Ligne | undefined>(
+      (min, l) => (!min || Number(l.volatilite_annualisee_pct) < Number(min.volatilite_annualisee_pct) ? l : min),
+      undefined,
+    );
+  // Dernier jour où le MASI était à son plus haut (écart nul) : lu dans la série, pas calculé.
+  const dernierPlusHaut = [...dd].reverse().find((l) => Number(l.drawdown_pct) === 0);
+  const auPlusHaut = dernierPlusHaut?.date === dd[dd.length - 1]?.date;
   // Données quotidiennes : début et fin lus dans dw.v_indices_synthese (mêmes séances que dw.v_masi_drawdown).
   const masiQuotidien = synthese?.find((l) => l.indice === "MASI");
   const volatilite: Jeu = {
@@ -180,15 +198,18 @@ function ongletVolatilite(
           theme="Risque"
           constat="Le risque a fortement augmenté."
           tuiles={[
-            { etiquette: "Pire baisse du MASI depuis un plus haut", valeur: formatPourcentage(pire[0].drawdown_pct) },
             {
-              etiquette: `Amplitude des variations du MASI en ${derniere.annee} (volatilité sur un an)`,
+              etiquette: `Volatilité du MASI en ${derniere.annee} (amplitude des variations, sur un an)`,
               valeur: formatPourcentage(derniere.volatilite_annualisee_pct, { signe: false }),
+            },
+            {
+              etiquette: `En ${plusCalme?.annee ?? "—"}, l'année complète la plus calme`,
+              valeur: formatPourcentage(plusCalme?.volatilite_annualisee_pct, { signe: false }),
             },
           ]}
           precision={formatPeriode(masiQuotidien?.debut, masiQuotidien?.fin, "quotidien", { horsDividendes: false })}
-          conclusion="Les creux du MASI se sont approfondis."
-          details={`La pire baisse a été atteinte le ${formatDate(pire[0].date)}. Mesurées chaque séance, la baisse et la volatilité sont plus précises que les chiffres de l'accueil, relevés chaque vendredi.`}
+          conclusion={`Pire baisse : ${formatPourcentage(pire[0].drawdown_pct)} le ${formatDate(pire[0].date)}. Au ${formatDate(masiQuotidien?.fin)}, le MASI est encore à ${formatPourcentage(masiQuotidien?.drawdown_actuel_pct)} de son plus haut.`}
+          details="La pire baisse est recalculée à chaque mise à jour (séance par séance, dans la base) : si le MASI descend plus bas, la carte change d'elle-même. Mesurées chaque séance, la baisse et la volatilité sont plus précises que les chiffres de l'accueil, relevés chaque vendredi."
         />
       }
       graphiques={
@@ -208,7 +229,11 @@ function ongletVolatilite(
           </CarteGraphique>
           <CarteGraphique
             titre="Les creux du MASI se sont approfondis"
-            note="Écart entre le MASI et son plus haut précédent. Source : Bourse de Casablanca."
+            note={`Écart entre le MASI et son plus haut précédent. ${
+              dernierPlusHaut && !auPlusHaut
+                ? `Depuis son plus haut du ${formatDate(dernierPlusHaut.date)}, le MASI ne l'a plus retrouvé. `
+                : ""
+            }Source : Bourse de Casablanca.`}
           >
             <GraphiqueLignes
               jeux={[baisse]}
@@ -257,19 +282,23 @@ function ongletIndices(quotidien: Ligne[] | null, synthese: Ligne[] | null) {
           teinte="sarcelle"
           icone={Building2}
           theme="Grandes valeurs"
-          constat="Les grandes valeurs font moins bien que le marché."
+          constat="Les grandes valeurs ont décroché du reste du marché."
           tuiles={[
             { etiquette: "MASI 20 (les 20 plus grandes sociétés), rendement", valeur: formatPourcentage(masi20?.rendement_total_pct) },
             { etiquette: "MASI (tout le marché), rendement", valeur: formatPourcentage(masi?.rendement_total_pct) },
           ]}
           precision={`${formatPeriode(masi20?.debut, masi20?.fin, "quotidien", { horsDividendes: false })} · indices hors dividendes`}
-          conclusion="Les 20 plus grandes valeurs ont moins rapporté, et plus baissé."
-          details={`Pire baisse depuis un plus haut : ${formatPourcentage(masi20?.pire_drawdown_pct)} pour le MASI 20, contre ${formatPourcentage(masi?.pire_drawdown_pct)} pour le MASI.`}
+          conclusion={
+            masi20 && masi20.drawdown_actuel_pct === masi20.pire_drawdown_pct
+              ? `Au ${formatDate(masi20.fin)}, le MASI 20 est à son point le plus bas de la période (${formatPourcentage(masi20.drawdown_actuel_pct)} sous son plus haut).`
+              : "Les 20 plus grandes valeurs ont moins rapporté, et plus baissé."
+          }
+          details={`Pire baisse depuis un plus haut : ${formatPourcentage(masi20?.pire_drawdown_pct)} pour le MASI 20, contre ${formatPourcentage(masi?.pire_drawdown_pct)} pour le MASI. Avant, les deux indices évoluaient ensemble (voir le graphique). La cause reste à expliquer par l'analyse des principales capitalisations : le site ne l'a pas encore étudiée.`}
         />
       }
       graphiques={
         <CarteGraphique
-          titre="Le MASI 20 est resté derrière le MASI, et a plus baissé"
+          titre="Les deux indices évoluaient ensemble, puis les grandes valeurs ont décroché"
           note="Base 100 au premier jour. Les deux indices sont hors dividendes. Source : Bourse de Casablanca."
         >
           <GraphiqueLignes
@@ -349,7 +378,7 @@ function ongletPer(valo: Ligne[] | null) {
             },
             { etiquette: "Moyenne historique sur 10 ans", valeur: formatMultiple(moyenneRecente?.per) },
           ]}
-          conclusion="On paie moins d'années de bénéfices qu'en moyenne."
+          conclusion={`Le PER ${anneeCible} prévu (Scope 40) est passé de ${formatMultiple(premier?.per)} à ${formatMultiple(dernier?.per)}, sous sa moyenne de 10 ans de ${formatMultiple(moyenneRecente?.per)}. Moins cher ne veut pas dire bonne affaire : si les bénéfices baissent, le PER remontera.`}
           details={`PER = prix d'une action divisé par le bénéfice par action attendu : combien d'années de bénéfices on paie. Le PER prévu pour ${anneeCible} était de ${formatMultiple(premier?.per)} le ${formatDate(premier?.date_article)}.`}
         />
       }
@@ -448,7 +477,11 @@ export default async function PageOpcvmActions() {
       <BandeauKpi titre="Chiffres clés de la page" kpis={kpis} />
       <ConclusionPage>
         Les épargnants ont investi dans les fonds Actions après la hausse du marché, juste avant que le risque
-        augmente. Le marché est pourtant devenu moins cher.
+        augmente. Le marché est pourtant devenu moins cher
+        {per?.premier && per.dernier
+          ? ` (PER ${per.anneeCible} prévu passé de ${formatMultiple(per.premier.per)} à ${formatMultiple(per.dernier.per)})`
+          : ""}
+        .
       </ConclusionPage>
       <Onglets
         onglets={[

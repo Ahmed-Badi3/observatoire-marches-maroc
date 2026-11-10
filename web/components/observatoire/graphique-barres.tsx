@@ -6,6 +6,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  LabelList,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -108,7 +109,7 @@ export function GraphiqueBarres({
       </div>
       <div style={{ height: hauteur }} role="img" aria-label={description}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={jeu.donnees} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
+          <BarChart data={jeu.donnees} margin={{ top: jeu.etiquettesHaut ? 28 : 8, right: 16, bottom: 0, left: 0 }}>
             <CartesianGrid vertical={false} stroke="var(--separateur)" />
             <XAxis
               dataKey={cleX}
@@ -145,6 +146,28 @@ export function GraphiqueBarres({
                 hide={masquees.has(s.cle)}
                 isAnimationActive={false}
               >
+                {i === 0 && jeu.etiquettesHaut && (
+                  <LabelList
+                    dataKey={cleX}
+                    content={(props: object) => {
+                      const p = props as { x?: number | string; y?: number | string; width?: number | string; value?: unknown };
+                      const texte = jeu.etiquettesHaut?.[String(p.value)];
+                      if (!texte) return null;
+                      return (
+                        <text
+                          x={Number(p.x) + Number(p.width) / 2}
+                          y={Number(p.y) - 8}
+                          textAnchor="middle"
+                          fontSize={11}
+                          fontWeight={600}
+                          fill="var(--serie-2)"
+                        >
+                          {texte}
+                        </text>
+                      );
+                    }}
+                  />
+                )}
                 {colorerSigne &&
                   jeu.donnees.map((r, k) => {
                     const n = enNombre(r[s.cle]);

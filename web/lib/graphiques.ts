@@ -15,7 +15,15 @@ import {
 export type Rangee = Record<string, string | number | null>;
 export type Serie = { cle: string; libelle: string; couleur?: string };
 // Un « jeu » = un choix proposé à l'utilisateur (ex. Nominal / Réel) : ses données et ses séries.
-export type Jeu = { id: string; libelle: string; donnees: Rangee[]; series: Serie[] };
+export type Jeu = {
+  id: string;
+  libelle: string;
+  donnees: Rangee[];
+  series: Serie[];
+  // Graphique en barres : petit texte au-dessus de chaque barre, par valeur de l'axe X
+  // (ex. « MASI +26,1 % » au-dessus de l'année 2025). Texte déjà formaté.
+  etiquettesHaut?: Record<string, string>;
+};
 
 export type FormatValeur = "nombre" | "pourcentage" | "pb" | "points" | "multiple" | "milliards";
 
