@@ -212,7 +212,7 @@ async function lireFondsTauxAnnuel() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   return plat(await sql()`
-    SELECT categorie, annee, rendement_pct, var_taux_10a_pb,
+    SELECT categorie, annee, rendement_pct, var_taux_10a_pb, taux_10a_debut,
            to_char(premiere_date, 'YYYY-MM-DD') AS premiere_date, to_char(derniere_date, 'YYYY-MM-DD') AS derniere_date, annee_partielle
     FROM analytics.fonds_taux_annuel ORDER BY annee, categorie`);
 }
@@ -222,7 +222,8 @@ async function lireSensibilite() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   return plat(await sql()`
-    SELECT periode, categorie, nb_semaines, sensibilite_implicite, correlation, r2
+    SELECT periode, categorie, nb_semaines, sensibilite_implicite, correlation, r2,
+           r2 * 100 AS r2_pct -- même valeur, en % (« les taux expliquent 57 % »)
     FROM analytics.sensibilite_fonds_taux ORDER BY periode, categorie`);
 }
 export const sensibilite = () => sur("sensibilité", lireSensibilite);
@@ -262,7 +263,8 @@ async function lireTimingFluxTaux() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
   return plat(await sql()`
-    SELECT categorie, nb_semaines, corr_flux_rend_passe, corr_flux_rend_futur
+    SELECT categorie, nb_semaines, corr_flux_rend_passe, corr_flux_rend_futur,
+           corr_flux_pct_rend_passe, corr_flux_pct_rend_futur
     FROM analytics.flux_fonds_taux_timing ORDER BY categorie`);
 }
 export const timingFluxTaux = () => sur("timing des flux obligataires", lireTimingFluxTaux);

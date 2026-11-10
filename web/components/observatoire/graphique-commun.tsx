@@ -25,7 +25,9 @@ export function InfoBulle({
   typeX: "date" | "texte";
 }) {
   if (!active || !payload?.length) return null;
-  const titre = typeX === "date" ? formatDate(String(label)) : String(label ?? "");
+  // Sur un axe de temps, l'étiquette est un instant en millisecondes : on le remet en date AAAA-MM-JJ.
+  const date = typeof label === "number" ? new Date(label).toISOString().slice(0, 10) : String(label);
+  const titre = typeX === "date" ? formatDate(date) : String(label ?? "");
   return (
     <div className="rounded-lg bg-carte px-3 py-2 text-xs shadow-carte">
       <p className="mb-1 font-semibold text-texte">{titre}</p>

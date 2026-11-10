@@ -5,6 +5,7 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  ReferenceArea,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -50,6 +51,7 @@ export function GraphiqueLignes({
   escalier = false,
   points = false,
   reference,
+  zoneGrisee,
   ligneZero = false,
   decimalesAxe = 0,
   decimalesInfo,
@@ -66,6 +68,7 @@ export function GraphiqueLignes({
   escalier?: boolean; // marches d'escalier (ex. taux directeur)
   points?: boolean; // un point visible sur chaque donnée
   reference?: { valeur: number | null; libelle: string }; // ligne horizontale en pointillé (ex. PER moyen)
+  zoneGrisee?: { jusquAu: string; libelle: string }; // période grisée au début de l'axe des dates (AAAA-MM-JJ)
   ligneZero?: boolean;
   decimalesAxe?: number;
   decimalesInfo?: number;
@@ -89,6 +92,14 @@ export function GraphiqueLignes({
     const debut = coupure(derniere, p.annees);
     return jeu.donnees.filter((r) => String(r[cleX]).slice(0, 10) >= debut);
   }, [jeu, periode, avecDates, filtrePeriode, cleX]);
+
+  // Axe de temps réel : chaque date devient un instant (millisecondes), placé à sa vraie position.
+  // Sinon, des données quotidiennes puis hebdomadaires seraient espacées de façon égale (CORRECTIONS.md,
+  // courbe des taux). Ce n'est qu'une conversion de format, pas un calcul.
+  const avecTemps = useMemo(
+    () => (avecDates ? donnees.map((r) => ({ ...r, __t: Date.parse(`${String(r[cleX]).slice(0, 10)}T00:00:00Z`) })) : donnees),
+    [donnees, avecDates, cleX],
+  );
 
   if (!jeu || jeu.donnees.length === 0) {
     return <p className="py-8 text-sm text-texte-secondaire">Données indisponibles.</p>;
@@ -132,16 +143,40 @@ export function GraphiqueLignes({
       </div>
       <div style={{ height: hauteur }} role="img" aria-label={description}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={donnees} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
+          <LineChart data={avecTemps} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
             <CartesianGrid vertical={false} stroke="var(--separateur)" />
-            <XAxis
-              dataKey={cleX}
-              tickFormatter={(v: string) => (avecDates ? formatMoisAnnee(v) : String(v))}
-              tick={{ fontSize: 12, fill: "var(--texte-secondaire)" }}
-              axisLine={false}
-              tickLine={false}
-              minTickGap={48}
-            />
+            {avecDates ? (
+              <XAxis
+                dataKey="__t"
+                type="number"
+                scale="time"
+                domain={["dataMin", "dataMax"]}
+                tickFormatter={(v: number) => formatMoisAnnee(new Date(v).toISOString())}
+                tick={{ fontSize: 12, fill: "var(--texte-secondaire)" }}
+                axisLine={false}
+                tickLine={false}
+                minTickGap={48}
+              />
+            ) : (
+              <XAxis
+                dataKey={cleX}
+                tickFormatter={(v: string) => String(v)}
+                tick={{ fontSize: 12, fill: "var(--texte-secondaire)" }}
+                axisLine={false}
+                tickLine={false}
+                minTickGap={48}
+              />
+            )}
+            {avecDates && zoneGrisee && avecTemps.length > 0 && (
+              <ReferenceArea
+                x1={Number(avecTemps[0].__t)}
+                x2={Date.parse(`${zoneGrisee.jusquAu}T00:00:00Z`)}
+                fill="var(--serie-8)"
+                fillOpacity={0.35}
+                ifOverflow="hidden"
+                label={{ value: zoneGrisee.libelle, position: "insideTop", fontSize: 11, fill: "var(--texte-secondaire)" }}
+              />
+            )}
             <YAxis
               width={52}
               tickFormatter={formatAxe}

@@ -1,0 +1,21 @@
+version: 2
+
+seeds:
+  - name: exclusions_courbe_bam
+    description: >
+      Points de la courbe des taux publiée par Bank Al-Maghrib écartés du calcul : un bon tout juste émis
+      coté environ 0,5 point sous ses voisins, un seul jour, qui faisait plonger le taux à 13 semaines
+      interpolé (vérifié dans staging.bam_courbe_taux le 10/11/2026 ; seuls cas de tout l'historique où une
+      maturité fixe s'écarte de plus de 0,2 point de la veille ET du lendemain). Données brutes inchangées.
+    config:
+      column_types:
+        date_courbe: date
+        date_echeance: date
+        justification: text
+    columns:
+      - name: date_courbe
+        tests:
+          - not_null
+      - name: date_echeance
+        tests:
+          - not_null

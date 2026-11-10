@@ -30,6 +30,7 @@ import {
   formatDate,
   formatMilliards,
   formatDateCourte,
+  formatMoisAnnee,
   formatNombre,
   formatPointsDeBase,
   formatPourcentage,
@@ -43,6 +44,9 @@ export const metadata: Metadata = { title: "Taux et obligations" };
 const MLT = "Obligations MLT";
 const CT = "Obligations CT";
 const TOUTE_LA_PERIODE = "Toute la période";
+// Date du changement de méthode de la courbe BAM (docs/DATA.md) : avant, taux de la dernière transaction
+// de chaque bon ; depuis, courbe de référence calculée chaque jour. Repère méthodologique, pas un résultat.
+const METHODE_BAM = "2023-03-21";
 
 // « Toute la période » → « toute la période » au milieu d'une phrase ; « BAM » garde ses majuscules.
 const minusculeInitiale = (t: unknown) => {
@@ -70,11 +74,19 @@ function ongletAnnees(fonds: Ligne[] | null) {
   }));
   const colonnes: Colonne[] = [
     { cle: "annee", libelle: "Année" },
-    { cle: "var_taux_10a_pb", libelle: "Taux à 10 ans", type: "pb" },
+    { cle: "var_taux_10a_pb", libelle: "Variation du taux à 10 ans sur l'année", type: "pb" },
     ...series.map((s): Colonne => ({ cle: s, libelle: s, type: "pourcentage", colore: true })),
   ];
 
-  const derniere = fonds.filter((f) => f.categorie === MLT).at(-1);
+  const mltAnnees = fonds.filter((f) => f.categorie === MLT);
+  const derniere = mltAnnees.at(-1);
+  // Deux années de hausse des taux (la première et la dernière) : même hausse, résultats différents.
+  const hausses = mltAnnees.filter((f) => Number(f.var_taux_10a_pb) > 0);
+  const [h1, h2] = [hausses[0], hausses.at(-1)];
+  const comparaison =
+    h1 && h2 && h1 !== h2
+      ? `En ${h1.annee} et en ${h2.annee}, le taux à 10 ans a monté presque autant (${formatPointsDeBase(h1.var_taux_10a_pb)} et ${formatPointsDeBase(h2.var_taux_10a_pb)}), mais les fonds MLT ont fait ${formatPourcentage(h1.rendement_pct)} contre ${formatPourcentage(h2.rendement_pct)} : au 1er janvier ${h1.annee}, le taux de départ était de ${formatPourcentage(h1.taux_10a_debut, { signe: false, decimales: 2 })}, contre ${formatPourcentage(h2.taux_10a_debut, { signe: false, decimales: 2 })} au 1er janvier ${h2.annee}. Des intérêts encaissés plus élevés ont amorti la baisse du prix des obligations.`
+      : undefined;
   return (
     <MiseEnPageResultat
       carte={
@@ -94,12 +106,13 @@ function ongletAnnees(fonds: Ligne[] | null) {
             },
           ]}
           conclusion="Les années où les taux baissent sont les meilleures pour ces fonds, celles où ils montent les pires."
+          details={comparaison}
         />
       }
       graphiques={
         <CarteGraphique
           titre="Quand les taux baissent, les fonds longs gagnent le plus ; quand ils montent, ils perdent"
-          note="Rendement des fonds par année civile. Entre parenthèses, les mois couverts quand l'année est incomplète. Sources : AMMC, Bank Al-Maghrib."
+          note="Rendement des fonds par année civile. Entre parenthèses, les mois couverts quand l'année est incomplète ; en 2022, le taux à 10 ans vient de l'ancienne méthode de Bank Al-Maghrib (avant mars 2023). Sources : AMMC, Bank Al-Maghrib."
         >
           <GraphiqueBarres
             jeux={[jeu]}
@@ -114,6 +127,10 @@ function ongletAnnees(fonds: Ligne[] | null) {
         <div>
           <TitreTableau>Rendement des fonds et variation du taux à 10 ans, année par année</TitreTableau>
           <TableauTriable colonnes={colonnes} lignes={lignes} legende="Rendement annuel des fonds de taux" />
+          <p className="mt-2 text-xs text-texte-secondaire">
+            Une hausse des taux fait baisser le prix des obligations : un « + » dans la colonne des taux est
+            mauvais pour les fonds MLT. 1 pb (point de base) = 0,01 point de pourcentage.
+          </p>
         </div>
       }
     />
@@ -168,8 +185,8 @@ function ongletSensibilite(sens: Ligne[] | null) {
               interpretation: `R² = ${formatNombre(recente?.r2)}`,
             },
           ]}
-          conclusion={`Quand le taux à 10 ans monte d'un point, un fonds MLT perd environ ${formatPourcentage(toute?.sensibilite_implicite, { decimales: 1, signe: false })}.`}
-          details={`Sensibilité = perte approximative du fonds, en %, pour +1 point de taux à 10 ans. R² = part des variations hebdomadaires du fonds expliquée par les taux. Fonds CT, sur toute la période : ${formatNombre(ct?.sensibilite_implicite, { decimales: 1 })}.`}
+          conclusion={`Quand le taux à 10 ans monte d'un point, un fonds MLT perd environ ${formatPourcentage(toute?.sensibilite_implicite, { decimales: 1, signe: false })} : sensibilité ${formatNombre(toute?.sensibilite_implicite, { decimales: 1 })} = −${formatPourcentage(toute?.sensibilite_implicite, { decimales: 1, signe: false })} pour +1 point de taux. Les taux expliquent environ ${formatPourcentage(toute?.r2_pct, { decimales: 0, signe: false })} des variations hebdomadaires de ces fonds.`}
+          details={`Taux à 10 ans = taux de marché des bons du Trésor, différent du taux directeur de Bank Al-Maghrib. Sensibilité = perte approximative du fonds, en %, pour +1 point de taux à 10 ans. R² = part des variations hebdomadaires du fonds expliquée par les taux. Fonds CT, sur toute la période : ${formatNombre(ct?.sensibilite_implicite, { decimales: 1 })}.`}
         />
       }
       graphiques={
@@ -218,6 +235,13 @@ function ongletAnticipations(decisions: Ligne[] | null, resume: Ligne[] | null) 
   };
   const hausse = resume?.find((r) => r.decision === "Hausse");
   const baisse = resume?.find((r) => r.decision === "Baisse");
+  const nbTotal = (resume ?? []).reduce((n, r) => n + Number(r.nb), 0); // nombre de lignes, pas un calcul financier
+  const datesHausses = decisions.filter((d) => d.decision === "Hausse").map((d) => formatDateCourte(d.date_effet));
+  const exempleHausse = decisions.find((d) => d.decision === "Hausse");
+  // Maintiens où le marché attendait une baisse : taux à 13 semaines au moins 10 pb sous le taux directeur.
+  const maintiensAttendus = decisions.filter(
+    (d) => d.decision === "Maintien" && Number(d.ecart_13s_vs_directeur_pb) <= -10,
+  );
 
   const colonnes: Colonne[] = [
     { cle: "date_effet", libelle: "Entrée en vigueur", type: "date" },
@@ -225,7 +249,7 @@ function ongletAnticipations(decisions: Ligne[] | null, resume: Ligne[] | null) 
     { cle: "taux_avant", libelle: "Avant", type: "pourcentage", signe: false, decimales: 2 },
     { cle: "taux_apres", libelle: "Après", type: "pourcentage", signe: false, decimales: 2 },
     { cle: "taux_13s_veille", libelle: "Taux 13 sem. la veille", type: "pourcentage", signe: false, decimales: 2 },
-    { cle: "ecart_13s_vs_directeur_pb", libelle: "Écart avec le directeur", type: "pb", colore: true },
+    { cle: "ecart_13s_vs_directeur_pb", libelle: "Écart avec le directeur", type: "pb" },
   ];
   return (
     <MiseEnPageResultat
@@ -245,8 +269,16 @@ function ongletAnticipations(decisions: Ligne[] | null, resume: Ligne[] | null) 
               valeur: `${formatPointsDeBase(baisse?.ecart_min)} à ${formatPointsDeBase(baisse?.ecart_max)}`,
             },
           ]}
-          conclusion="Avant une hausse, le taux à 13 semaines était déjà au-dessus du taux directeur."
-          details="Le taux à 13 semaines est le taux de marché des bons du Trésor à 3 mois, la veille de chaque décision. Un écart positif veut dire que le marché prêtait déjà plus cher que le taux directeur."
+          conclusion={`Avant une hausse, le taux à 13 semaines était déjà au-dessus du taux directeur. ${nbTotal} décisions, dont ${hausse?.nb ?? "—"} hausses et ${baisse?.nb ?? "—"} baisses : résultat indicatif, pas une preuve statistique.`}
+          details={`Si le marché attend une hausse, personne ne prête à 3 mois au taux actuel : le taux à 13 semaines monte avant la décision.${
+            exempleHausse
+              ? ` Exemple : la veille de la hausse du ${formatDate(exempleHausse.date_effet)}, le taux à 13 semaines était de ${formatPourcentage(exempleHausse.taux_13s_veille, { signe: false, decimales: 2 })}, pour un nouveau taux directeur de ${formatPourcentage(exempleHausse.taux_apres, { signe: false, decimales: 2 })}.`
+              : ""
+          }${
+            maintiensAttendus.length > 0
+              ? ` Lors de certains maintiens, le marché attendait une baisse qui n'est pas venue : ${maintiensAttendus.map((d) => `${formatMoisAnnee(d.date_effet)} (${formatPointsDeBase(d.ecart_13s_vs_directeur_pb)})`).join(", ")}.`
+              : ""
+          } Limites : les hausses (${datesHausses.join(", ")}) tombent avant ou au moment du changement de méthode de Bank Al-Maghrib (${formatDate(METHODE_BAM)}) ; avant, le taux à 13 semaines est celui de la dernière transaction et peut dater de plusieurs semaines. La « veille » est la dernière courbe disponible avant la décision : certaines années, les courbes n'ont été collectées que le vendredi, elle peut donc dater de quelques jours.`}
         />
       }
       graphiques={
@@ -282,7 +314,7 @@ function ongletAnticipations(decisions: Ligne[] | null, resume: Ligne[] | null) 
 }
 
 /* ---------- Résultat 11 : flux ---------- */
-function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] | null) {
+function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] | null, fonds: Ligne[] | null) {
   if (!flux || flux.length === 0) return <Indisponible />;
   const { donnees, series } = pivoter(etiqueterAnnees(flux), "annee", "categorie", "flux_net_md");
   const jeu: Jeu = {
@@ -295,9 +327,19 @@ function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] |
   const colonnes: Colonne[] = [
     { cle: "categorie", libelle: "Catégorie" },
     { cle: "nb_semaines", libelle: "Semaines", type: "nombre", decimales: 0 },
-    { cle: "corr_flux_rend_passe", libelle: "Flux net hebdo ↔ rendement du fonds, 4 semaines précédentes", type: "correlation" },
-    { cle: "corr_flux_rend_futur", libelle: "Flux net hebdo ↔ rendement du fonds, 4 semaines suivantes", type: "correlation" },
+    { cle: "corr_flux_pct_rend_passe", libelle: "Flux net hebdo (en % de l'actif net) ↔ rendement du fonds, 4 semaines précédentes", type: "correlation" },
+    { cle: "corr_flux_pct_rend_futur", libelle: "Flux net hebdo (en % de l'actif net) ↔ rendement du fonds, 4 semaines suivantes", type: "correlation" },
   ];
+  // Flux par catégorie et par année (lus en base), pour les phrases sous le graphique.
+  const fluxDe = (categorie: string, annee: unknown) =>
+    flux.find((f) => f.categorie === categorie && String(f.annee) === String(annee))?.flux_net_md;
+  const anneesMlt = (fonds ?? []).filter((f) => f.categorie === MLT);
+  const derniereAnnee = anneesMlt.at(-1)?.annee;
+  // Une année de hausse des taux où les fonds MLT ont pourtant reçu de l'argent, et le rendement de l'année suivante.
+  const achatAvantRallye = anneesMlt.find(
+    (f, i) => Number(f.var_taux_10a_pb) > 0 && Number(fluxDe(MLT, f.annee)) > 0 && anneesMlt[i + 1],
+  );
+  const anneeSuivante = achatAvantRallye ? anneesMlt[anneesMlt.indexOf(achatAvantRallye) + 1] : undefined;
   return (
     <MiseEnPageResultat
       carte={
@@ -305,12 +347,12 @@ function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] |
           teinte="sarcelle"
           icone={Users}
           theme="Comportement des épargnants"
-          constat="Les épargnants obligataires suivent moins la tendance que ceux des fonds actions."
+          constat="Les épargnants obligataires ne suivent presque pas la tendance, contrairement à ceux des fonds Actions."
           tuiles={[
             {
-              etiquette: "Flux net hebdo des fonds MLT ↔ leur rendement des 4 semaines précédentes",
-              valeur: formatNombre(mlt?.corr_flux_rend_passe, { signe: true }),
-              interpretation: interpreterCorrelation(mlt?.corr_flux_rend_passe),
+              etiquette: "Achats nets des fonds MLT (en % de l'actif net) ↔ leur rendement des 4 semaines précédentes",
+              valeur: formatNombre(mlt?.corr_flux_pct_rend_passe, { signe: true }),
+              interpretation: interpreterCorrelation(mlt?.corr_flux_pct_rend_passe),
             },
             {
               etiquette: "Achats nets des fonds Actions ↔ MASI des 4 semaines précédentes",
@@ -318,14 +360,22 @@ function ongletFlux(flux: Ligne[] | null, timing: Ligne[] | null, kpi: Ligne[] |
               interpretation: interpreterCorrelation(kpi?.[0]?.corr_passe),
             },
           ]}
-          conclusion="Les épargnants des fonds de taux courent moins après la performance."
-          details="Les flux des fonds MLT sont mesurés en dirhams, ceux des fonds Actions en % de leur actif net : les deux chiffres ne se comparent pas exactement."
+          conclusion="Les épargnants des fonds de taux courent beaucoup moins après la performance."
+          details={`Les deux corrélations sont mesurées de la même façon (flux de la semaine en % de l'actif net du fonds) : elles se comparent. Mesurée sur les flux en dirhams, celle des fonds MLT vaut ${formatNombre(mlt?.corr_flux_rend_passe, { signe: true })}.`}
         />
       }
       graphiques={
         <CarteGraphique
-          titre="Les capitaux ont quitté les fonds MLT quand les taux ont remonté"
-          note="Flux net = souscriptions − rachats, en milliards de dirhams, par année civile. Entre parenthèses, les mois couverts quand l'année est incomplète. Source : AMMC."
+          titre="Flux nets des fonds de taux, année par année"
+          note={`Flux net = souscriptions − rachats, en milliards de dirhams, par année civile. Entre parenthèses, les mois couverts quand l'année est incomplète. ${
+            derniereAnnee
+              ? `En ${derniereAnnee}, les fonds longs (MLT) enregistrent ${formatMilliards(fluxDe(MLT, derniereAnnee))} pendant que les fonds courts reçoivent ${formatMilliards(fluxDe("Monétaire", derniereAnnee))} (monétaires) et ${formatMilliards(fluxDe(CT, derniereAnnee))} (CT). `
+              : ""
+          }${
+            achatAvantRallye && anneeSuivante
+              ? `Mais en ${achatAvantRallye.annee}, les taux avaient aussi monté (${formatPointsDeBase(achatAvantRallye.var_taux_10a_pb)}) et les fonds MLT ont reçu ${formatMilliards(fluxDe(MLT, achatAvantRallye.annee))} : acheter à taux élevés était un bon moment, avant ${formatPourcentage(anneeSuivante.rendement_pct)} en ${anneeSuivante.annee}. `
+              : ""
+          }Source : AMMC.`}
         >
           <GraphiqueBarres
             jeux={[jeu]}
@@ -373,6 +423,15 @@ function ongletCourbe(courbes: Ligne[] | null, serie: Ligne[] | null) {
   const derniere = courbes.filter((c) => Number(c.rang) === 0);
   const dix = derniere.find((c) => c.maturite === "10 ans");
   const treize = derniere.find((c) => c.maturite === "13 sem");
+  // Taux d'une maturité sur une courbe (rang 0 = la plus récente, 1 = il y a un an, 2 = il y a deux ans).
+  const taux = (r: number, m: string) => courbes.find((c) => Number(c.rang) === r && c.maturite === m)?.taux_pct;
+  const pentification =
+    rangs.includes(1)
+      ? `Entre le ${formatDate(dateDuRang(1))} et le ${formatDate(dateDuRang(0))}, le taux à 13 semaines est passé de ${formatPourcentage(taux(1, "13 sem"), { signe: false, decimales: 2 })} à ${formatPourcentage(taux(0, "13 sem"), { signe: false, decimales: 2 })}, le taux à 10 ans de ${formatPourcentage(taux(1, "10 ans"), { signe: false, decimales: 2 })} à ${formatPourcentage(taux(0, "10 ans"), { signe: false, decimales: 2 })}.`
+      : "";
+  const touteEnBaisse =
+    rangs.includes(2) &&
+    ["13 sem", "1 an", "2 ans", "5 ans", "10 ans"].every((m) => Number(taux(1, m)) < Number(taux(2, m)));
 
   let jeuTemps: Jeu | null = null;
   if (serie && serie.length > 0) {
@@ -385,7 +444,8 @@ function ongletCourbe(courbes: Ligne[] | null, serie: Ligne[] | null) {
       series: p.series.map((s, i) => ({
         cle: s,
         libelle: noms[s] ?? s,
-        couleur: i === 0 ? "var(--serie-2)" : "var(--serie-1)",
+        // Couleurs différentes de celles du graphique des courbes (où le sarcelle = la courbe la plus récente).
+        couleur: s === "13 sem" ? "var(--serie-5)" : "var(--serie-3)",
       })),
     };
   }
@@ -410,7 +470,11 @@ function ongletCourbe(courbes: Ligne[] | null, serie: Ligne[] | null) {
         <>
           <CarteGraphique
             titre="La forme de la courbe des taux évolue d'une année à l'autre"
-            note="Taux de référence du marché secondaire des bons du Trésor, par durée restante. Source : Bank Al-Maghrib."
+            note={`Taux de référence du marché secondaire des bons du Trésor, par durée restante. ${pentification} Quand le taux long monte plus que le taux court, la courbe se « pentifie » : c'est ce qui fait perdre les fonds obligataires longs pendant que le monétaire gagne encore.${
+              touteEnBaisse
+                ? ` Entre le ${formatDate(dateDuRang(2))} et le ${formatDate(dateDuRang(1))}, toute la courbe avait baissé (baisses du taux directeur) : une bonne année pour les obligations.`
+                : ""
+            } Source : Bank Al-Maghrib.`}
           >
             <GraphiqueLignes
               jeux={[jeuCourbe]}
@@ -427,10 +491,11 @@ function ongletCourbe(courbes: Ligne[] | null, serie: Ligne[] | null) {
           {jeuTemps && (
             <CarteGraphique
               titre="L'écart entre taux courts et taux longs varie dans le temps"
-              note="Taux à 13 semaines et à 10 ans, jour par jour. Source : Bank Al-Maghrib."
+              note="Taux à 13 semaines et à 10 ans, à leur vraie date (quotidiens certaines années, hebdomadaires d'autres). En gris, la période de l'ancienne méthode de Bank Al-Maghrib : taux de la dernière transaction de chaque bon, d'où les paliers plats et les sauts. Quelques cotations aberrantes d'un seul jour sont écartées (voir « Méthode et sources »). Source : Bank Al-Maghrib."
             >
               <GraphiqueLignes
                 jeux={[jeuTemps]}
+                zoneGrisee={{ jusquAu: METHODE_BAM, libelle: "ancienne méthode BAM" }}
                 format="pourcentage"
                 decimalesAxe={1}
                 decimalesInfo={2}
@@ -504,7 +569,7 @@ export default async function PageTauxObligations() {
           { id: "annees", libelle: "Fonds par année", contenu: ongletAnnees(fonds) },
           { id: "sensibilite", libelle: "Sensibilité aux taux", contenu: ongletSensibilite(sens) },
           { id: "anticipations", libelle: "Anticipations", contenu: ongletAnticipations(decisions, resume) },
-          { id: "flux", libelle: "Flux des épargnants", contenu: ongletFlux(flux, timing, kpi) },
+          { id: "flux", libelle: "Flux des épargnants", contenu: ongletFlux(flux, timing, kpi, fonds) },
           { id: "courbe", libelle: "Courbe des taux", contenu: ongletCourbe(courbes, serie) },
         ]}
       />

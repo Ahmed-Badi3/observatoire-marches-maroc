@@ -158,47 +158,47 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 ### Onglet Fonds par année (Résultat 8)
 
-- [ ] Étiqueter « 2022 (3 mois, ancienne méthode BAM) » ou retirer 2022 ; étiqueter « 2026 (jan.–oct.) ».
-- [ ] Renommer la colonne « Taux à 10 ans » en « Variation du taux à 10 ans sur l'année » (risque de confusion avec « comparé à il y a 10 ans »).
-- [ ] Note sous le tableau : « Une hausse des taux fait baisser le prix des obligations : + = mauvais pour les fonds OMLT. 1 pb = 0,01 %. »
-- [ ] Ajouter l'explication 2023 vs 2026 : même hausse des taux (+68 / +73 pb) mais OMLT +1,6 % contre −1,8 %, car les taux de départ (donc les intérêts encaissés) étaient plus élevés en 2023. À vérifier d'abord : niveau du taux 10 ans au 1er janvier 2023 et au 1er janvier 2026 dans la courbe BAM.
+- [x] Étiqueter « 2022 (3 mois, ancienne méthode BAM) » ou retirer 2022 ; étiqueter « 2026 (jan.–oct.) ».
+- [x] Renommer la colonne « Taux à 10 ans » en « Variation du taux à 10 ans sur l'année » (risque de confusion avec « comparé à il y a 10 ans »).
+- [x] Note sous le tableau : « Une hausse des taux fait baisser le prix des obligations : + = mauvais pour les fonds OMLT. 1 pb = 0,01 %. »
+- [x] Ajouter l'explication 2023 vs 2026 : même hausse des taux (+68 / +73 pb) mais OMLT +1,6 % contre −1,8 %, car les taux de départ (donc les intérêts encaissés) étaient plus élevés en 2023. À vérifier d'abord : niveau du taux 10 ans au 1er janvier 2023 et au 1er janvier 2026 dans la courbe BAM. *(Vérifié : taux 10 ans 3,19 % au 1er janvier 2023 contre 2,95 % au 1er janvier 2026 ; phrase construite avec les valeurs de la base.)*
 - [ ] Mettre à jour le rapport (−1,6 % / +68 pb) avec les chiffres du site (−1,8 % / +73 pb), ou dater les chiffres du rapport.
 
 ### Onglet Sensibilité aux taux (Résultat 9)
 
 - [x] Erreur dans la carte : « Depuis le changement de méthode de Bank Al-Maghrib : 4,1 » est inversé. Le tableau donne 4,60 depuis le 24/03/2023 et 4,14 sur toute la période. Corriger en : « Sur toute la période (202 semaines) : 4,1. »
-- [ ] Expliquer le R² en mots sur la carte : « Les taux expliquent environ 38 % des variations hebdomadaires de ces fonds. »
-- [ ] Préciser le signe : « Sensibilité 4,6 = −4,6 % pour +1 point de taux. »
-- [ ] Préciser « taux à 10 ans (taux de marché des bons du Trésor, différent du taux directeur de BAM) ».
-- [ ] Signaler que la sensibilité du monétaire (0,29) n'est pas fiable (R² = 0,01). *(Obsolète depuis la correction AMMC du 09/11/2026 : R² ≈ 0,3. À revoir avec la page Taux.)*
+- [x] Expliquer le R² en mots sur la carte : « Les taux expliquent environ 38 % des variations hebdomadaires de ces fonds. »
+- [x] Préciser le signe : « Sensibilité 4,6 = −4,6 % pour +1 point de taux. »
+- [x] Préciser « taux à 10 ans (taux de marché des bons du Trésor, différent du taux directeur de BAM) ».
+- [x] Signaler que la sensibilité du monétaire (0,29) n'est pas fiable (R² = 0,01). *(Obsolète depuis la correction AMMC du 09/11/2026 : R² ≈ 0,3. À revoir avec la page Taux.)* *(Sans objet depuis la correction AMMC : R² ≈ 0,3.)*
 
 ### Onglet Anticipations (Résultat 10)
 
-- [ ] Ajouter une limite sous la carte : les 3 hausses (27/09/2022, 22/12/2022, 23/03/2023) tombent avant ou au moment de la rupture de méthode BAM (21/03/2023) ; avant cette date, le taux 13 semaines est celui de la dernière transaction et peut dater de plusieurs semaines. Vérifier pour le 23/03/2023 quelle courbe sert de « veille ».
-- [ ] Ajouter la taille de l'échantillon : « 17 décisions, dont 3 hausses et 3 baisses : résultat indicatif, pas une preuve statistique. »
-- [ ] Ajouter le constat sur les maintiens : « En septembre 2024 (−16 pb) et septembre 2025 (−17 pb), le marché attendait une baisse qui n'est pas venue. »
-- [ ] Ajouter une phrase d'explication : « Si le marché attend une hausse, personne ne prête à 3 mois au taux actuel : le taux 13 semaines monte avant la décision. » Exemple concret : 27/09/2022, taux 13 sem. la veille 1,91 % pour un nouveau taux directeur de 2,00 %.
-- [ ] Préciser que la « veille » peut dater d'une semaine en 2023–2025 (courbes BAM collectées le vendredi seulement).
-- [ ] Colonne « Écart avec le directeur » : retirer le vert/rouge (vert suggère « bon ») ; texte neutre, ou couleur selon la décision comme dans le graphique.
+- [x] Ajouter une limite sous la carte : les 3 hausses (27/09/2022, 22/12/2022, 23/03/2023) tombent avant ou au moment de la rupture de méthode BAM (21/03/2023) ; avant cette date, le taux 13 semaines est celui de la dernière transaction et peut dater de plusieurs semaines. Vérifier pour le 23/03/2023 quelle courbe sert de « veille ». *(Vérifié : pour la hausse du 23/03/2023, la dernière courbe disponible est celle du 20/03/2023, donc encore de l'ancienne méthode.)*
+- [x] Ajouter la taille de l'échantillon : « 17 décisions, dont 3 hausses et 3 baisses : résultat indicatif, pas une preuve statistique. »
+- [x] Ajouter le constat sur les maintiens : « En septembre 2024 (−16 pb) et septembre 2025 (−17 pb), le marché attendait une baisse qui n'est pas venue. » *(Maintiens retenus automatiquement : taux à 13 semaines au moins 10 pb sous le taux directeur la veille.)*
+- [x] Ajouter une phrase d'explication : « Si le marché attend une hausse, personne ne prête à 3 mois au taux actuel : le taux 13 semaines monte avant la décision. » Exemple concret : 27/09/2022, taux 13 sem. la veille 1,91 % pour un nouveau taux directeur de 2,00 %.
+- [x] Préciser que la « veille » peut dater d'une semaine en 2023–2025 (courbes BAM collectées le vendredi seulement).
+- [x] Colonne « Écart avec le directeur » : retirer le vert/rouge (vert suggère « bon ») ; texte neutre, ou couleur selon la décision comme dans le graphique.
 
 ### Onglet Flux des épargnants (Résultat 11)
 
-- [ ] Rendre la comparaison avec les fonds Actions possible : recalculer la corrélation des fonds de taux avec les flux en % de l'actif net (comme pour les Actions, 0,43), ou celle des Actions en dirhams. Puis retirer la phrase « les deux chiffres ne se comparent pas exactement ».
+- [x] Rendre la comparaison avec les fonds Actions possible : recalculer la corrélation des fonds de taux avec les flux en % de l'actif net (comme pour les Actions, 0,43), ou celle des Actions en dirhams. Puis retirer la phrase « les deux chiffres ne se comparent pas exactement ». *(Nouvelle colonne dbt en % de l'actif net : 0,17 pour les fonds MLT contre 0,43 pour les fonds Actions ; la conclusion tient.)*
 - [x] Étiqueter « 2022 (3 mois) » et « 2026 (jan.–oct.) » sous les barres.
-- [ ] Nuancer le titre « Les capitaux ont quitté les fonds MLT quand les taux ont remonté » : vrai en 2026 (−17 Md), mais en 2023 les taux ont aussi monté (+68 pb) et les OMLT ont reçu +18 Md. Ajouter : « En 2023, les épargnants ont acheté à taux élevés : bon timing avant le rallye de 2024 (+8,2 %). »
-- [ ] Ajouter le constat de rotation 2026 : « L'argent est passé des fonds longs (OMLT −17 Md) vers les fonds courts (Monétaire ≈ +37 Md, OCT ≈ +25 Md). »
-- [ ] Qualifier les corrélations : 0,15 et 0,09 sont faibles ; écrire « léger suivi de tendance » plutôt qu'un lien net.
-- [ ] Vérifier le nombre de semaines (213 ici, 212 dans le rapport) et dater les chiffres.
+- [x] Nuancer le titre « Les capitaux ont quitté les fonds MLT quand les taux ont remonté » : vrai en 2026 (−17 Md), mais en 2023 les taux ont aussi monté (+68 pb) et les OMLT ont reçu +18 Md. Ajouter : « En 2023, les épargnants ont acheté à taux élevés : bon timing avant le rallye de 2024 (+8,2 %). »
+- [x] Ajouter le constat de rotation 2026 : « L'argent est passé des fonds longs (OMLT −17 Md) vers les fonds courts (Monétaire ≈ +37 Md, OCT ≈ +25 Md). »
+- [x] Qualifier les corrélations : 0,15 et 0,09 sont faibles ; écrire « léger suivi de tendance » plutôt qu'un lien net. *(Barème du site : « aucun lien » sous 0,2.)*
+- [x] Vérifier le nombre de semaines (213 ici, 212 dans le rapport) et dater les chiffres. *(212 sur la copie figée, 213 en ligne (une semaine AMMC de plus) : le site affiche le nombre lu en base.)*
 
 ### Onglet Courbe des taux
 
-- [ ] Bug du graphique « L'écart entre taux courts et taux longs » : l'axe horizontal place les points à intervalle égal (axe par catégorie) alors que les données sont quotidiennes en 2022–2023 et 2026, hebdomadaires en 2023–2025. Résultat : avril 2023 → août 2024 (16 mois) prend autant de place que février → juin 2026 (4 mois). Passer à un vrai axe de temps.
-- [ ] Sur ce même graphique, griser ou annoter la période avant le 21/03/2023 (« ancienne méthode BAM ») : les paliers plats et le saut vertical du 10 ans (≈ 3,2 % → 4,2 %) viennent de taux de dernière transaction, pas d'un vrai mouvement quotidien.
-- [ ] Vérifier les pics vers le bas du taux 13 semaines vers mi-2025 (jusqu'à ≈ 1,7 %) : probablement des erreurs de collecte ou des jours sans courbe. Corriger ou exclure.
-- [ ] Ajouter l'explication clé sous le graphique des courbes : « Entre nov. 2025 et nov. 2026, le taux court n'a presque pas bougé (≈ 2,2 %) mais le 10 ans est passé de ≈ 2,85 % à 3,81 % : la courbe s'est pentue. C'est ce qui a fait perdre les OMLT en 2026 alors que le monétaire gagnait encore. »
-- [ ] Ajouter aussi : « De nov. 2024 à nov. 2025, toute la courbe a baissé (baisses de BAM) : bonne année pour les obligations. »
-- [ ] Couleurs : le bleu-vert désigne la courbe 2026 sur le 1er graphique et le taux à 10 ans sur le 2e ; utiliser des couleurs différentes pour éviter la confusion.
-- [ ] Dater la carte : le 3,81 % est au 03/11/2026, alors que le reste du site est au 23/10/2026.
+- [x] Bug du graphique « L'écart entre taux courts et taux longs » : l'axe horizontal place les points à intervalle égal (axe par catégorie) alors que les données sont quotidiennes en 2022–2023 et 2026, hebdomadaires en 2023–2025. Résultat : avril 2023 → août 2024 (16 mois) prend autant de place que février → juin 2026 (4 mois). Passer à un vrai axe de temps.
+- [x] Sur ce même graphique, griser ou annoter la période avant le 21/03/2023 (« ancienne méthode BAM ») : les paliers plats et le saut vertical du 10 ans (≈ 3,2 % → 4,2 %) viennent de taux de dernière transaction, pas d'un vrai mouvement quotidien.
+- [x] Vérifier les pics vers le bas du taux 13 semaines vers mi-2025 (jusqu'à ≈ 1,7 %) : probablement des erreurs de collecte ou des jours sans courbe. Corriger ou exclure. *(Vérifié : 3 cotations aberrantes de BAM (22/08, 03/09, 17/09/2025), écartées dans dbt (seed exclusions_courbe_bam).)*
+- [x] Ajouter l'explication clé sous le graphique des courbes : « Entre nov. 2025 et nov. 2026, le taux court n'a presque pas bougé (≈ 2,2 %) mais le 10 ans est passé de ≈ 2,85 % à 3,81 % : la courbe s'est pentue. C'est ce qui a fait perdre les OMLT en 2026 alors que le monétaire gagnait encore. »
+- [x] Ajouter aussi : « De nov. 2024 à nov. 2025, toute la courbe a baissé (baisses de BAM) : bonne année pour les obligations. »
+- [x] Couleurs : le bleu-vert désigne la courbe 2026 sur le 1er graphique et le taux à 10 ans sur le 2e ; utiliser des couleurs différentes pour éviter la confusion.
+- [x] Dater la carte : le 3,81 % est au 03/11/2026, alors que le reste du site est au 23/10/2026.
 
 ## Page Introductions en bourse
 
@@ -275,7 +275,7 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 - [ ] BUG : le tableau « Fraîcheur des données » est vide (une seule ligne « — »). Vérifier la requête ou la vue qui l'alimente (droits de lecture du compte du site, nom de vue, schéma analytics). Attendu : une ligne par source (AMMC, MASI, courbe BAM, HCP, IPO, PER) avec sa dernière date.
 - [x] Le tableau qualité affirme « Chaque page indique sur quelle fréquence le chiffre est calculé » : ce n'est pas encore le cas (voir Priorité 1). Soit le réaliser, soit corriger la phrase.
 - [ ] Ajouter une phrase à la ligne « changement de méthode en mars 2023 » : « Avant le 21/03/2023, BAM publiait le taux de la dernière transaction de chaque bon, parfois vieux de plusieurs semaines ; depuis, une courbe de référence calculée chaque jour. Les résultats sont donc donnés sur les deux périodes. »
-- [ ] Ajouter au tableau qualité, une fois vérifiés : la semaine anormale du monétaire (−1,22 %) et les pics du taux 13 semaines mi-2025.
+- [x] Ajouter au tableau qualité, une fois vérifiés : la semaine anormale du monétaire (−1,22 %) et les pics du taux 13 semaines mi-2025. *(Les deux lignes sont dans le tableau qualité de la page Méthode.)*
 - [ ] Reformuler la limite « Le MASI sert d'approximation… les dividendes n'y sont pas comptés » en disant le sens du biais : « Le MASI exclut les dividendes (≈ 3 %/an) que les fonds encaissent : la comparaison avantage les fonds. »
 - [ ] Ajouter une section « Définitions des indicateurs » : Sharpe = (rendement annualisé − rendement du monétaire) ÷ volatilité ; volatilité (écart-type hebdo × √52) ; pire baisse ; composition des portefeuilles (prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70, rééquilibrés chaque semaine).
 - [ ] Ajouter un petit lexique pour les recruteurs non spécialistes : OPCVM, OMLT, OCT, monétaire, point de base, PER, sensibilité, corrélation, R², séance, sursouscription.

@@ -14,3 +14,5 @@ sources:
         description: "Indices hebdomadaires des OPCVM par catégorie (AMMC, phase 1)"
       - name: ammc_flux
         description: "Souscriptions et rachats hebdomadaires des OPCVM par catégorie (AMMC, phase 1)"
+      - name: ammc_actif_net
+        description: "Actif net hebdomadaire des OPCVM par catégorie (AMMC) : sert à exprimer les flux en % de l'actif net"

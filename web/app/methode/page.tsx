@@ -65,6 +65,12 @@ const QUALITE = [
       "Indices recalculés dans dbt à partir des variations publiées, semaine par semaine, avec la justification de chaque correction (table corrections_indices_ammc). Sans cela, le monétaire paraissait plus risqué que les fonds CT.",
   },
   {
+    probleme:
+      "Courbe des taux de Bank Al-Maghrib : quelques bons tout juste émis cotés très en dessous de leurs voisins, un seul jour",
+    solution:
+      "Cotations écartées dans dbt (table exclusions_courbe_bam, avec la justification de chacune) : elles faisaient plonger le taux à 13 semaines.",
+  },
+  {
     probleme: "Plusieurs chiffres légitimes pour une même mesure du MASI (chaque séance, chaque vendredi, fin de mois)",
     solution: "Sous chaque chiffre du MASI, le site indique sa fréquence et sa période (voir « Pourquoi le MASI a plusieurs chiffres »).",
   },

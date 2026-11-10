@@ -1,11 +1,16 @@
 -- Taux BAM interpolés à maturités fixes (13 semaines, 1, 2, 5, 10 ans), par jour de courbe
+-- Les points listés dans le seed exclusions_courbe_bam (cotations aberrantes d'un jour) sont écartés.
 with points as (
     select
-        date_courbe,
-        (date_echeance - date_courbe) / 365.0 as maturite_ans,
-        taux_pct
-    from {{ source('staging', 'bam_courbe_taux') }}
-    where date_echeance > date_courbe
+        b.date_courbe,
+        (b.date_echeance - b.date_courbe) / 365.0 as maturite_ans,
+        b.taux_pct
+    from {{ source('staging', 'bam_courbe_taux') }} b
+    left join {{ ref('exclusions_courbe_bam') }} x
+        on x.date_courbe = b.date_courbe
+       and x.date_echeance = b.date_echeance
+    where b.date_echeance > b.date_courbe
+      and x.date_courbe is null
 ),
 
 cibles as (

@@ -170,6 +170,8 @@ Période commune : vendredis AMMC couverts par l'historique du MASI. Valeurs de 
 | `analytics.synthese_annuel` | `actif`, `annee`, `nb_semaines` (1re et dernière année partielles), `rendement_pct`, `premiere_date`, `derniere_date`, `annee_partielle` (Priorité 2 des corrections : étiquette « 2026 (janv.–oct.) ») |
 | `analytics.compositions_portefeuilles` (seed dbt, Priorité 8 des corrections) | `portefeuille`, `placement` (Monétaire, OMLT, Fonds Actions), `poids_pct` : prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70. Lu par `synthese_rendements_hebdo` (les poids n'y sont plus écrits en dur) et par la barre empilée du site. Test : chaque portefeuille fait 100 %. |
 | `analytics.corrections_indices_ammc` (seed dbt) et `analytics.ammc_indices_corriges` (modèle) | 3 semaines où l'indice publié par l'AMMC contredit ses propres variations (Monétaire 11/04/2025 et 16/05/2025, Obligations CT 16/05/2025 ; vérifié dans les fichiers Excel d'origine). Le modèle recalcule l'indice à partir de la variation publiée (`indice`, `indice_publie`, `corrige`) et remplace `staging.ammc_indices` dans `synthese_rendements_hebdo` et `obligations_vs_taux_hebdo`. `dw.fact_opcvm_hebdo` (Power BI) n'est pas corrigé. |
+| `analytics.exclusions_courbe_bam` (seed dbt) | 3 cotations de la courbe BAM écartées par `courbe_taux_quotidienne` (22/08, 03/09 et 17/09/2025 : un bon à 13 semaines tout juste émis coté ≈ 1,68 % contre ≈ 2,1–2,2 % pour ses voisins, qui faisait plonger le taux à 13 semaines interpolé). Seuls cas de l'historique où une maturité fixe s'écarte de plus de 0,2 point de la veille et du lendemain. |
+| `analytics.flux_fonds_taux_timing` (colonnes ajoutées le 10/11/2026) | `corr_flux_pct_rend_passe`, `corr_flux_pct_rend_futur` : même corrélation que `corr_flux_rend_*`, mais avec le flux en % de l'actif net de la semaine précédente (source `staging.ammc_actif_net`), comme `dw.v_kpi_timing` pour les fonds Actions. |
 | `analytics.synthese_correlations` (chaque paire une fois, `actif_1 < actif_2` par ordre alphabétique, hors portefeuilles) | `actif_1`, `actif_2`, `nb_semaines`, `correlation` (de −1 à 1, pas un %) |
 | `analytics.synthese_rendements_hebdo` | `date`, `actif`, `rendement_hebdo` (**fraction**, 0,01 = 1 %) |
 
@@ -270,7 +272,7 @@ Plusieurs méthodes valables donnent des chiffres différents. Le site suit ce t
 | Résultat 1 : MASI +21 %, +26 %, −8 % | `analytics.synthese_annuel` (vendredis AMMC, 2026 au 16/10) | `dw.v_masi_annuel` : +22,2 %, +27,6 %, −12,2 % (dernière séance de l'année, 2026 au 30/10) |
 | Résultats 2 et 3 : volatilité, pire drawdown du MASI | Données quotidiennes (`dw`) : −19,0 % | Résultat 15 : données hebdomadaires, volatilité 15,2 %, pire baisse −16,2 % |
 | Résultat 9 : sensibilité MLT 4,1, R² = 0,57 | `analytics.sensibilite_fonds_taux`, ligne « Toute la période » (201 semaines) | Ligne « Depuis le 24/03/2023 » : 4,59, R² = 0,379 |
-| Résultat 11 : corrélation flux 0,15 (MLT) et 0,43 (Actions) | 0,15 : flux en dirhams. 0,43 : flux en % de l'actif net | Mesures différentes : le site le signale s'il les compare |
+| Résultat 11 : corrélation flux 0,17 (MLT) et 0,43 (Actions) | Les deux en % de l'actif net : `corr_flux_pct_rend_passe` (MLT) et `dw.v_kpi_timing.corr_passe` (Actions) | 0,15 (README) : flux MLT en dirhams (`corr_flux_rend_passe`), ne se compare pas au 0,43 |
 | Résultat 15 : placements | `analytics.synthese_classes_actifs` (9 lignes, 7 dans le README). Sharpe du Monétaire : stocké `0,00`, affiché `—` | — |
 
 ## Chiffres ajoutés en dbt (tâche A8)
