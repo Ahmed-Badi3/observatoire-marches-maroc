@@ -194,6 +194,18 @@ async function lireDecisionsBam() {
 }
 export const decisionsBam = () => sur("décisions BAM", lireDecisionsBam);
 
+// Dates des hausses du taux directeur (toutes, y compris avant le début de l'historique du MASI),
+// et première séance du MASI : pour expliquer pourquoi il n'y a pas de barre « Hausse ».
+async function lireHaussesBam() {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
+  return plat(await sql()`
+    SELECT to_char(date_effet, 'YYYY-MM-DD') AS date_effet,
+           (SELECT to_char(min(date), 'YYYY-MM-DD') FROM dw.fact_masi_quotidien) AS debut_masi
+    FROM analytics.decisions_bam WHERE type_decision = 'hausse' ORDER BY date_effet`);
+}
+export const haussesBam = () => sur("hausses du taux directeur", lireHaussesBam);
+
 /* ---------- Taux et obligations ---------- */
 
 async function lireFondsTauxAnnuel() {

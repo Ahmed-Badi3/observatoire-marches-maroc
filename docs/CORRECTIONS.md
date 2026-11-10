@@ -135,24 +135,24 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 ### Onglet MASI et PIB (Résultat 5)
 
 - [x] Étiqueter « 2026 T4 (en cours) » : la barre −12,3 % ne couvre qu'octobre.
-- [ ] Remplacer « Le recul récent du MASI ne vient pas d'un ralentissement économique mais de la valorisation » (raisonnement circulaire) par : « Le recul du MASI en 2026 ne s'explique pas par l'économie, qui croît encore de 4 % : il suit deux années de forte hausse et la remontée des taux. »
-- [ ] Ajouter dans « Méthode et sources » : le PIB est une croissance réelle (hors inflation), le MASI une variation nominale ; l'inflation étant très basse, le message ne change pas.
-- [ ] Ne pas affirmer que la Bourse « annonce » l'économie : écrire « à tester sur une période plus longue » (seulement 8 à 9 trimestres).
+- [x] Remplacer « Le recul récent du MASI ne vient pas d'un ralentissement économique mais de la valorisation » (raisonnement circulaire) par : « Le recul du MASI en 2026 ne s'explique pas par l'économie, qui croît encore de 4 % : il suit deux années de forte hausse et la remontée des taux. »
+- [x] Ajouter dans « Méthode et sources » : le PIB est une croissance réelle (hors inflation), le MASI une variation nominale ; l'inflation étant très basse, le message ne change pas.
+- [x] Ne pas affirmer que la Bourse « annonce » l'économie : écrire « à tester sur une période plus longue » (seulement 8 à 9 trimestres).
 
 ### Onglet Nominal et réel (Résultat 6)
 
-- [ ] Nuance importante sur la carte : la période étudiée commence en novembre 2023, après le pic d'inflation (+10,1 % en février 2023). Écrire : « Sur la période étudiée, qui commence après le pic d'inflation, celle-ci a peu pesé. »
+- [x] Nuance importante sur la carte : la période étudiée commence en novembre 2023, après le pic d'inflation (+10,1 % en février 2023). Écrire : « Sur la période étudiée, qui commence après le pic d'inflation, celle-ci a peu pesé. »
 - [x] Le +50,5 % nominal est un 3e chiffre différent du MASI : voir Priorité 1.
 - [x] Graphique de l'inflation : segments droits au lieu de la courbe lissée (les données sont mensuelles).
-- [ ] Phrase sous le graphique de l'inflation : « Fin 2025 et mi-2026, les prix ont même légèrement baissé (déflation). »
+- [x] Phrase sous le graphique de l'inflation : « Fin 2025 et mi-2026, les prix ont même légèrement baissé (déflation). » *(Les mois de déflation sont lus dans la série HCP, pas écrits à la main.)*
 
 ### Onglet Décisions de la banque centrale (Résultat 7)
 
-- [ ] Expliquer pourquoi il n'y a pas de barre « Hausse » : les 3 hausses (sept. 2022, déc. 2022, mars 2023) sont avant le début de l'historique du MASI (≈ nov. 2023, 3 ans gratuits). Dire aussi pourquoi 9 maintiens seulement sur les décisions de la période.
-- [ ] Définir « performance habituelle » dans la note (moyenne du MASI sur 20 séances sur quelle période ?).
-- [ ] Ajouter une limite : les 3 baisses (juin 2024, déc. 2024, mars 2025) tombent toutes pendant la forte hausse de 2024–2025. Comparé à une moyenne qui inclut la baisse de 2026, le MASI de ces périodes paraît « anormal » même sans effet de la décision. Option : comparer à la moyenne des 60 séances précédant chaque décision.
-- [ ] Avec 3 cas, montrer chaque baisse séparément (un point par décision) plutôt qu'une seule moyenne, pour voir si les 3 vont dans le même sens.
-- [ ] Lien avec l'onglet Anticipations : les baisses étaient des surprises pour le marché des taux (écart −2 à +8 pb), ce qui rend une réaction du MASI après l'annonce plus plausible. Ajouter cette phrase.
+- [x] Expliquer pourquoi il n'y a pas de barre « Hausse » : les 3 hausses (sept. 2022, déc. 2022, mars 2023) sont avant le début de l'historique du MASI (≈ nov. 2023, 3 ans gratuits). Dire aussi pourquoi 9 maintiens seulement sur les décisions de la période.
+- [x] Définir « performance habituelle » dans la note (moyenne du MASI sur 20 séances sur quelle période ?).
+- [x] Ajouter une limite : les 3 baisses (juin 2024, déc. 2024, mars 2025) tombent toutes pendant la forte hausse de 2024–2025. Comparé à une moyenne qui inclut la baisse de 2026, le MASI de ces périodes paraît « anormal » même sans effet de la décision. Option : comparer à la moyenne des 60 séances précédant chaque décision. *(Limite ajoutée ; l'option « 60 séances avant chaque décision » demanderait un nouveau calcul dbt, non fait.)*
+- [x] Avec 3 cas, montrer chaque baisse séparément (un point par décision) plutôt qu'une seule moyenne, pour voir si les 3 vont dans le même sens.
+- [x] Lien avec l'onglet Anticipations : les baisses étaient des surprises pour le marché des taux (écart −2 à +8 pb), ce qui rend une réaction du MASI après l'annonce plus plausible. Ajouter cette phrase.
 
 ## Page Taux et obligations
 

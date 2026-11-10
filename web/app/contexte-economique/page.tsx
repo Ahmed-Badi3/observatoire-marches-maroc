@@ -16,6 +16,8 @@ import { Onglets } from "@/components/observatoire/onglets";
 import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-triable";
 import {
   decisionsBam,
+  haussesBam,
+  resumeAnticipations,
   inflation,
   inflationPic,
   macroPic,
@@ -26,10 +28,12 @@ import {
 } from "@/lib/donnees-pages";
 import {
   LIBELLE_FREQUENCE,
+  formatDate,
   formatDateCourte,
   formatMoisAnnee,
   formatPeriode,
   formatPoints,
+  formatPointsDeBase,
   formatPourcentage,
   formatTrimestre,
 } from "@/lib/format";
@@ -46,6 +50,9 @@ function ongletPib(lignesMacro: Ligne[] | null, lignesPic: Ligne[] | null) {
   const avecPeriode = (l: Ligne): Ligne => ({ ...l, periode: formatTrimestre(l.annee, l.trimestre, l.trimestre_en_cours) });
   const macro = lignesMacro.map(avecPeriode);
   const p = lignesPic?.[0] ? avecPeriode(lignesPic[0]) : undefined;
+  const avecPib = macro.filter((m) => m.croissance_pib_pct !== null);
+  const pibRecent = avecPib.at(-1);
+  const nbTrimestres = avecPib.length;
   const jeu: Jeu = {
     id: "pib",
     libelle: "MASI et PIB",
@@ -77,7 +84,11 @@ function ongletPib(lignesMacro: Ligne[] | null, lignesPic: Ligne[] | null) {
           ]}
           precision={`${LIBELLE_FREQUENCE.trimestriel}, variation sur un an · MASI hors dividendes`}
           conclusion="C'est le trimestre où l'écart entre la Bourse et l'économie a été le plus grand."
-          details="Le recul récent du MASI ne vient pas d'un ralentissement économique mais de la valorisation."
+          details={`${
+            pibRecent
+              ? `Le recul du MASI en ${pibRecent.annee} ne s'explique pas par l'économie, qui croît encore de ${formatPourcentage(pibRecent.croissance_pib_pct, { signe: false })} sur un an (${pibRecent.periode}) : il suit deux années de forte hausse et la remontée des taux longs. `
+              : ""
+          }Avec seulement ${nbTrimestres} trimestres où les deux chiffres existent, l'idée que la Bourse anticipe l'économie reste à tester sur une période plus longue.`}
         />
       }
       graphiques={
@@ -123,6 +134,10 @@ function ongletReel(reel: Ligne[] | null, infl: Ligne[] | null, pic: Ligne[] | n
   const premier = reel[0];
   const dernier = reel[reel.length - 1];
   const p = pic?.[0];
+  // Mois où l'inflation sur un an est négative (déflation), lus dans la série HCP.
+  const moisDeflation = (infl ?? [])
+    .filter((l) => Number(l.inflation_annuelle_pct) < 0)
+    .map((l) => formatMoisAnnee(l.date));
 
   return (
     <MiseEnPageResultat
@@ -137,7 +152,7 @@ function ongletReel(reel: Ligne[] | null, infl: Ligne[] | null, pic: Ligne[] | n
             { etiquette: "MASI en pouvoir d'achat (réel, après inflation)", valeur: formatPourcentage(dernier.reel_pct) },
           ]}
           precision={formatPeriode(premier.date, dernier.date, "mensuel")}
-          conclusion="En pouvoir d'achat, le MASI gagne presque autant."
+          conclusion="En pouvoir d'achat, le MASI gagne presque autant : sur la période étudiée, qui commence après le pic d'inflation, celle-ci a peu pesé."
           details={`Le calcul s'arrête au dernier mois d'inflation publié par le HCP : ces chiffres ne se comparent donc pas directement au rendement de l'accueil, relevé chaque vendredi.${
             p
               ? ` L'inflation a atteint ${formatPourcentage(p.inflation_annuelle_pct)} en ${formatMoisAnnee(p.date)}, puis elle est retombée : le vrai risque de la période a été la volatilité.`
@@ -162,7 +177,11 @@ function ongletReel(reel: Ligne[] | null, infl: Ligne[] | null, pic: Ligne[] | n
           {infl && infl.length > 0 && (
             <CarteGraphique
               titre="L'inflation est retombée après son pic"
-              note="Inflation sur un an, mois par mois. Source : HCP."
+              note={`Inflation sur un an, mois par mois. ${
+                moisDeflation.length > 0
+                  ? `Les prix ont même légèrement baissé sur un an (déflation) en ${moisDeflation.join(", ")}. `
+                  : ""
+              }Source : HCP.`}
             >
               <GraphiqueLignes
                 jeux={[
@@ -188,10 +207,37 @@ function ongletReel(reel: Ligne[] | null, infl: Ligne[] | null, pic: Ligne[] | n
 }
 
 /* ---------- Résultat 7 : décisions de Bank Al-Maghrib ---------- */
-function ongletBam(moyennes: Ligne[] | null, decisions: Ligne[] | null) {
+function ongletBam(
+  moyennes: Ligne[] | null,
+  decisions: Ligne[] | null,
+  hausses: Ligne[] | null,
+  anticipations: Ligne[] | null,
+) {
   if (!moyennes || moyennes.length === 0) return <Indisponible />;
   const baisse = moyennes.find((m) => m.type_decision === "baisse");
   const maintien = moyennes.find((m) => m.type_decision === "maintien");
+  const baisses = (decisions ?? []).filter((d) => d.type_decision === "baisse");
+  const datesBaisses = baisses.map((d) => formatMoisAnnee(d.date_annonce)).join(", ");
+  const datesHausses = (hausses ?? []).map((h) => formatMoisAnnee(h.date_effet)).join(", ");
+  const debutMasi = hausses?.[0]?.debut_masi;
+  const anticipBaisse = anticipations?.find((a) => a.decision === "Baisse");
+  // Chaque baisse séparément : avec si peu de cas, on regarde si elles vont toutes dans le même sens.
+  const jeuBaisses: Jeu = {
+    id: "baisses",
+    libelle: "Chaque baisse",
+    series: [
+      { cle: "j5", libelle: "5 séances après", couleur: "var(--serie-1)" },
+      { cle: "j20", libelle: "20 séances après", couleur: "var(--serie-3)" },
+    ],
+    donnees: numeriser(
+      baisses.map((d) => ({
+        categorie: formatMoisAnnee(d.date_annonce),
+        j5: d.rendement_anormal_5_pct,
+        j20: d.rendement_anormal_20_pct,
+      })),
+      ["j5", "j20"],
+    ),
+  };
   const jeu: Jeu = {
     id: "moy",
     libelle: "Moyennes",
@@ -239,19 +285,26 @@ function ongletBam(moyennes: Ligne[] | null, decisions: Ligne[] | null) {
           ]}
           precision={`${LIBELLE_FREQUENCE.quotidien}, 20 séances après chaque annonce · MASI hors dividendes`}
           conclusion="Très peu de baisses : c'est une corrélation, pas une preuve de cause."
-          details="Chaque chiffre est l'écart moyen entre la performance du MASI sur les 20 séances qui suivent l'annonce et sa performance habituelle, en points de pourcentage."
+          details={`Chaque chiffre est l'écart moyen entre la performance du MASI sur les 20 séances qui suivent l'annonce et sa performance habituelle : la performance moyenne du MASI sur 20 séances, en partant de n'importe quel jour de son historique. Limite : les baisses (${datesBaisses}) tombent toutes pendant la forte hausse de 2024–2025 ; comparé à une moyenne qui inclut la baisse récente, le MASI de ces périodes paraît « anormal » même sans effet de la décision.${
+            anticipBaisse
+              ? ` Les baisses étaient pourtant des surprises pour le marché des taux (la veille, écart du taux à 13 semaines avec le taux directeur de ${formatPointsDeBase(anticipBaisse.ecart_min)} à ${formatPointsDeBase(anticipBaisse.ecart_max)}, voir « Taux et obligations ») : une réaction du MASI après l'annonce est donc plausible.`
+              : ""
+          }`}
         />
       }
       graphiques={
         <CarteGraphique
           titre="Après une baisse du taux directeur, le MASI a mieux fait que d'habitude"
-          note="Écart entre la performance du MASI après l'annonce et sa performance habituelle sur la même durée. Entre parenthèses : le nombre de décisions. Sources : Bank Al-Maghrib, Bourse de Casablanca."
+          note={`Écart entre la performance du MASI après l'annonce et sa performance habituelle sur la même durée. Entre parenthèses : le nombre de décisions, prises depuis le début de l'historique du MASI${
+            debutMasi ? ` (${formatDate(debutMasi)})` : ""
+          }. Pas de barre « Hausse » : les hausses (${datesHausses || "—"}) ont eu lieu avant ce début. Sources : Bank Al-Maghrib, Bourse de Casablanca.`}
         >
           <GraphiqueBarres
-            jeux={[jeu]}
+            jeux={[jeu, jeuBaisses]}
             format="points"
             decimalesInfo={1}
-            description="Écart moyen du MASI après une baisse ou un maintien du taux directeur"
+            labelChoix="Affichage"
+            description="Écart du MASI après une baisse ou un maintien du taux directeur, en moyenne ou baisse par baisse"
           />
         </CarteGraphique>
       }
@@ -281,6 +334,8 @@ export default async function PageContexteEconomique() {
   const picInfl = await inflationPic();
   const moyennes = await moyennesBam();
   const decisions = await decisionsBam();
+  const hausses = await haussesBam();
+  const anticipations = await resumeAnticipations();
 
   // Bandeau de KPI : les derniers chiffres de la page, et en pastille le chiffre de comparaison lu en base.
   const reelDernier = reel?.[reel.length - 1];
@@ -331,7 +386,7 @@ export default async function PageContexteEconomique() {
         onglets={[
           { id: "pib", libelle: "MASI et PIB", contenu: ongletPib(macro, picMacro) },
           { id: "reel", libelle: "Nominal et réel", contenu: ongletReel(reel, infl, picInfl) },
-          { id: "bam", libelle: "Décisions de la banque centrale", contenu: ongletBam(moyennes, decisions) },
+          { id: "bam", libelle: "Décisions de la banque centrale", contenu: ongletBam(moyennes, decisions, hausses, anticipations) },
         ]}
       />
     </>

@@ -5,6 +5,7 @@ export const LIMITES = [
   "Corrélation n'est pas causalité, et les fenêtres de quatre semaines qui se chevauchent surestiment la significativité.",
   "Le MASI sert d'approximation de la valeur des fonds Actions : les dividendes n'y sont pas comptés.",
   "L'historique gratuit du MASI est court, et la période étudiée contient deux années de forte hausse.",
+  "La croissance du PIB est réelle (hors inflation), la variation du MASI est nominale : l'inflation de la période étant très basse, la comparaison n'en est presque pas faussée.",
   "Les PER et rendements du dividende sont des prévisions de sociétés de bourse, aux périmètres et méthodes différents.",
   "Peu de décisions de Bank Al-Maghrib dans la période : les conclusions sont fragiles.",
   "Le taux à 13 semaines dépend aussi des besoins de financement du Trésor, pas seulement des anticipations de taux.",
