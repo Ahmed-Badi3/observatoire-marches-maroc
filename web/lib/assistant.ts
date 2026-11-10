@@ -20,7 +20,7 @@ import {
   valorisation,
 } from "@/lib/donnees-pages";
 import { LIBELLE_FREQUENCE } from "@/lib/format";
-import { LIMITES } from "@/lib/methode";
+import { DEFINITIONS, LIMITES } from "@/lib/methode";
 
 // Assistant IA du site (Priorité 7 de docs/CORRECTIONS.md), version 1.
 // Image : un guichetier qui a sous les yeux une fiche avec tous les résultats du site, et qui n'a le droit
@@ -65,6 +65,7 @@ export async function construireFiche(): Promise<string> {
     fonds_de_taux_flux_annuels_md: await fluxFondsTaux(),
     fonds_de_taux_timing_flux: await timingFluxTaux(),
     introductions_en_bourse: await ipo(),
+    definitions: Object.fromEntries(DEFINITIONS),
     limites: LIMITES,
   };
   return JSON.stringify(fiche);

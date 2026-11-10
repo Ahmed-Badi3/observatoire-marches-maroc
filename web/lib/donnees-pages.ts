@@ -373,6 +373,24 @@ async function lireSharpeExtremes() {
 }
 export const sharpeExtremes = () => sur("extrêmes du Sharpe", lireSharpeExtremes);
 
+async function lireBase100Actions() {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
+  return plat(await sql()`
+    SELECT actif, to_char(date, 'YYYY-MM-DD') AS date, base_100
+    FROM analytics.synthese_base100 WHERE actif IN ('MASI', 'Fonds Actions') ORDER BY date, actif`);
+}
+export const base100Actions = () => sur("base 100 MASI et fonds Actions", lireBase100Actions);
+
+async function lireFondsVsMasi() {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
+  return plat(await sql()`
+    SELECT nb_semaines, ecart_moyen_annualise_pts, tracking_error_pct, ratio_information
+    FROM analytics.synthese_fonds_vs_masi`);
+}
+export const fondsVsMasi = () => sur("fonds Actions face au MASI", lireFondsVsMasi);
+
 async function lireCompositions() {
   "use cache";
   cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });

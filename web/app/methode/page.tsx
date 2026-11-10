@@ -6,7 +6,9 @@ import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-
 import { placements } from "@/lib/donnees";
 import { fraicheur, indicesSynthese, rendementReel, type Ligne } from "@/lib/donnees-pages";
 import { LIBELLE_FREQUENCE, formatPeriode, formatPourcentage, type Frequence, type Valeur } from "@/lib/format";
-import { LIMITES } from "@/lib/methode";
+import { DEFINITIONS, LEXIQUE, LIMITES } from "@/lib/methode";
+import { compositions } from "@/lib/donnees-pages";
+import { formatNombre } from "@/lib/format";
 import { URL_GITHUB } from "@/lib/pages";
 
 export const metadata: Metadata = { title: "Méthode et sources" };
@@ -52,7 +54,8 @@ const QUALITE = [
   },
   {
     probleme: "Courbe des taux de Bank Al-Maghrib : changement de méthode en mars 2023",
-    solution: "Les analyses de sensibilité sont aussi faites depuis le changement de méthode.",
+    solution:
+      "Avant, BAM publiait le taux de la dernière transaction de chaque bon, parfois vieux de plusieurs semaines ; depuis, une courbe de référence calculée chaque jour. Les résultats sont donc donnés sur les deux périodes, et la période ancienne est grisée sur les graphiques.",
   },
   {
     probleme: "Courbe des taux : échéances différentes chaque jour",
@@ -146,6 +149,14 @@ const colonnesFraicheur: Colonne[] = [
 export default async function PageMethode() {
   // L'une après l'autre : la connexion à la base est unique (lib/db.ts).
   const dates = await fraicheur();
+  const compo = await compositions();
+  // « prudent 50/40/10 » : poids lus en base (Monétaire / OMLT / fonds Actions).
+  const portefeuilles = [...new Set((compo ?? []).map((c) => String(c.portefeuille)))].map((p) => {
+    const poids = ["Monétaire", "OMLT", "Fonds Actions"].map((pl) =>
+      formatNombre(compo?.find((c) => c.portefeuille === p && c.placement === pl)?.poids_pct, { decimales: 0 }),
+    );
+    return `${p.replace("Portefeuille ", "")} ${poids.join("/")}`;
+  });
   const masiHebdo = (await placements())?.find((l) => l.actif === "MASI");
   const masiQuotidien = (await indicesSynthese())?.find((l) => l.indice === "MASI");
   const masiMensuel = await rendementReel();
@@ -292,6 +303,35 @@ export default async function PageMethode() {
             offre gratuite pour améliorer ses services : n&apos;y écrivez rien de personnel.
           </li>
         </ul>
+      </CarteGraphique>
+
+      <CarteGraphique titre="Définitions des indicateurs">
+        <dl className="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2">
+          {DEFINITIONS.map(([terme, definition]) => (
+            <div key={terme}>
+              <dt className="font-semibold text-texte">{terme}</dt>
+              <dd className="text-texte-secondaire">{definition}</dd>
+            </div>
+          ))}
+          <div>
+            <dt className="font-semibold text-texte">Portefeuilles types</dt>
+            <dd className="text-texte-secondaire">
+              Construits à partir des indices de catégorie de l&apos;AMMC, rééquilibrés chaque semaine (Monétaire / OMLT /
+              fonds Actions, en %) : {portefeuilles.join(", ") || "—"}.
+            </dd>
+          </div>
+        </dl>
+      </CarteGraphique>
+
+      <CarteGraphique titre="Petit lexique">
+        <dl className="grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+          {LEXIQUE.map(([terme, definition]) => (
+            <div key={terme}>
+              <dt className="font-semibold text-texte">{terme}</dt>
+              <dd className="text-texte-secondaire">{definition}</dd>
+            </div>
+          ))}
+        </dl>
       </CarteGraphique>
 
       <CarteGraphique titre="Limites : ce que les chiffres ne disent pas">

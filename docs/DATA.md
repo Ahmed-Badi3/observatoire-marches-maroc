@@ -174,6 +174,8 @@ Période commune : vendredis AMMC couverts par l'historique du MASI. Valeurs de 
 | `analytics.flux_fonds_taux_timing` (colonnes ajoutées le 10/11/2026) | `corr_flux_pct_rend_passe`, `corr_flux_pct_rend_futur` : même corrélation que `corr_flux_rend_*`, mais avec le flux en % de l'actif net de la semaine précédente (source `staging.ammc_actif_net`), comme `dw.v_kpi_timing` pour les fonds Actions. |
 | `analytics.ipo_performance` (colonnes ajoutées le 10/11/2026) | `date_achat_j20`, `duree_detention_jours`, `masi_depuis_j20_pct`, `anormal_achat_j20_pts` : achat à la 20e séance comparé au MASI sur exactement la même période. |
 | `analytics.ipo_trajectoires` (modèle, 10/11/2026) | `ticker`, `societe`, `n_seance` (0 = prix d'IPO, jusqu'à 120), `base_100` : cours en base 100 au prix d'introduction. |
+| `analytics.synthese_base100` (modèle, 10/11/2026) | `actif`, `date`, `base_100` : valeur de 100 DH placés le premier vendredi de la période commune. |
+| `analytics.synthese_fonds_vs_masi` (modèle, 10/11/2026) | `nb_semaines`, `debut`, `fin`, `ecart_moyen_annualise_pts`, `tracking_error_pct`, `ratio_information` : fonds Actions face au MASI. |
 | `analytics.synthese_correlations` (chaque paire une fois, `actif_1 < actif_2` par ordre alphabétique, hors portefeuilles) | `actif_1`, `actif_2`, `nb_semaines`, `correlation` (de −1 à 1, pas un %) |
 | `analytics.synthese_rendements_hebdo` | `date`, `actif`, `rendement_hebdo` (**fraction**, 0,01 = 1 %) |
 

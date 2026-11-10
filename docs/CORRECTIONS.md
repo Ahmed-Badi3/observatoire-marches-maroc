@@ -237,48 +237,48 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 ### Onglet Rendement et risque (Résultat 15)
 
-- [ ] ERREUR de définition sous le graphique en barres : « Sharpe = rendement annualisé divisé par la volatilité » est faux. Le calcul réel est (rendement annualisé − taux sans risque) ÷ volatilité : MASI (12,8 − 2,8) ÷ 15,1 = 0,66 (sans le taux sans risque on obtiendrait 0,85). Corriger le texte.
-- [ ] Remplacer « Le Monétaire n'est pas affiché : son ratio n'est pas significatif » par « Le Monétaire sert de taux sans risque : son Sharpe vaut 0 par construction », et retirer sa place vide dans le graphique (elle ressemble à une donnée manquante).
-- [ ] Trier les barres du Sharpe par volatilité croissante ou par Sharpe, pas par ordre alphabétique.
-- [ ] Les noms coupés sous les barres (« …feuille dynamique », « …ortefeuille équilibré ») : raccourcir (« Dynamique », « Équilibré », « Prudent ») ou passer en barres horizontales.
-- [ ] Doublon avec l'accueil : même nuage de points et même tableau. Garder le détail ici et, sur l'accueil, seulement le nuage + un lien « Voir la synthèse » (ou l'inverse).
-- [ ] Ajouter la légende des couleurs du nuage (portefeuilles types / fonds et indices), comme sur l'accueil.
-- [ ] Préciser la base des colonnes « % du rendement du MASI » et « % du risque du MASI » : calculées sur le rendement annualisé et la volatilité (équilibré : 7,4 ÷ 12,8 = 58 % ; 7,5 ÷ 15,1 = 50 %).
-- [ ] Mettre en avant les OCT : 26 % du rendement du MASI pour seulement 5 % de son risque.
+- [x] ERREUR de définition sous le graphique en barres : « Sharpe = rendement annualisé divisé par la volatilité » est faux. Le calcul réel est (rendement annualisé − taux sans risque) ÷ volatilité : MASI (12,8 − 2,8) ÷ 15,1 = 0,66 (sans le taux sans risque on obtiendrait 0,85). Corriger le texte.
+- [x] Remplacer « Le Monétaire n'est pas affiché : son ratio n'est pas significatif » par « Le Monétaire sert de taux sans risque : son Sharpe vaut 0 par construction », et retirer sa place vide dans le graphique (elle ressemble à une donnée manquante).
+- [x] Trier les barres du Sharpe par volatilité croissante ou par Sharpe, pas par ordre alphabétique.
+- [x] Les noms coupés sous les barres (« …feuille dynamique », « …ortefeuille équilibré ») : raccourcir (« Dynamique », « Équilibré », « Prudent ») ou passer en barres horizontales.
+- [x] Doublon avec l'accueil : même nuage de points et même tableau. Garder le détail ici et, sur l'accueil, seulement le nuage + un lien « Voir la synthèse » (ou l'inverse). *(Détail gardé dans la Synthèse ; sur l'accueil, nuage + notes + lien « Tous les placements côte à côte ».)*
+- [x] Ajouter la légende des couleurs du nuage (portefeuilles types / fonds et indices), comme sur l'accueil.
+- [x] Préciser la base des colonnes « % du rendement du MASI » et « % du risque du MASI » : calculées sur le rendement annualisé et la volatilité (équilibré : 7,4 ÷ 12,8 = 58 % ; 7,5 ÷ 15,1 = 50 %).
+- [x] Mettre en avant les OCT : 26 % du rendement du MASI pour seulement 5 % de son risque. *(Après correction AMMC : 26 % du rendement du MASI pour 2,6 % de son risque (lus en base).)*
 - [x] Corriger le titre de la carte « Plus de rendement, c'est autant plus de risque » → « Plus de rendement, c'est plus de risque », et ajouter : « écarts de Sharpe trop faibles pour départager les placements sur moins de 3 ans ».
 
 ### Onglet Année par année (Résultat 16)
 
-- [ ] La carte ne démontre pas son titre : « Le classement change d'une année à l'autre » avec en gros −8,7 % (fonds Actions 2026). Mettre plutôt en gros le changement de classement, ex. « Fonds Actions : 1er en 2024 (+22,6 %), dernier en 2026 (−8,7 %) ».
-- [ ] Ajouter au tableau Monétaire, OCT, OMLT et Diversifiés : sans eux, on ne voit pas le « classement » (en 2026, OCT ≈ +2,1 % et Monétaire ≈ +2,0 % passent en tête). Option : afficher le rang (1er…9e) dans chaque case.
+- [x] La carte ne démontre pas son titre : « Le classement change d'une année à l'autre » avec en gros −8,7 % (fonds Actions 2026). Mettre plutôt en gros le changement de classement, ex. « Fonds Actions : 1er en 2024 (+22,6 %), dernier en 2026 (−8,7 %) ».
+- [x] Ajouter au tableau Monétaire, OCT, OMLT et Diversifiés : sans eux, on ne voit pas le « classement » (en 2026, OCT ≈ +2,1 % et Monétaire ≈ +2,0 % passent en tête). Option : afficher le rang (1er…9e) dans chaque case.
 - [x] Étiqueter « 2023 (≈ 6 semaines, depuis le 17/11) » et « 2026 (jan.–oct.) » dans le graphique et le tableau.
 - [x] MASI 2026 = −7,7 % ici, −8,0 % et −12,2 % ailleurs : voir Priorité 1.
-- [ ] Ajouter une phrase sous le graphique : « Le prudent a perdu presque rien en 2026 (−0,5 %) mais n'a gagné qu'un tiers des actions en 2024–2025. »
+- [x] Ajouter une phrase sous le graphique : « Le prudent a perdu presque rien en 2026 (−0,5 %) mais n'a gagné qu'un tiers des actions en 2024–2025. »
 
 ### Onglet Corrélations (Résultat 17)
 
 - [x] À VÉRIFIER EN PRIORITÉ : le Monétaire a une corrélation de 0,40 à 0,53 avec tous les placements, MASI compris. C'est anormal pour un placement presque sans risque. Hypothèse : la semaine anormale à −1,22 % (voir Accueil) tombe une semaine où tout baisse et tire toutes les corrélations. Recalculer la matrice sans cette semaine (ou après correction de la donnée AMMC) et comparer. *(Vérifié : après correction des 3 semaines AMMC, 0,25 à 0,35.)*
-- [ ] Afficher seulement la moitié de la matrice (triangle) : chaque chiffre apparaît aujourd'hui deux fois.
-- [ ] Renforcer l'échelle de couleurs : 0,38 et 0,53 ont presque la même teinte ; utiliser une échelle plus contrastée entre 0 et 1.
-- [ ] Ajouter le constat sur les Diversifiés : corrélation 0,98 avec les fonds Actions, ils se comportent comme une « petite dose » d'actions, pas comme un mélange indépendant.
-- [ ] Préciser dans la carte : aucune corrélation n'est négative ; les obligations amortissent les chutes (0,38 avec le MASI) sans les compenser.
+- [x] Afficher seulement la moitié de la matrice (triangle) : chaque chiffre apparaît aujourd'hui deux fois.
+- [x] Renforcer l'échelle de couleurs : 0,38 et 0,53 ont presque la même teinte ; utiliser une échelle plus contrastée entre 0 et 1.
+- [x] Ajouter le constat sur les Diversifiés : corrélation 0,98 avec les fonds Actions, ils se comportent comme une « petite dose » d'actions, pas comme un mélange indépendant.
+- [x] Préciser dans la carte : aucune corrélation n'est négative ; les obligations amortissent les chutes (0,38 avec le MASI) sans les compenser.
 
 ### Onglet Fonds Actions et MASI (Résultat 18)
 
-- [ ] Erreur de raisonnement dans la carte : « Le MASI ne compte pas les dividendes : l'écart reflète les frais et les choix de gestion ». Comme les fonds encaissent les dividendes (≈ 3 %/an) et pas le MASI, l'écart réel est PLUS GRAND que 2,7 points (de l'ordre de 10 points sur la période). Corriger : « Le MASI ne compte pas les dividendes, que les fonds encaissent : à dividendes égaux, l'écart réel est plus grand. »
-- [ ] Idéalement, comparer à un indice dividendes inclus (indice de rentabilité du MASI, à vérifier sur le site de la Bourse de Casablanca) ou ajouter ≈ 3 %/an de dividendes au MASI en estimation, en le disant.
-- [ ] Le graphique met sur le même axe deux mesures différentes (rendement cumulé et volatilité annualisée). Le remplacer par deux courbes base 100 dans le temps (MASI et fonds Actions), qui montrent quand l'écart s'est creusé.
-- [ ] Ajouter le ratio d'information (écart moyen fonds − MASI ÷ volatilité de cet écart) et la tracking error : indicateurs classiques pour juger un gérant face à son indice.
+- [x] Erreur de raisonnement dans la carte : « Le MASI ne compte pas les dividendes : l'écart reflète les frais et les choix de gestion ». Comme les fonds encaissent les dividendes (≈ 3 %/an) et pas le MASI, l'écart réel est PLUS GRAND que 2,7 points (de l'ordre de 10 points sur la période). Corriger : « Le MASI ne compte pas les dividendes, que les fonds encaissent : à dividendes égaux, l'écart réel est plus grand. »
+- [ ] Idéalement, comparer à un indice dividendes inclus (indice de rentabilité du MASI, à vérifier sur le site de la Bourse de Casablanca) ou ajouter ≈ 3 %/an de dividendes au MASI en estimation, en le disant. *(Non fait : demande une recherche (indice de rentabilité du MASI) ou une estimation des dividendes à ajouter en dbt.)*
+- [x] Le graphique met sur le même axe deux mesures différentes (rendement cumulé et volatilité annualisée). Le remplacer par deux courbes base 100 dans le temps (MASI et fonds Actions), qui montrent quand l'écart s'est creusé. *(Nouveau modèle dbt synthese_base100 : deux courbes « 100 DH placés ».)*
+- [x] Ajouter le ratio d'information (écart moyen fonds − MASI ÷ volatilité de cet écart) et la tracking error : indicateurs classiques pour juger un gérant face à son indice. *(Nouveau modèle dbt synthese_fonds_vs_masi : tracking error 6,2 %, ratio d'information −0,08.)*
 
 ## Page Méthode et sources
 
-- [ ] BUG : le tableau « Fraîcheur des données » est vide (une seule ligne « — »). Vérifier la requête ou la vue qui l'alimente (droits de lecture du compte du site, nom de vue, schéma analytics). Attendu : une ligne par source (AMMC, MASI, courbe BAM, HCP, IPO, PER) avec sa dernière date.
+- [x] BUG : le tableau « Fraîcheur des données » est vide (une seule ligne « — »). Vérifier la requête ou la vue qui l'alimente (droits de lecture du compte du site, nom de vue, schéma analytics). Attendu : une ligne par source (AMMC, MASI, courbe BAM, HCP, IPO, PER) avec sa dernière date. *(Non reproduit le 10/11/2026 : en local, le tableau lit bien ses 7 sources sur Supabase. Probable version en cache sur Vercel lors d'une coupure de la base : à vérifier en ligne après le prochain déploiement.)*
 - [x] Le tableau qualité affirme « Chaque page indique sur quelle fréquence le chiffre est calculé » : ce n'est pas encore le cas (voir Priorité 1). Soit le réaliser, soit corriger la phrase.
-- [ ] Ajouter une phrase à la ligne « changement de méthode en mars 2023 » : « Avant le 21/03/2023, BAM publiait le taux de la dernière transaction de chaque bon, parfois vieux de plusieurs semaines ; depuis, une courbe de référence calculée chaque jour. Les résultats sont donc donnés sur les deux périodes. »
+- [x] Ajouter une phrase à la ligne « changement de méthode en mars 2023 » : « Avant le 21/03/2023, BAM publiait le taux de la dernière transaction de chaque bon, parfois vieux de plusieurs semaines ; depuis, une courbe de référence calculée chaque jour. Les résultats sont donc donnés sur les deux périodes. »
 - [x] Ajouter au tableau qualité, une fois vérifiés : la semaine anormale du monétaire (−1,22 %) et les pics du taux 13 semaines mi-2025. *(Les deux lignes sont dans le tableau qualité de la page Méthode.)*
-- [ ] Reformuler la limite « Le MASI sert d'approximation… les dividendes n'y sont pas comptés » en disant le sens du biais : « Le MASI exclut les dividendes (≈ 3 %/an) que les fonds encaissent : la comparaison avantage les fonds. »
-- [ ] Ajouter une section « Définitions des indicateurs » : Sharpe = (rendement annualisé − rendement du monétaire) ÷ volatilité ; volatilité (écart-type hebdo × √52) ; pire baisse ; composition des portefeuilles (prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70, rééquilibrés chaque semaine).
-- [ ] Ajouter un petit lexique pour les recruteurs non spécialistes : OPCVM, OMLT, OCT, monétaire, point de base, PER, sensibilité, corrélation, R², séance, sursouscription.
+- [x] Reformuler la limite « Le MASI sert d'approximation… les dividendes n'y sont pas comptés » en disant le sens du biais : « Le MASI exclut les dividendes (≈ 3 %/an) que les fonds encaissent : la comparaison avantage les fonds. »
+- [x] Ajouter une section « Définitions des indicateurs » : Sharpe = (rendement annualisé − rendement du monétaire) ÷ volatilité ; volatilité (écart-type hebdo × √52) ; pire baisse ; composition des portefeuilles (prudent 50/40/10, équilibré 20/40/40, dynamique 10/20/70, rééquilibrés chaque semaine).
+- [x] Ajouter un petit lexique pour les recruteurs non spécialistes : OPCVM, OMLT, OCT, monétaire, point de base, PER, sensibilité, corrélation, R², séance, sursouscription.
 - [x] La page dit qu'aucun chiffre n'est écrit à la main, « y compris dans les phrases » : l'inversion 4,6 / 4,1 de la carte Résultat 9 vient donc probablement du modèle de phrase (mauvais champ). Vérifier le code de cette carte.
 
 ## Relecture terminée

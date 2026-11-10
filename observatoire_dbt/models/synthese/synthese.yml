@@ -46,3 +46,17 @@ models:
         description: "Vrai si l'année n'est pas couverte en entier (macro annee_partielle)"
         tests:
           - not_null
+  - name: synthese_base100
+    description: Valeur de chaque placement et portefeuille en base 100 au premier vendredi de la période commune.
+    columns:
+      - name: base_100
+        tests:
+          - not_null
+  - name: synthese_fonds_vs_masi
+    description: >
+      Fonds Actions face au MASI : écart moyen annualisé (points), tracking error (volatilité annualisée de
+      l'écart hebdomadaire) et ratio d'information (écart moyen ÷ tracking error).
+    columns:
+      - name: tracking_error_pct
+        tests:
+          - not_null

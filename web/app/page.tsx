@@ -1,22 +1,13 @@
-import { Landmark, Percent, Rocket, Scale, TrendingUp, Wallet } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Landmark, Percent, Rocket, Scale, TrendingUp, Wallet } from "lucide-react";
 
 import { CarteKpi } from "@/components/observatoire/carte-kpi";
 import { CarteModule } from "@/components/observatoire/carte-module";
 import { CarteVedette } from "@/components/observatoire/carte-vedette";
 import { NuageRendementRisque } from "@/components/observatoire/nuage-rendement-risque";
-import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-triable";
 import { placements, type Placement } from "@/lib/donnees";
 import { compositions, pireDrawdown, sharpeExtremes } from "@/lib/donnees-pages";
 import { formatDateCourte, formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
-
-const colonnesPlacements: Colonne[] = [
-  { cle: "actif", libelle: "Placement" },
-  { cle: "rdt_cumule_pct", libelle: "Rendement cumulé", type: "pourcentage", colore: true },
-  { cle: "rdt_annualise_pct", libelle: "Annualisé", type: "pourcentage", colore: true },
-  { cle: "volatilite_pct", libelle: "Volatilité", type: "pourcentage", signe: false },
-  { cle: "pire_baisse_pct", libelle: "Pire baisse", type: "pourcentage", colore: true },
-  { cle: "ratio_rendement_risque", libelle: "Sharpe", type: "nombre" },
-];
 
 // OPCVM et marché actions partagent une page : les deux cartes mènent au bon onglet (ancres lues en E4).
 const MODULES = [
@@ -189,30 +180,25 @@ export default async function PageAccueil() {
         </div>
       </section>
 
-      {/* 5. Tableau triable des placements */}
-      <section aria-label="Tableau des placements" className="space-y-3">
-        <h2 className="text-base font-semibold">Tous les placements côte à côte</h2>
-        {lignes ? (
-          <TableauTriable
-            colonnes={colonnesPlacements}
-            lignes={lignes.map((l) => ({
-              ...l,
-              // Le Monétaire a un Sharpe stocké à 0,00 (non significatif) : on affiche « — » (docs/DATA.md).
-              ratio_rendement_risque:
-                l.actif === "Monétaire" ? null : l.ratio_rendement_risque,
-            }))}
-            legende="Rendement, risque et rendement par unité de risque de chaque placement"
-            triInitial={{ cle: "rdt_cumule_pct", sens: "desc" }}
-          />
-        ) : (
-          <p className="rounded-carte bg-carte p-6 text-sm text-texte-secondaire shadow-carte">
-            Données indisponibles.
-          </p>
-        )}
+      {/* 5. Le tableau détaillé est sur la page Synthèse (pas de doublon) ; ici, un lien et les notes. */}
+      <section aria-label="Tous les placements" className="space-y-3">
+        <Link
+          href="/synthese"
+          className="flex items-center justify-between gap-3 rounded-carte bg-carte p-5 shadow-carte transition-colors hover:bg-page"
+        >
+          <span>
+            <span className="block text-base font-semibold text-texte">Tous les placements côte à côte</span>
+            <span className="text-sm text-texte-secondaire">
+              Rendement, risque, pire baisse et Sharpe des {lignes?.length ?? "—"} placements et portefeuilles types,
+              dans la Synthèse quantitative.
+            </span>
+          </span>
+          <ArrowRight className="size-5 shrink-0 text-accent-fonce" aria-hidden="true" />
+        </Link>
         <div className="space-y-1.5 text-xs leading-relaxed text-texte-secondaire">
           <p>
             Sharpe = (rendement annualisé − celui des fonds monétaires, {tauxSansRisque}) ÷ volatilité. Les
-            fonds monétaires servent de taux sans risque, d&apos;où le « — ». Hors fonds obligataires court terme,
+            fonds monétaires servent de taux sans risque : leur Sharpe vaut 0 par construction. Hors fonds obligataires court terme,
             les écarts de Sharpe ({formatNombre(sharpe?.minimum)} à {formatNombre(sharpe?.maximum)}) sont trop
             faibles pour départager les placements sur une période aussi courte ({precisionRisque.charAt(0).toLowerCase()}
             {precisionRisque.slice(1)}). Les fonds CT ({formatNombre(oct?.ratio_rendement_risque)}) se distinguent

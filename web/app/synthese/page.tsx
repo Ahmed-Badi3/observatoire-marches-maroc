@@ -16,11 +16,20 @@ import { NuageRendementRisque } from "@/components/observatoire/nuage-rendement-
 import { Onglets } from "@/components/observatoire/onglets";
 import { TableauTriable, type Colonne } from "@/components/observatoire/tableau-triable";
 import { placements, type Placement } from "@/lib/donnees";
-import { compositions, correlations, sharpeExtremes, syntheseAnnuel, type Ligne } from "@/lib/donnees-pages";
+import {
+  base100Actions,
+  compositions,
+  correlations,
+  fondsVsMasi,
+  sharpeExtremes,
+  syntheseAnnuel,
+  type Ligne,
+} from "@/lib/donnees-pages";
+import { GraphiqueLignes } from "@/components/observatoire/graphique-lignes";
 import { BarreEmpilee } from "@/components/observatoire/barre-empilee";
 import { formatNombre, formatPeriode, formatPourcentage } from "@/lib/format";
 import { interpreterCorrelation } from "@/lib/interpretation";
-import { enNombre, etiqueterAnnees, type Jeu } from "@/lib/graphiques";
+import { enNombre, etiqueterAnnees, pivoter, type Jeu } from "@/lib/graphiques";
 
 export const metadata: Metadata = { title: "Synthèse quantitative" };
 
@@ -51,12 +60,23 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
     ...l,
     ratio_rendement_risque: l.actif === "Monétaire" ? null : l.ratio_rendement_risque,
   }));
+  // Barres du Sharpe : sans le Monétaire (taux sans risque, Sharpe nul par construction), triées par Sharpe,
+  // avec des noms courts (« Prudent » plutôt que « Portefeuille prudent », sinon coupés sous les barres).
   const sharpe: Jeu = {
     id: "sharpe",
     libelle: "Sharpe",
     series: [{ cle: "sharpe", libelle: "Rendement par unité de risque (Sharpe)" }],
-    donnees: lignesTableau.map((l) => ({ actif: l.actif, sharpe: enNombre(l.ratio_rendement_risque) })),
+    donnees: lignes
+      .filter((l) => l.actif !== "Monétaire")
+      .sort((a, b) => Number(b.ratio_rendement_risque) - Number(a.ratio_rendement_risque))
+      .map((l) => {
+        const court = l.actif.replace("Portefeuille ", "");
+        return { actif: court.charAt(0).toUpperCase() + court.slice(1), sharpe: enNombre(l.ratio_rendement_risque) };
+      }),
   };
+  const oct = lignes.find((l) => l.actif === "OCT");
+  const equilibre = lignes.find((l) => l.actif === PORTEFEUILLES[1]);
+  const monetaire = lignes.find((l) => l.actif === "Monétaire");
   return (
     <MiseEnPageResultat
       carte={
@@ -72,12 +92,12 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
             },
             {
               etiquette: "Fonds obligataires court terme (OCT)",
-              valeur: formatNombre(lignes.find((l) => l.actif === "OCT")?.ratio_rendement_risque),
+              valeur: formatNombre(oct?.ratio_rendement_risque),
             },
           ]}
           precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
           conclusion="Hors fonds de taux courts, aucun placement n'est nettement meilleur : on choisit son niveau de risque."
-          details="Les écarts de Sharpe entre les autres placements sont trop faibles pour les départager sur une période aussi courte. Les fonds CT ont un ratio élevé surtout parce que leur risque est très faible : le moindre surplus de rendement sur le monétaire, divisé par une volatilité minuscule, donne un grand nombre. Les trois portefeuilles types sont construits à partir des fonds (voir « Méthode et sources »)."
+          details={`Les écarts de Sharpe entre les autres placements sont trop faibles pour les départager sur une période aussi courte. Les fonds CT ont un ratio élevé surtout parce que leur risque est très faible : le moindre surplus de rendement sur le monétaire, divisé par une volatilité minuscule, donne un grand nombre. À retenir : ils apportent ${formatPourcentage(oct?.part_rdt_masi_pct, { decimales: 0, signe: false })} du rendement du MASI pour seulement ${formatPourcentage(oct?.part_risque_masi_pct, { decimales: 0, signe: false })} de son risque. Les trois portefeuilles types sont construits à partir des fonds (voir « Méthode et sources »).`}
         />
       }
       graphiques={
@@ -97,7 +117,7 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
           </CarteGraphique>
           <CarteGraphique
             titre="Par unité de risque, les placements se valent presque tous"
-            note="Sharpe = rendement annualisé divisé par la volatilité. Le Monétaire n'est pas affiché : son ratio n'est pas significatif."
+            note={`Sharpe = (rendement annualisé − celui des fonds monétaires, ${formatPourcentage(monetaire?.rdt_annualise_pct, { signe: false })} par an) ÷ volatilité. Le Monétaire sert de taux sans risque : son Sharpe vaut 0 par construction, il n'est donc pas affiché. Barres triées du plus élevé au plus faible.`}
           >
             <GraphiqueBarres
               jeux={[sharpe]}
@@ -120,6 +140,15 @@ function ongletRendementRisque(lignes: Placement[], extremes: Ligne[] | null) {
             legende="Rendement, risque et Sharpe de chaque placement"
             triInitial={{ cle: "rdt_cumule_pct", sens: "desc" }}
           />
+          <p className="mt-2 text-xs text-texte-secondaire">
+            « % du rendement du MASI » = rendement annualisé du placement ÷ celui du MASI (portefeuille équilibré :{" "}
+            {formatPourcentage(equilibre?.rdt_annualise_pct, { signe: false })} ÷{" "}
+            {formatPourcentage(masi?.rdt_annualise_pct, { signe: false })} ={" "}
+            {formatPourcentage(equilibre?.part_rdt_masi_pct, { decimales: 0, signe: false })}). « % du risque du MASI » =
+            volatilité du placement ÷ celle du MASI ({formatPourcentage(equilibre?.volatilite_pct, { signe: false })} ÷{" "}
+            {formatPourcentage(masi?.volatilite_pct, { signe: false })} ={" "}
+            {formatPourcentage(equilibre?.part_risque_masi_pct, { decimales: 0, signe: false })}).
+          </p>
         </div>
       }
     />
@@ -162,21 +191,37 @@ function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined, compo
   const derniere = annees[annees.length - 1];
   const prudent = etiquetes.find((l) => l.actif === PORTEFEUILLES[0] && l.annee === derniere);
   const dynamique = etiquetes.find((l) => l.actif === PORTEFEUILLES[2] && l.annee === derniere);
-  const actions = etiquetes.find((l) => l.actif === FONDS_ACTIONS && l.annee === derniere);
 
+  // Classement de chaque placement, année par année (tri des valeurs lues en base, 1 = meilleur).
+  const actifs = [...new Set(etiquetes.map((l) => String(l.actif)))];
+  const rang = (actif: string, annee: string) => {
+    const tries = etiquetes
+      .filter((l) => l.annee === annee)
+      .sort((a, b) => Number(b.rendement_pct) - Number(a.rendement_pct));
+    return tries.findIndex((l) => l.actif === actif) + 1;
+  };
+  const ordinal = (n: number) => (n === 1 ? "1er" : `${n}e`);
+  const anneesCompletes = annees.filter((a) =>
+    etiquetes.some((l) => l.annee === a && String(l.annee_partielle) === "false"),
+  );
+  const meilleureAnneeActions = anneesCompletes.reduce<string | undefined>(
+    (m, a) => (!m || rang(FONDS_ACTIONS, a) < rang(FONDS_ACTIONS, m) ? a : m),
+    undefined,
+  );
+  const ligneActions = (a: string | undefined) => etiquetes.find((l) => l.actif === FONDS_ACTIONS && l.annee === a);
+  const prudentComplet = anneesCompletes.map((a) => formatPourcentage(valeur(PORTEFEUILLES[0], a)));
+  const actionsComplet = anneesCompletes.map((a) => formatPourcentage(valeur(FONDS_ACTIONS, a)));
+
+  // Tableau : une ligne par placement (les 9, fonds de taux compris), une colonne par année, et le rang
+  // de la dernière année : on voit le classement changer.
   const colonnes: Colonne[] = [
-    { cle: "annee", libelle: "Année" },
-    ...[MASI, FONDS_ACTIONS, ...PORTEFEUILLES].map((a): Colonne => ({
-      cle: a,
-      libelle: a.replace("Portefeuille ", "Portef. "),
-      type: "pourcentage",
-      colore: true,
-    })),
+    { cle: "actif", libelle: "Placement" },
+    ...annees.map((a): Colonne => ({ cle: a, libelle: a, type: "pourcentage", colore: true })),
+    { cle: "rang", libelle: `Rang en ${derniere}`, type: "nombre", decimales: 0 },
   ];
-  const lignes = annees.map((a) => ({
-    annee: a,
-    ...Object.fromEntries([MASI, FONDS_ACTIONS, ...PORTEFEUILLES].map((x) => [x, valeur(x, a)])),
-  }));
+  const lignes = actifs
+    .map((x) => ({ actif: x, ...Object.fromEntries(annees.map((a) => [a, valeur(x, a)])), rang: rang(x, derniere) }))
+    .sort((a, b) => a.rang - b.rang);
 
   return (
     <MiseEnPageResultat
@@ -187,18 +232,26 @@ function ongletAnnees(annuel: Ligne[] | null, masi: Placement | undefined, compo
           theme="Classement des placements"
           constat="Le classement des placements change d'une année à l'autre."
           tuiles={[
-            { etiquette: `Fonds Actions en ${derniere}`, valeur: formatPourcentage(actions?.rendement_pct) },
-            { etiquette: "Portefeuille prudent, même période", valeur: formatPourcentage(prudent?.rendement_pct) },
+            {
+              etiquette: `Fonds Actions en ${meilleureAnneeActions ?? "—"}, sur ${actifs.length} placements`,
+              valeur: meilleureAnneeActions ? ordinal(rang(FONDS_ACTIONS, meilleureAnneeActions)) : "—",
+              interpretation: formatPourcentage(ligneActions(meilleureAnneeActions)?.rendement_pct),
+            },
+            {
+              etiquette: `Fonds Actions en ${derniere}, sur ${actifs.length} placements`,
+              valeur: ordinal(rang(FONDS_ACTIONS, derniere)),
+              interpretation: formatPourcentage(ligneActions(derniere)?.rendement_pct),
+            },
           ]}
           precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
           conclusion="Choisissez un portefeuille au-dessus du graphique pour le comparer au MASI et aux fonds Actions."
-          details={`Portefeuille dynamique sur la même période : ${formatPourcentage(dynamique?.rendement_pct)}.`}
+          details={`En ${derniere}, portefeuille prudent : ${formatPourcentage(prudent?.rendement_pct)} ; portefeuille dynamique : ${formatPourcentage(dynamique?.rendement_pct)}. Le tableau sous le graphique donne le rang de chaque placement.`}
         />
       }
       graphiques={
         <CarteGraphique
           titre="Un portefeuille prudent limite les années de baisse, au prix des années de hausse"
-          note="Rendement par année civile, sur les vendredis AMMC. Entre parenthèses, les mois couverts quand l'année est incomplète. Les portefeuilles types sont construits à partir des fonds (voir « Méthode et sources »)."
+          note={`Rendement par année civile, sur les vendredis AMMC. Entre parenthèses, les mois couverts quand l'année est incomplète. Le portefeuille prudent a limité la perte à ${formatPourcentage(prudent?.rendement_pct)} en ${derniere}, mais n'a gagné que ${prudentComplet.join(" et ")} en ${anneesCompletes.join(" et ")}, contre ${actionsComplet.join(" et ")} pour les fonds Actions.`}
         >
           <GraphiqueBarres
             jeux={jeux}
@@ -256,6 +309,8 @@ function ongletCorrelations(paires: Ligne[] | null, masi: Placement | undefined)
   const cellules: CelluleChaleur[] = presents.flatMap((l) =>
     presents.map((c) => ({ ligne: l, colonne: c, valeur: corr(l, c) })),
   );
+  const aucuneNegative = paires.every((p) => Number(p.correlation) >= 0);
+  const diversifiesActions = corr("Fonds Diversifiés", FONDS_ACTIONS);
   return (
     <MiseEnPageResultat
       carte={
@@ -278,7 +333,7 @@ function ongletCorrelations(paires: Ligne[] | null, masi: Placement | undefined)
           ]}
           precision={`Corrélations des rendements · ${formatPeriode(masi?.debut, masi?.fin, "hebdo", { horsDividendes: false })}`}
           conclusion="Les fonds de taux bougent bien moins avec le MASI que les fonds Actions : c'est ce qui amortit les chutes."
-          details={`MASI ↔ fonds obligataires CT (OCT) : ${formatNombre(corr(MASI, "OCT"))}, ${interpreterCorrelation(corr(MASI, "OCT")) ?? "—"}. Plus la corrélation est proche de 0, plus deux placements bougent indépendamment.`}
+          details={`${aucuneNegative ? "Aucune corrélation n'est négative : les obligations amortissent les chutes des actions, sans les compenser. " : ""}MASI ↔ fonds obligataires CT (OCT) : ${formatNombre(corr(MASI, "OCT"))}, ${interpreterCorrelation(corr(MASI, "OCT")) ?? "—"}. Les fonds Diversifiés ne sont pas un mélange indépendant : corrélation de ${formatNombre(diversifiesActions)} avec les fonds Actions (${interpreterCorrelation(diversifiesActions) ?? "—"}), ils se comportent comme une « petite dose » d'actions. Plus la corrélation est proche de 0, plus deux placements bougent indépendamment.`}
         />
       }
       graphiques={
@@ -290,6 +345,7 @@ function ongletCorrelations(paires: Ligne[] | null, masi: Placement | undefined)
             etiquettes={presents}
             cellules={cellules}
             legende="Corrélation entre les rendements hebdomadaires de chaque paire de placements"
+            triangle
           />
         </CarteGraphique>
       }
@@ -298,19 +354,18 @@ function ongletCorrelations(paires: Ligne[] | null, masi: Placement | undefined)
 }
 
 /* ---------- Résultat 18 : fonds Actions vs MASI ---------- */
-function ongletFondsActions(lignes: Placement[]) {
+function ongletFondsActions(lignes: Placement[], base100: Ligne[] | null, gestion: Ligne[] | null) {
   const masi = lignes.find((l) => l.actif === MASI);
   const actions = lignes.find((l) => l.actif === FONDS_ACTIONS);
+  const g = gestion?.[0];
+  // Deux courbes base 100 dans le temps (au lieu de deux mesures différentes sur le même axe).
+  const { donnees, series } = pivoter(base100 ?? [], "date", "actif", "base_100");
+  const couleurs: Record<string, string> = { [MASI]: "var(--serie-2)", [FONDS_ACTIONS]: "var(--serie-1)" };
   const jeu: Jeu = {
-    id: "fa",
-    libelle: "Comparaison",
-    series: [
-      { cle: "rendement", libelle: "Rendement cumulé", couleur: "var(--serie-1)" },
-      { cle: "volatilite", libelle: "Volatilité annualisée", couleur: "var(--serie-6)" },
-    ],
-    donnees: [masi, actions]
-      .filter((l): l is Placement => !!l)
-      .map((l) => ({ actif: l.actif, rendement: enNombre(l.rdt_cumule_pct), volatilite: enNombre(l.volatilite_pct) })),
+    id: "base100",
+    libelle: "Base 100",
+    donnees,
+    series: series.map((s) => ({ cle: s, libelle: s, couleur: couleurs[s] })),
   };
   return (
     <MiseEnPageResultat
@@ -325,22 +380,23 @@ function ongletFondsActions(lignes: Placement[]) {
             { etiquette: "MASI, rendement cumulé", valeur: formatPourcentage(masi?.rdt_cumule_pct) },
           ]}
           precision={formatPeriode(masi?.debut, masi?.fin, "hebdo")}
-          conclusion="Les fonds rapportent un peu moins que l'indice qu'ils cherchent à suivre."
-          details={`Volatilité : ${formatPourcentage(actions?.volatilite_pct, { signe: false })} pour les fonds Actions, contre ${formatPourcentage(masi?.volatilite_pct, { signe: false })} pour le MASI. Le MASI ne compte pas les dividendes : l'écart reflète les frais et les choix de gestion.`}
+          conclusion={`Les fonds rapportent un peu moins que l'indice qu'ils cherchent à suivre${
+            g ? `, en s'en écartant nettement : tracking error ${formatPourcentage(g.tracking_error_pct, { signe: false })}, ratio d'information ${formatNombre(g.ratio_information, { signe: true })}` : ""
+          }.`}
+          details={`Volatilité : ${formatPourcentage(actions?.volatilite_pct, { signe: false })} pour les fonds Actions, contre ${formatPourcentage(masi?.volatilite_pct, { signe: false })} pour le MASI. Tracking error = à quel point le fonds s'écarte de l'indice, dans un sens ou dans l'autre (volatilité de l'écart hebdomadaire, sur un an). Ratio d'information = écart moyen ÷ tracking error : ce que cet écart a rapporté par unité d'écart pris ; négatif, il a coûté. Le MASI ne compte pas les dividendes, que les fonds encaissent : à dividendes égaux, l'écart réel de gestion est plus grand que celui affiché.`}
         />
       }
       graphiques={
         <CarteGraphique
-          titre="Les fonds Actions rapportent un peu moins que l'indice qu'ils cherchent à suivre"
-          note="Sur la même période, chaque vendredi AMMC. Le MASI est hors dividendes ; les fonds, eux, les encaissent. Sources : AMMC, Bourse de Casablanca."
+          titre="100 DH placés dans le MASI ou dans les fonds Actions"
+          note="Valeur de 100 DH placés le premier vendredi de la période, semaine après semaine (chaque vendredi AMMC). Le MASI est hors dividendes ; les fonds, eux, les encaissent. Sources : AMMC, Bourse de Casablanca."
         >
-          <GraphiqueBarres
+          <GraphiqueLignes
             jeux={[jeu]}
-            cleX="actif"
-            format="pourcentage"
+            format="nombre"
+            decimalesAxe={0}
             decimalesInfo={1}
-            hauteur={260}
-            description="Rendement cumulé et volatilité du MASI et des fonds Actions"
+            description="Valeur en base 100 du MASI et des fonds Actions, semaine par semaine"
           />
         </CarteGraphique>
       }
@@ -354,6 +410,8 @@ export default async function PageSynthese() {
   const annuel = await syntheseAnnuel();
   const compo = await compositions();
   const paires = await correlations();
+  const base100 = await base100Actions();
+  const gestion = await fondsVsMasi();
 
   // Bandeau de KPI : chiffres de la synthèse, et en pastille le chiffre de comparaison lu en base.
   const masi = lignes?.find((l) => l.actif === MASI);
@@ -412,7 +470,7 @@ export default async function PageSynthese() {
           {
             id: "fonds-actions",
             libelle: "Fonds Actions et MASI",
-            contenu: lignes ? ongletFondsActions(lignes) : <Indisponible />,
+            contenu: lignes ? ongletFondsActions(lignes, base100, gestion) : <Indisponible />,
           },
         ]}
       />
