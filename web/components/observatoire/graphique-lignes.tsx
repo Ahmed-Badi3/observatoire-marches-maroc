@@ -52,6 +52,7 @@ export function GraphiqueLignes({
   points = false,
   reference,
   zoneGrisee,
+  repereX,
   ligneZero = false,
   decimalesAxe = 0,
   decimalesInfo,
@@ -69,6 +70,7 @@ export function GraphiqueLignes({
   points?: boolean; // un point visible sur chaque donnée
   reference?: { valeur: number | null; libelle: string }; // ligne horizontale en pointillé (ex. PER moyen)
   zoneGrisee?: { jusquAu: string; libelle: string }; // période grisée au début de l'axe des dates (AAAA-MM-JJ)
+  repereX?: { valeur: string; libelle: string }; // trait vertical sur un axe de textes (ex. 20e séance)
   ligneZero?: boolean;
   decimalesAxe?: number;
   decimalesInfo?: number;
@@ -186,6 +188,14 @@ export function GraphiqueLignes({
               domain={["auto", "auto"]}
             />
             {ligneZero && <ReferenceLine y={0} stroke="var(--texte-secondaire)" strokeDasharray="4 4" />}
+            {!avecDates && repereX && (
+              <ReferenceLine
+                x={repereX.valeur}
+                stroke="var(--texte-secondaire)"
+                strokeDasharray="4 4"
+                label={{ value: repereX.libelle, position: "insideTopRight", fontSize: 11, fill: "var(--texte-secondaire)" }}
+              />
+            )}
             {reference && reference.valeur !== null && (
               <ReferenceLine
                 y={reference.valeur}

@@ -125,3 +125,21 @@ export function etiqueterAnnees<T extends Record<string, unknown>>(
   }
   return lignes.map((l) => ({ ...l, annee: etiquettes.get(String(l.annee)) ?? String(l.annee), annee_brute: String(l.annee) }));
 }
+
+// Graduations « rondes » pour l'axe vertical d'un graphique en barres : pas de 1, 2, 2,5 ou 5 × 10^n,
+// zéro toujours inclus. Exemple : de −5 à 37 → −10, 0, 10, 20, 30, 40. Dessin de l'axe seulement.
+export function graduationsRondes(valeurs: (number | null)[], nbVise = 5): number[] | undefined {
+  const nombres = valeurs.filter((v): v is number => v !== null && Number.isFinite(v));
+  if (nombres.length === 0) return undefined;
+  const min = Math.min(0, ...nombres);
+  const max = Math.max(0, ...nombres);
+  if (min === max) return undefined;
+  const brut = (max - min) / nbVise;
+  const puissance = Math.pow(10, Math.floor(Math.log10(brut)));
+  const pas = [1, 2, 2.5, 5, 10].map((m) => m * puissance).find((p) => p >= brut) ?? 10 * puissance;
+  const graduations: number[] = [];
+  for (let v = Math.floor(min / pas) * pas; v <= Math.ceil(max / pas) * pas + pas / 2; v += pas) {
+    graduations.push(Math.round(v * 1e6) / 1e6);
+  }
+  return graduations;
+}

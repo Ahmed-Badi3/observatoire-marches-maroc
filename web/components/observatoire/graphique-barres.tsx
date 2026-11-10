@@ -14,7 +14,7 @@ import {
   YAxis,
 } from "recharts";
 
-import { couleurSerie, enNombre, formateur, type FormatValeur, type Jeu } from "@/lib/graphiques";
+import { couleurSerie, enNombre, formateur, graduationsRondes, type FormatValeur, type Jeu } from "@/lib/graphiques";
 import { InfoBulle, Legende } from "./graphique-commun";
 import { Segments } from "./segments";
 
@@ -84,6 +84,10 @@ export function GraphiqueBarres({
   const libelles = Object.fromEntries(jeu.series.map((s) => [s.cle, s.libelle]));
   const formatInfo = formateur(format, { decimales: decimalesInfo, signe: signeInfo });
   const formatAxe = formateur(format, { decimales: decimalesAxe, signe: false });
+  // Graduations rondes (0, 10, 20…) calculées sur les séries affichées.
+  const graduations = graduationsRondes(
+    jeu.donnees.flatMap((r) => jeu.series.filter((s) => !masquees.has(s.cle)).map((s) => enNombre(r[s.cle]))),
+  );
 
   function basculer(cle: string) {
     setMasquees((actuel) => {
@@ -125,6 +129,8 @@ export function GraphiqueBarres({
             />
             <YAxis
               width={52}
+              ticks={empile ? undefined : graduations}
+              domain={!empile && graduations ? [graduations[0], graduations[graduations.length - 1]] : undefined}
               tickFormatter={formatAxe}
               tick={{ fontSize: 12, fill: "var(--texte-secondaire)" }}
               axisLine={false}

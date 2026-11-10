@@ -142,3 +142,15 @@ describe("mois et année (axes des graphiques)", () => {
     expect(formatMoisAnnee(null)).toBe("—");
   });
 });
+
+import { graduationsRondes } from "./graphiques";
+
+describe("graduations rondes de l'axe vertical", () => {
+  it("pas rond et zéro inclus", () => {
+    expect(graduationsRondes([13.5, 36.4, 20])).toEqual([0, 10, 20, 30, 40]);
+    expect(graduationsRondes([-5, 37])).toEqual([-10, 0, 10, 20, 30, 40]);
+  });
+  it("aucune donnée", () => {
+    expect(graduationsRondes([null])).toBeUndefined();
+  });
+});

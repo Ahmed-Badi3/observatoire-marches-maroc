@@ -27,7 +27,8 @@ export function Jauge({
   return (
     <svg viewBox="0 0 100 56" className={className} aria-hidden="true">
       <path d={arc} fill="none" stroke={fond} strokeWidth="10" strokeLinecap="round" />
-      <path
+      {/* Rien à remplir pour 0 : sinon le bout arrondi du trait dessinerait un point */}
+      {rempli > 0 && <path
         d={arc}
         fill="none"
         stroke={couleur}
@@ -35,7 +36,7 @@ export function Jauge({
         strokeLinecap="round"
         strokeDasharray={`${rempli} ${LONGUEUR_ARC}`}
         className="jauge-remplissage"
-      />
+      />}
     </svg>
   );
 }

@@ -20,3 +20,15 @@ models:
       - name: prix_ipo
         tests:
           - not_null
+
+  - name: ipo_trajectoires
+    description: >
+      Cours de chaque IPO cotée en base 100 au prix d'introduction, séance par séance, de 0 (prix d'IPO) à 120.
+      Pour le graphique « Trajectoire après l'introduction » du site.
+    columns:
+      - name: ticker
+        tests:
+          - not_null
+      - name: base_100
+        tests:
+          - not_null

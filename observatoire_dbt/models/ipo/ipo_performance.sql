@@ -66,6 +66,7 @@ base as (
         p.nb_seances,
         p.d_dernier,
         p.c_j1, p.c_j5, p.c_m1, p.c_m6, p.c_a1, p.c_dernier,
+        p.d_m1,
         mv.cloture   as masi_veille,
         mj1.cloture  as masi_j1,
         mj5.cloture  as masi_j5,
@@ -128,6 +129,12 @@ select
 
     -- achat en bourse au cours de la 20e séance (≈ 1 mois), gardé jusqu'au dernier cours (%)
     c_m1                                                                as cours_j20,
-    round((c_dernier / c_m1 - 1) * 100, 2)                              as rdt_achat_j20_pct
+    round((c_dernier / c_m1 - 1) * 100, 2)                              as rdt_achat_j20_pct,
+
+    -- même achat comparé au MASI sur la même période (de la 20e séance au dernier cours)
+    d_m1                                                                as date_achat_j20,
+    d_dernier - d_m1                                                    as duree_detention_jours,
+    round((masi_dernier / masi_m1 - 1) * 100, 2)                        as masi_depuis_j20_pct,
+    round((c_dernier / c_m1 - masi_dernier / masi_m1) * 100, 2)         as anormal_achat_j20_pts
 from base
 order by date_premiere_cotation

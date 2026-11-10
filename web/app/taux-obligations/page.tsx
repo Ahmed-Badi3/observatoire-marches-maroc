@@ -441,7 +441,7 @@ function ongletCourbe(courbes: Ligne[] | null, serie: Ligne[] | null) {
       id: "temps",
       libelle: "Taux",
       donnees: p.donnees,
-      series: p.series.map((s, i) => ({
+      series: p.series.map((s) => ({
         cle: s,
         libelle: noms[s] ?? s,
         // Couleurs différentes de celles du graphique des courbes (où le sarcelle = la courbe la plus récente).

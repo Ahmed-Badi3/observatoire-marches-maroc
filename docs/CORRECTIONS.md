@@ -204,34 +204,34 @@ Source : vidéo d'Ahmed (reel « Sales pipeline CRM dashboard », compte code\_a
 
 ### Onglet Performance face au MASI (Résultat 12)
 
-- [ ] Nuance indispensable sur la carte : avec des sursouscriptions de 34x à 64x, un souscripteur n'a reçu qu'environ 1,5 à 3 % des actions demandées. Ajouter : « Mais avec 34x à 64x de sursouscription, le gain réel reste très faible : ≈ +0,73 DH pour 100 DH demandés sur SGTM. » (chiffres déjà calculés en phase 3 ; vérifier s'ils sont dans un autre onglet).
-- [ ] Ajouter la taille et le contexte de l'échantillon : « 6 IPO, presque toutes lancées pendant la hausse de 2024–2025 : résultat indicatif. »
-- [ ] Dater les chiffres : « dernier cours au JJ/MM/2026 » sous le tableau (les écarts changent chaque jour).
-- [ ] Préciser que l'écart avec le MASI est calculé sur une période différente pour chaque IPO (de sa 1re cotation à aujourd'hui), et si les rendements sont hors dividendes comme le MASI.
-- [ ] Axe vertical du graphique : graduations rondes (0, 10, 20, 30, 40 pts) au lieu de 13 / 26 / 39.
-- [ ] Renommer la colonne « Achat à la 20e séance » en « Acheté en bourse après 1 mois et gardé jusqu'à aujourd'hui ».
-- [ ] Expliquer « Sursouscription 34,7x » dans une note : « la demande a été 34,7 fois plus grande que le nombre d'actions offertes ».
-- [ ] Laprophan : ajouter une ligne « à venir » (souscription du 9 au 17/11/2026, prix 341 DH), puis ses chiffres après la 1re cotation.
+- [x] Nuance indispensable sur la carte : avec des sursouscriptions de 34x à 64x, un souscripteur n'a reçu qu'environ 1,5 à 3 % des actions demandées. Ajouter : « Mais avec 34x à 64x de sursouscription, le gain réel reste très faible : ≈ +0,73 DH pour 100 DH demandés sur SGTM. » (chiffres déjà calculés en phase 3 ; vérifier s'ils sont dans un autre onglet). *(Gain réel lu dans analytics.ipo_performance.gain_pour_100_dh_demandes (connu pour 3 IPO sur 6 : SGTM +0,73 DH).)*
+- [x] Ajouter la taille et le contexte de l'échantillon : « 6 IPO, presque toutes lancées pendant la hausse de 2024–2025 : résultat indicatif. » *(Écrit avec le nombre d'IPO et la période de cotation lus en base ; « presque toutes pendant la hausse » non affirmé.)*
+- [x] Dater les chiffres : « dernier cours au JJ/MM/2026 » sous le tableau (les écarts changent chaque jour).
+- [x] Préciser que l'écart avec le MASI est calculé sur une période différente pour chaque IPO (de sa 1re cotation à aujourd'hui), et si les rendements sont hors dividendes comme le MASI.
+- [x] Axe vertical du graphique : graduations rondes (0, 10, 20, 30, 40 pts) au lieu de 13 / 26 / 39.
+- [x] Renommer la colonne « Achat à la 20e séance » en « Acheté en bourse après 1 mois et gardé jusqu'à aujourd'hui ».
+- [x] Expliquer « Sursouscription 34,7x » dans une note : « la demande a été 34,7 fois plus grande que le nombre d'actions offertes ».
+- [ ] Laprophan : ajouter une ligne « à venir » (souscription du 9 au 17/11/2026, prix 341 DH), puis ses chiffres après la 1re cotation. *(Non fait : c'est la tâche F3 de docs/TASKS.md (procédure manuelle d'Ahmed).)*
 
 ### Onglet Premier jour (Résultat 13)
 
-- [ ] Ajouter l'explication du +61,0 % : Vicenne, Cash Plus et SGTM ont exactement +61 % en 5 séances parce qu'elles ont touché le plafond de +10 % chaque jour pendant 5 jours (1,10 × 1,10 × 1,10 × 1,10 × 1,10 ≈ 1,61). Phrase : « Trois IPO ont atteint le plafond quotidien 5 jours de suite : la demande dépassait l'offre et le prix ne pouvait pas monter plus vite. »
-- [ ] Carte : « Meilleur gain en 5 séances » laisse croire à une seule IPO ; écrire « +61,0 % pour 3 IPO sur 6 (Vicenne, Cash Plus, SGTM) ».
-- [ ] Vérifier pourquoi T2S fait +20 % le 1er jour alors que les autres sont plafonnées à ≈ +10 % (seuil de variation modifié en 2026 ? règle spéciale le jour d'introduction ?). Citer la source une fois trouvée.
-- [ ] Ajouter que pour T2S et Cash Plus, la hausse s'arrête dès la 1re semaine (5 séances > 1 mois), contrairement au titre « la hausse se poursuit bien après le premier jour ».
-- [ ] Le tableau « Les introductions en bourse, une par une » est répété sous chaque onglet : le placer une seule fois sous les onglets.
+- [x] Ajouter l'explication du +61,0 % : Vicenne, Cash Plus et SGTM ont exactement +61 % en 5 séances parce qu'elles ont touché le plafond de +10 % chaque jour pendant 5 jours (1,10 × 1,10 × 1,10 × 1,10 × 1,10 ≈ 1,61). Phrase : « Trois IPO ont atteint le plafond quotidien 5 jours de suite : la demande dépassait l'offre et le prix ne pouvait pas monter plus vite. » *(Le plafond de +10 % par séance est écrit dans l'explication (règle de la Bourse, pas une donnée de la base).)*
+- [x] Carte : « Meilleur gain en 5 séances » laisse croire à une seule IPO ; écrire « +61,0 % pour 3 IPO sur 6 (Vicenne, Cash Plus, SGTM) ».
+- [ ] Vérifier pourquoi T2S fait +20 % le 1er jour alors que les autres sont plafonnées à ≈ +10 % (seuil de variation modifié en 2026 ? règle spéciale le jour d'introduction ?). Citer la source une fois trouvée. *(Non fait : demande une recherche sur les règles de la Bourse de Casablanca (seuil de variation le jour d'introduction).)*
+- [x] Ajouter que pour T2S et Cash Plus, la hausse s'arrête dès la 1re semaine (5 séances > 1 mois), contrairement au titre « la hausse se poursuit bien après le premier jour ».
+- [x] Le tableau « Les introductions en bourse, une par une » est répété sous chaque onglet : le placer une seule fois sous les onglets.
 
 ### Structure de la page IPO
 
-- [ ] Les onglets se répètent : même tableau et mêmes chiffres (5 séances, 1 mois) sous chaque onglet. Option recommandée : remplacer les onglets « Premier jour » et « Achat après un mois » par un seul graphique « Trajectoire après l'introduction » (une ligne par IPO, base 100 au prix d'IPO, des séances 0 à 120), avec le jour 20 marqué d'un trait vertical. On y voit d'un coup le plafond des premiers jours, le pic, puis la redescente.
-- [ ] Garder ensuite : carte Résultat 12 (face au MASI) + carte Résultat 13 (plafond +61 %) + carte « achat après un mois : perte dans 5 cas sur 6 » + le tableau une seule fois.
+- [x] Les onglets se répètent : même tableau et mêmes chiffres (5 séances, 1 mois) sous chaque onglet. Option recommandée : remplacer les onglets « Premier jour » et « Achat après un mois » par un seul graphique « Trajectoire après l'introduction » (une ligne par IPO, base 100 au prix d'IPO, des séances 0 à 120), avec le jour 20 marqué d'un trait vertical. On y voit d'un coup le plafond des premiers jours, le pic, puis la redescente. *(Page restructurée : 3 cartes, graphique « Trajectoire après l'introduction » (nouveau modèle dbt ipo_trajectoires), écart avec le MASI, achat après un mois face au MASI, tableau unique.)*
+- [x] Garder ensuite : carte Résultat 12 (face au MASI) + carte Résultat 13 (plafond +61 %) + carte « achat après un mois : perte dans 5 cas sur 6 » + le tableau une seule fois.
 
 ### Onglet Achat après un mois (Résultat 14)
 
-- [ ] Comparer au MASI sur la même période (de la 20e séance à aujourd'hui) : une partie des pertes vient de la baisse générale du marché en 2026. Ajouter une colonne ou une 2e barre « MASI sur la même période », et l'écart en points.
-- [ ] Indiquer la durée de détention de chaque achat (CFG ≈ 3 ans, T2S ≈ 3 mois) : les résultats ne se comparent pas directement. Option : ajouter le rendement annualisé.
-- [ ] Expliquer l'exception CFG Bank (+20,2 %) : achetée début 2024, au début de la hausse du marché, et gardée presque 3 ans.
-- [ ] Harmoniser la date : « gardé jusqu'au 3 novembre 2026 » alors que le reste du site est au 23/10/2026.
+- [x] Comparer au MASI sur la même période (de la 20e séance à aujourd'hui) : une partie des pertes vient de la baisse générale du marché en 2026. Ajouter une colonne ou une 2e barre « MASI sur la même période », et l'écart en points. *(Nouvelles colonnes dbt masi_depuis_j20_pct et anormal_achat_j20_pts : les 6 achats font moins bien que le MASI (−3 à −32 pts), CFG Bank compris (+20,2 % contre +30,6 %).)*
+- [x] Indiquer la durée de détention de chaque achat (CFG ≈ 3 ans, T2S ≈ 3 mois) : les résultats ne se comparent pas directement. Option : ajouter le rendement annualisé. *(Colonne duree_detention_jours (dbt) dans le tableau ; rendement annualisé non affiché (trompeur sur 2 mois pour T2S).)*
+- [x] Expliquer l'exception CFG Bank (+20,2 %) : achetée début 2024, au début de la hausse du marché, et gardée presque 3 ans.
+- [x] Harmoniser la date : « gardé jusqu'au 3 novembre 2026 » alors que le reste du site est au 23/10/2026. *(Les cours des IPO et le MASI quotidien vont plus loin que les données AMMC : la date du dernier cours est écrite sous le tableau et dans la carte.)*
 
 ## Page Synthèse quantitative
 

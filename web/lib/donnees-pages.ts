@@ -307,10 +307,22 @@ async function lireIpo() {
     SELECT ticker, societe, to_char(date_premiere_cotation, 'YYYY-MM-DD') AS date_premiere_cotation,
            sursouscription, rdt_j1_pct, rdt_j5_pct, rdt_1m_pct, rdt_depuis_ipo_pct,
            masi_depuis_ipo_pct, anormal_depuis_ipo_pts, rdt_achat_j20_pct,
-           to_char(date_dernier_cours, 'YYYY-MM-DD') AS date_dernier_cours
+           to_char(date_dernier_cours, 'YYYY-MM-DD') AS date_dernier_cours,
+           taux_satisfaction_pct, gain_pour_100_dh_demandes,
+           to_char(date_achat_j20, 'YYYY-MM-DD') AS date_achat_j20, duree_detention_jours,
+           masi_depuis_j20_pct, anormal_achat_j20_pts
     FROM analytics.ipo_performance ORDER BY date_premiere_cotation`);
 }
 export const ipo = () => sur("IPO", lireIpo);
+
+async function lireTrajectoires() {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 86400, expire: 604800 });
+  return plat(await sql()`
+    SELECT societe, n_seance, base_100
+    FROM analytics.ipo_trajectoires ORDER BY n_seance, societe`);
+}
+export const trajectoiresIpo = () => sur("trajectoires des IPO", lireTrajectoires);
 
 async function lireIpoResume() {
   "use cache";
